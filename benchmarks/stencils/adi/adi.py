@@ -18,6 +18,7 @@ from benchmarks.polybench import PolyBench
 from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
+import numpy as np
 
 
 class Adi(PolyBench):
@@ -26,10 +27,14 @@ class Adi(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        if implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -52,7 +57,7 @@ class Adi(PolyBench):
         q = self.create_array(2, [self.N, self.N], self.DATA_TYPE(0))
 
         # Initialize data structures
-        self.initialize_array(u)
+        self.initialize_array(u, v, p, q)
 
         # Benchmark the kernel
         self.time_kernel(u, v, p, q)
@@ -79,7 +84,7 @@ class _StrategyList(Adi):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, u: list):
+    def initialize_array(self, u: list, v: list, p: list, q: list):
         for i in range(0, self.N):
             for j in range(0, self.N):
                 u[i][j] = self.DATA_TYPE(i + self.N - j) / self.N
@@ -136,6 +141,61 @@ class _StrategyList(Adi):
                     u[i][j] = p[i][j] * u[i][j+1] + q[i][j]
 #scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, u: list, v: list, p: list, q: list):
+#scop begin
+        DY = 1.0/self.DATA_TYPE(self.N)
+        DT = 1.0/self.DATA_TYPE(self.TSTEPS)
+        B1 = 2.0
+        B2 = 1.0
+        mul2 = B2 * DT / (DY * DY)
+        e = 1.0+mul2
+        d = -mul2 / 2.0
+        DX = 1.0/self.DATA_TYPE(self.N)
+        f = d
+        mul1 = B1 * DT / (DX * DX)
+        b = 1.0+mul1
+        a = -mul1 / 2.0
+        c = a
+        if((self.N-3>= 0)):
+            for c1 in range (1 , (self.TSTEPS)+1):
+                for c17 in range (1 , (self.N-2)+1):
+                    v[self.N-1][c17] = 1.0
+                for c17 in range (1 , (self.N-2)+1):
+                    p[c17][0] = 0.0
+                for c17 in range (1 , (self.N-2)+1):
+                    for c18 in range (1 , (self.N-2)+1):
+                        p[c17][c18] = -c / (a*p[c17][c18-1]+b)
+                for c17 in range (1 , (self.N-2)+1):
+                    v[0][c17] = 1.0
+                for c17 in range (1 , (self.N-2)+1):
+                    q[c17][0] = v[0][c17]
+                for c17 in range (1 , (self.N-2)+1):
+                    for c18 in range (1 , (self.N-2)+1):
+                        q[c17][c18] = (-d*u[c18][c17-1]+(1.0+2.0*d)*u[c18][c17] - f*u[c18][c17+1]-a*q[c17][c18-1])/(a*p[c17][c18-1]+b)
+                for c17 in range (1 , (self.N-2)+1):
+                    u[c17][0] = 1.0
+                    p[c17][0] = 0.0
+                    u[c17][self.N-1] = 1.0
+                for c17 in range (1 , (self.N-2)+1):
+                    q[c17][0] = u[c17][0]
+                for c17 in range (1 , (self.N-2)+1):
+                    for c18 in range (1 , (self.N-2)+1):
+                        v[self.N-1-c18][c17] = p[c17][self.N-1-c18] * v[self.N-c18][c17] + q[c17][self.N-1-c18]
+                for c17 in range (1 , (self.N-2)+1):
+                    for c18 in range (1 , (self.N-2)+1):
+                        p[c17][c18] = -f / (d*p[c17][c18-1]+e)
+                for c17 in range (1 , (self.N-2)+1):
+                    for c18 in range (1 , (self.N-2)+1):
+                        q[c17][c18] = (-a*v[c17-1][c18]+(1.0+2.0*a)*v[c17][c18] - c*v[c17+1][c18]-d*q[c17][c18-1])/(d*p[c17][c18-1]+e)
+                for c17 in range (1 , (self.N-2)+1):
+                    for c18 in range (1 , (self.N-2)+1):
+                        u[c17][self.N-1-c18] = p[c17][self.N-1-c18] * u[c17][self.N-c18] + q[c17][self.N-1-c18]
+#scop end
 
 class _StrategyListFlattened(Adi):
 
@@ -145,7 +205,7 @@ class _StrategyListFlattened(Adi):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, u: list):
+    def initialize_array(self, u: list, v: list, p: list, q: list):
         for i in range(0, self.N):
             for j in range(0, self.N):
                 u[self.N * i + j] = self.DATA_TYPE(i + self.N - j) / self.N
@@ -181,10 +241,13 @@ class _StrategyListFlattened(Adi):
                 p[self.N * i + 0] = 0.0
                 q[self.N * i + 0] = v[self.N * 0 + i]
                 for j in range(1, self.N - 1):
-                    p[self.N * i + j] = -c / (a * p[self.N * i + j - 1] + b)
+                    tmp_pm1 = p[self.N * i + j - 1]
+#                    p[self.N * i + j] = -c / (a * p[self.N * i + j - 1] + b)
+                    p[self.N * i + j] = -c / (a * tmp_pm1 + b)
                     q[self.N * i + j] = (-d * u[self.N * j + i - 1] + (1.0 + 2.0 * d) * u[self.N * j + i]
                                          - f * u[self.N * j + i + 1] - a * q[self.N * i + j - 1]) / (
-                                a * p[self.N * i + j - 1] + b)
+#                                a * p[self.N * i + j - 1] + b)
+                                a * tmp_pm1 + b)
 
                 v[self.N * (self.N - 1) + i] = 1.0
                 for j in range(self.N - 2, 0, -1):
@@ -196,10 +259,13 @@ class _StrategyListFlattened(Adi):
                 p[self.N * i + 0] = 0.0
                 q[self.N * i + 0] = u[self.N * i + 0]
                 for j in range(1, self.N - 1):
-                    p[self.N * i + j] = -f / (d * p[self.N * i + j - 1] + e)
+                    tmp_pm1 = p[self.N * i  + j - 1]
+#                    p[self.N * i + j] = -f / (d * p[self.N * i + j - 1] + e)
+                    p[self.N * i + j] = -f / (d * tmp_pm1 + e)
                     q[self.N * i + j] = (-a * v[self.N * (i - 1) + j] + (1.0 + 2.0 * a) * v[self.N * i + j]
                                          - c * v[self.N * (i + 1) + j] - d * q[self.N * i + j - 1]) / (
-                                d * p[self.N * i + j - 1] + e)
+#                                d * p[self.N * i + j - 1] + e)
+                                d * tmp_pm1 + e)
 
                 u[self.N * i + self.N - 1] = 1.0
                 for j in range(self.N - 2, 0, -1):
@@ -215,7 +281,7 @@ class _StrategyNumPy(Adi):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, u: ndarray):
+    def initialize_array(self, u: list, v: list, p: list, q: list):
         for i in range(0, self.N):
             for j in range(0, self.N):
                 u[i, j] = self.DATA_TYPE(i + self.N - j) / self.N
@@ -246,28 +312,129 @@ class _StrategyNumPy(Adi):
 
         for t in range(1, self.TSTEPS + 1):
             # Column Sweep
-            for i in range(1, self.N - 1):
-                v[0, i] = 1.0
-                p[i, 0] = 0.0
-                q[i, 0] = v[0, i]
-                for j in range(1, self.N - 1):
-                    p[i, j] = -c / (a * p[i, j-1]+b)
-                    q[i, j] = (-d * u[j, i-1]+(1.0+2.0 * d) * u[j, i] - f * u[j, i+1]-a * q[i, j-1]) / (a * p[i, j-1]+b)
+            v[0, 1:self.N-1] = 1.0
+            p[1:self.N-1, 0] = 0.0
+            q[1:self.N-1, 0] = v[0, 1:self.N-1]
+            for j in range(1, self.N - 1):
+                p[1:self.N-1, j] = -c / (a * p[1:self.N-1, j-1] +b)
+                q[1:self.N-1,j] = (-d * u[j, 0:self.N-2]+(1.0+2.0*d) * u[j,1:self.N-1] - f * u[j,2:self.N] - a * q[1:self.N-1,j-1]) / (a * p[1:self.N-1, j-1]+b)
 
-                v[self.N-1, i] = 1.0
-                for j in range(self.N - 2, 0, -1):
-                    v[j, i] = p[i, j] * v[j+1, i] + q[i, j]
+            v[self.N-1, 1:self.N-1] = 1.0
+            for j in range(self.N - 2, 0, -1):
+                v[ j, 1:self.N-1 ] = p[ 1:self.N-1, j ] * v[ j+1, 1:self.N-1 ] + q[1:self.N-1, j]
 
             # Row Sweep
-            for i in range(1, self.N - 1):
-                u[i, 0] = 1.0
-                p[i, 0] = 0.0
-                q[i, 0] = u[i, 0]
-                for j in range(1, self.N - 1):
-                    p[i, j] = -f / (d * p[i, j-1]+e)
-                    q[i, j] = (-a * v[i-1, j]+(1.0+2.0 * a) * v[i, j] - c * v[i+1, j]-d * q[i, j-1]) / (d * p[i, j-1]+e)
+            u[1:self.N-1, 0] = 1.0
+            p[1:self.N-1, 0] = 0.0
+            q[1:self.N-1, 0] = u[1:self.N-1,0]
+            for j in range(1, self.N - 1):
+                p[1:self.N-1,j] = -f / (d * p[1:self.N-1,j-1]+e)
+                q[1:self.N-1,j] = (-a * v[0:self.N-2,j] + (1.0+2.0 * a) * v[1:self.N-1, j] - c * v[2:self.N, j]-d * q[1:self.N-1, j-1]) / (d * p[1:self.N-1, j-1]+e)
 
-                u[i, self.N-1] = 1.0
-                for j in range(self.N - 2, 0, -1):
-                    u[i, j] = p[i, j] * u[i, j+1] + q[i, j]
+            u[1:self.N-1, self.N-1] = 1.0
+            for j in range(self.N - 2, 0, -1):
+                u[1:self.N-1, j] = p[1:self.N-1,j] * u[1:self.N-1, j+1] + q[1:self.N-1,j]
+#scop end
+
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, u: list, v: list, p: list, q: list):
+#scop begin
+        DY = 1.0/self.DATA_TYPE(self.N)
+        DT = 1.0/self.DATA_TYPE(self.TSTEPS)
+        B1 = 2.0
+        B2 = 1.0
+        mul2 = B2 * DT / (DY * DY)
+        e = 1.0+mul2
+        d = -mul2 / 2.0
+        DX = 1.0/self.DATA_TYPE(self.N)
+        f = d
+        mul1 = B1 * DT / (DX * DX)
+        b = 1.0+mul1
+        a = -mul1 / 2.0
+        c = a
+        if((self.N-3>= 0)):
+            for c1 in range (1 , (self.TSTEPS)+1):
+                for c17 in range (1 , (self.N-2)+1):
+                    v[self.N*(self.N-1) + c17] = 1.0
+                for c17 in range (1 , (self.N-2)+1):
+                    p[self.N*(c17) + 0] = 0.0
+                for c17 in range (1 , (self.N-2)+1):
+                    for c18 in range (1 , (self.N-2)+1):
+                        p[self.N*(c17) + c18] = -c / (a*p[self.N*(c17) + c18-1]+b)
+                for c17 in range (1 , (self.N-2)+1):
+                    v[self.N*(0) + c17] = 1.0
+                for c17 in range (1 , (self.N-2)+1):
+                    q[self.N*(c17) + 0] = v[self.N*(0) + c17]
+                for c17 in range (1 , (self.N-2)+1):
+                    for c18 in range (1 , (self.N-2)+1):
+                        q[self.N*(c17) + c18] = (-d*u[self.N*(c18) + c17-1]+(1.0+2.0*d)*u[self.N*(c18) + c17] - f*u[self.N*(c18) + c17+1]-a*q[self.N*(c17) + c18-1])/(a*p[self.N*(c17) + c18-1]+b)
+                for c17 in range (1 , (self.N-2)+1):
+                    u[self.N*(c17) + 0] = 1.0
+                    p[self.N*(c17) + 0] = 0.0
+                    u[self.N*(c17) + self.N-1] = 1.0
+                for c17 in range (1 , (self.N-2)+1):
+                    q[self.N*(c17) + 0] = u[self.N*(c17) + 0]
+                for c17 in range (1 , (self.N-2)+1):
+                    for c18 in range (1 , (self.N-2)+1):
+                        v[self.N*(self.N-1-c18) + c17] = p[self.N*(c17) + self.N-1-c18] * v[self.N*(self.N-c18) + c17] + q[self.N*(c17) + self.N-1-c18]
+                for c17 in range (1 , (self.N-2)+1):
+                    for c18 in range (1 , (self.N-2)+1):
+                        p[self.N*(c17) + c18] = -f / (d*p[self.N*(c17) + c18-1]+e)
+                for c17 in range (1 , (self.N-2)+1):
+                    for c18 in range (1 , (self.N-2)+1):
+                        q[self.N*(c17) + c18] = (-a*v[self.N*(c17-1) + c18]+(1.0+2.0*a)*v[self.N*(c17) + c18] - c*v[self.N*(c17+1) + c18]-d*q[self.N*(c17) + c18-1])/(d*p[self.N*(c17) + c18-1]+e)
+                for c17 in range (1 , (self.N-2)+1):
+                    for c18 in range (1 , (self.N-2)+1):
+                        u[self.N*(c17) + self.N-1-c18] = p[self.N*(c17) + self.N-1-c18] * u[self.N*(c17) + self.N-c18] + q[self.N*(c17) + self.N-1-c18]
+
+# --pluto-fuse maxfuse
+#        DY = 1.0/self.N
+#        DT = 1.0/self.TSTEPS
+#        B1 = 2.0
+#        B2 = 1.0
+#        mul2 = B2 * DT / (DY * DY)
+#        e = 1.0+mul2
+#        d = -mul2 / 2.0
+#        f = d
+#        DX = 1.0/self.N
+#        mul1 = B1 * DT / (DX * DX)
+#        b = 1.0+mul1
+#        a = -mul1 / 2.0
+#        c = a
+#        if((self.N-3>= 0)):
+#            for c0 in range (1 , (self.TSTEPS)+1):
+#                for c7 in range (1 , (self.N-2)+1):
+#                    v[(self.N-1)*self.N + c7] = 1.0
+#                for c7 in range (1 , (self.N-2)+1):
+#                    p[(c7)*self.N + 0] = 0.0
+#                for c7 in range (1 , (self.N-2)+1):
+#                    for c12 in range (1 , (self.N-2)+1):
+#                        p[(c7)*self.N + c12] = -c / (a*p[(c7)*self.N + c12-1]+b)
+#                for c7 in range (1 , (self.N-2)+1):
+#                    v[(0)*self.N + c7] = 1.0
+#                    q[(c7)*self.N + 0] = v[(0)*self.N + c7]
+#                for c7 in range (1 , (self.N-2)+1):
+#                    for c12 in range (1 , (self.N-2)+1):
+#                        q[(c7)*self.N + c12] = (-d*u[(c12)*self.N + c7-1]+(1.0+2.0)*d)*u[(c12)*self.N + c7] - f*u[(c12)*self.N + c7+1]-a*q[(c7)*self.N + c12-1]/(a*p[(c7)*self.N + c12-1]+b)
+#                for c7 in range (1 , (self.N-2)+1):
+#                    u[(c7)*self.N + self.N-1] = 1.0
+#                    u[(c7)*self.N + 0] = 1.0
+#                    p[(c7)*self.N + 0] = 0.0
+#                for c7 in range (1 , (self.N-2)+1):
+#                    q[(c7)*self.N + 0] = u[(c7)*self.N + 0]
+#                for c7 in range (1 , (self.N-2)+1):
+#                    for c12 in range (1 , (self.N-2)+1):
+#                        v[(self.N-1-c12)*self.N + c7] = p[(c7)*self.N + self.N-1-c12] * v[(self.N-c12)*self.N + c7] + q[(c7)*self.N + self.N-1-c12]
+#                    for c12 in range (1 , (self.N-2)+1):
+#                        p[(c7)*self.N + c12] = -f / (d*p[(c7)*self.N + c12-1]+e)
+#                for c7 in range (1 , (self.N-2)+1):
+#                    for c12 in range (1 , (self.N-2)+1):
+#                        q[(c7)*self.N + c12] = (-a*v[(c7-1)*self.N + c12]+(1.0+2.0)*a)*v[(c7)*self.N + c12] - c*v[(c7+1)*self.N + c12]-d*q[(c7)*self.N + c12-1]/(d*p[(c7)*self.N + c12-1]+e)
+#                    for c12 in range (1 , (self.N-2)+1):
+#                        u[(c7)*self.N + self.N-1-c12] = p[(c7)*self.N + self.N-1-c12] * u[(c7)*self.N + self.N-c12] + q[(c7)*self.N + self.N-1-c12]
+#
 #scop end

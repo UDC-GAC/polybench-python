@@ -18,6 +18,7 @@ from benchmarks.polybench import PolyBench
 from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
+import numpy as np
 
 
 class Gemm(PolyBench):
@@ -26,10 +27,14 @@ class Gemm(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -55,7 +60,7 @@ class Gemm(PolyBench):
         B = self.create_array(2, [self.NK, self.NJ], self.DATA_TYPE(0))
 
         # Initialize data structures
-        self.initialize_array(C, A, B)
+        self.initialize_array(alpha, beta, C, A, B)
 
         # Benchmark the kernel
         self.time_kernel(alpha, beta, C, A, B)
@@ -82,7 +87,7 @@ class _StrategyList(Gemm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, C: list, A: list, B: list):
+    def initialize_array(self, alpha: float, beta: float, C: list, A: list, B: list):
         for i in range(0, self.NI):
             for j in range(0, self.NJ):
                 C[i][j] = self.DATA_TYPE((i * j + 1) % self.NI) / self.NI
@@ -113,6 +118,23 @@ class _StrategyList(Gemm):
                     C[i][j] += alpha * A[i][k] * B[k][j]
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, alpha: float, beta: float, C: list, A: list, B: list):
+# scop begin
+        if((self.NI-1>= 0) and (self.NJ-1>= 0)):
+            for c1 in range ((self.NI-1)+1):
+                for c2 in range ((self.NJ-1)+1):
+                    C[c1][c2] *= beta
+            if((self.NK-1>= 0)):
+                for c1 in range ((self.NI-1)+1):
+                    for c2 in range ((self.NJ-1)+1):
+                        for c3 in range ((self.NK-1)+1):
+                            C[c1][c2] += alpha * A[c1][c3] * B[c3][c2]
+# scop end
 
 class _StrategyListFlattened(Gemm):
 
@@ -122,7 +144,7 @@ class _StrategyListFlattened(Gemm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, C: list, A: list, B: list):
+    def initialize_array(self, alpha: float, beta: float, C: list, A: list, B: list):
         for i in range(0, self.NI):
             for j in range(0, self.NJ):
                 C[self.NJ * i + j] = self.DATA_TYPE((i * j + 1) % self.NI) / self.NI
@@ -162,7 +184,7 @@ class _StrategyNumPy(Gemm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, C: ndarray, A: ndarray, B: ndarray):
+    def initialize_array(self, alpha: float, beta: float, C: list, A: list, B: list):
         for i in range(0, self.NI):
             for j in range(0, self.NJ):
                 C[i, j] = self.DATA_TYPE((i * j + 1) % self.NI) / self.NI
@@ -184,11 +206,51 @@ class _StrategyNumPy(Gemm):
 
     def kernel(self, alpha: float, beta: float, C: ndarray, A: ndarray, B: ndarray):
 # scop begin
-        for i in range(0, self.NI):
-            for j in range(0, self.NJ):
-                C[i, j] *= beta
-
-            for k in range(0, self.NK):
-                for j in range(0, self.NJ):
-                    C[i, j] += alpha * A[i, k] * B[k, j]
+        C[0:self.NI,0:self.NJ] *= beta
+        C[0:self.NI,0:self.NJ] += alpha * np.dot( A[0:self.NI,0:self.NK], B[0:self.NK,0:self.NJ] )
 # scop end
+
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, alpha: float, beta: float, C: list, A: list, B: list):
+# scop begin
+#        if((self.NI-1>= 0) and (self.NJ-1>= 0)):
+#            for c1 in range ((self.NI-1)+1):
+#                for c2 in range ((self.NJ-1)+1):
+#                    C[self.NJ*(c1) + c2] *= beta
+#            if((self.NK-1>= 0)):
+#                for c1 in range ((self.NI-1)+1):
+#                    for c2 in range ((self.NJ-1)+1):
+#                        for c3 in range ((self.NK-1)+1):
+#                            C[self.NJ*(c1) + c2] += alpha * A[self.NK*(c1) + c3] * B[self.NJ*(c3) + c2]
+
+# --pluto --pluto-fuse maxfuse
+#        if ((self.NI >= 1) and (self.NJ >= 1)):
+#          if (self.NK >= 1):
+#            for c0 in range( self.NI ):
+#                for c1 in range( self.NJ ):
+#                    C[(c0)*self.NJ + c1] *= beta;
+#                    for c2 in range( c0, c0+self.NK ):
+#                        C[(c0)*self.NJ + c1] += alpha * A[(c0)*self.NK + (-1 * c0) + c2] * B[((-1 * c0) + c2)*self.NJ + c1];
+#          if (self.NK <= 0):
+#            for c0 in range( self.NI ):
+#                for c1 in range( self.NJ ):
+#                    C[(c0)*self.NJ + c1] *= beta;
+
+# --pluto --pluto-scalpriv --vectorizer --pragmatizer
+        if ((self.NI >= 1) and (self.NJ >= 1)):
+          ub1 = (self.NI + -1);
+          for c1 in range( ub1+1 ):
+              for c2 in range( self.NJ ):
+                  C[(c1)*self.NJ + c2] *= beta;
+          if (self.NK >= 1):
+            ub1 = (self.NI + -1);
+            for c1 in range( ub1+1 ):
+                  for c3 in range( self.NK ):
+                    for c2 in range( self.NJ ):
+                        C[(c1)*self.NJ + c2] += alpha * A[(c1)*self.NK + c3] * B[(c3)*self.NJ + c2];
+# scop end
+

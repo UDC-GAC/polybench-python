@@ -26,10 +26,14 @@ class Doitgen(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -52,7 +56,7 @@ class Doitgen(PolyBench):
         sum = self.create_array(1, [self.NP], self.DATA_TYPE(0))
 
         # Initialize data structures
-        self.initialize_array(A, C4)
+        self.initialize_array(A, C4, sum)
 
         # Benchmark the kernel
         self.time_kernel(A, C4, sum)
@@ -79,7 +83,7 @@ class _StrategyList(Doitgen):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: list, C4: list):
+    def initialize_array(self, A: list, C4: list, sum: list):
         for i in range(0, self.NR):
             for j in range(0, self.NQ):
                 for k in range(0, self.NP):
@@ -110,6 +114,24 @@ class _StrategyList(Doitgen):
                     A[r][q][p] = sum[p]
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, A: list, C4: list, sum: list):
+# scop begin
+        if((self.NP-1>= 0) and (self.NQ-1>= 0) and (self.NR-1>= 0)):
+            for c0 in range ((self.NR-1)+1):
+                for c1 in range ((self.NQ-1)+1):
+                    for c3 in range ((self.NP-1)+1):
+                        sum[c3] = 0.0
+                    for c3 in range ((self.NP-1)+1):
+                        for c4 in range ((self.NP-1)+1):
+                            sum[c3] += A[c0][c1][c4] * C4[c4][c3]
+                    for c3 in range ((self.NP-1)+1):
+                        A[c0][c1][c3] = sum[c3]
+# scop end
 
 class _StrategyListFlattened(Doitgen):
 
@@ -119,7 +141,7 @@ class _StrategyListFlattened(Doitgen):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: list, C4: list):
+    def initialize_array(self, A: list, C4: list, sum: list):
         for i in range(0, self.NR):
             for j in range(0, self.NQ):
                 for k in range(0, self.NP):
@@ -143,8 +165,11 @@ class _StrategyListFlattened(Doitgen):
             for q in range(self.NQ):
                 for p in range(0, self.NP):
                     sum[p] = 0.0
+#                    tmp = 0.0 # load elimination
                     for s in range(self.NP):
                         sum[p] += A[(self.NQ * r + q) * self.NP + s] * C4[self.NP * s + p]
+#                        tmp += A[(self.NQ * r + q) * self.NP + s] * C4[self.NP * s + p] # load elimination
+#                    sum[p] = tmp # load elimination
 
                 for p in range(0, self.NP):
                     A[(self.NQ * r + q) * self.NP + p] = sum[p]
@@ -159,7 +184,7 @@ class _StrategyNumPy(Doitgen):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: ndarray, C4: ndarray):
+    def initialize_array(self, A: list, C4: list, sum: list):
         for i in range(0, self.NR):
             for j in range(0, self.NQ):
                 for k in range(0, self.NP):
@@ -178,14 +203,54 @@ class _StrategyNumPy(Doitgen):
                     self.print_value(A[i, j, k])
 
     def kernel(self, A: ndarray, C4: ndarray, sum: ndarray):
+        import numpy as np
 # scop begin
         for r in range(0, self.NR):
             for q in range(self.NQ):
-                for p in range(0, self.NP):
-                    sum[p] = 0.0
-                    for s in range(self.NP):
-                        sum[p] += A[r, q, s] * C4[s, p]
+                sum[0:self.NP] = np.dot( A[r,q,0:self.NP], C4[0:self.NP,0:self.NP] )
+                A[r,q,0:self.NP] = sum[0:self.NP]
+# scop end
 
-                for p in range(0, self.NP):
-                    A[r, q, p] = sum[p]
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, A: list, C4: list, sum: list):
+# scop begin
+#        if((self.NP-1>= 0) and (self.NQ-1>= 0) and (self.NR-1>= 0)):
+#            for c0 in range ((self.NR-1)+1):
+#                for c1 in range ((self.NQ-1)+1):
+#                    for c3 in range ((self.NP-1)+1):
+#                        sum[c3] = 0.0
+#                    for c3 in range ((self.NP-1)+1):
+#                        for c4 in range ((self.NP-1)+1):
+#                            sum[c3] += A[self.NQ*self.NP*c0+self.NP*c1+c4] * C4[self.NP*(c4) + c3]
+#                    for c3 in range ((self.NP-1)+1):
+#                        A[self.NQ*self.NP*c0+self.NP*c1+c3] = sum[c3]
+
+# --pluto --pluto-prevector --vectorizer --pragmatizer
+#        if((self.NP-1>= 0) and (self.NQ-1>= 0) and (self.NR-1>= 0)):
+#            for c0 in range ((self.NR-1)+1):
+#                for c1 in range ((self.NQ-1)+1):
+#                    for c3 in range ((self.NP-1)+1):
+#                        sum[c3] = 0.0
+#                    for c4 in range ((self.NP-1)+1):
+#                        for c3 in range ((self.NP-1)+1):
+#                            sum[c3] += A[self.NQ*self.NP*c0+self.NP*c1+c4] * C4[self.NP*(c4) + c3]
+#                    for c3 in range ((self.NP-1)+1):
+#                        A[self.NQ*self.NP*c0+self.NP*c1+c3] = sum[c3]
+
+# --pluto --pluto-fuse maxfuse
+        if((self.NP-1>= 0) and (self.NQ-1>= 0) and (self.NR-1>= 0)):
+            for c0 in range ((self.NR-1)+1):
+                for c1 in range ((self.NQ-1)+1):
+                    for c4 in range ((self.NP-1)+1):
+                        sum[c4] = 0.0
+                    for c4 in range ((self.NP-1)+1):
+                        for c5 in range ((self.NP-1)+1):
+                            sum[c4] += A[c0*self.NQ*self.NP+c1*self.NP+c5] * C4[c5*self.NP+c4]
+                    for c4 in range ((self.NP-1)+1):
+                        A[c0*self.NQ*self.NP+c1*self.NP+c4] = sum[c4]
+
 # scop end

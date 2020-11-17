@@ -26,8 +26,12 @@ class Fdtd_2d(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
 
@@ -117,6 +121,101 @@ class _StrategyList(Fdtd_2d):
                     hz[i][j] = hz[i][j] - 0.7 * (ex[i][j+1] - ex[i][j] + ey[i+1][j] - ey[i][j])
 # scop end
 
+class _StrategyListPluto(Fdtd_2d):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+    def initialize_array(self, ex: list, ey: list, hz: list, _fict_: list):
+        for i in range(0, self.TMAX):
+            _fict_[i] = self.DATA_TYPE(i)
+
+        for i in range(0, self.NX):
+            for j in range(0, self.NY):
+                ex[i][j] = (self.DATA_TYPE(i) * (j + 1)) / self.NX
+                ey[i][j] = (self.DATA_TYPE(i) * (j + 2)) / self.NY
+                hz[i][j] = (self.DATA_TYPE(i) * (j + 3)) / self.NX
+
+    def print_array_custom(self, array: list, name: str):
+        # Although this function will print three arrays (ex, ey and hz), the code required is the same.
+        for i in range(0, self.NX):
+            for j in range(0, self.NY):
+                if (i * self.NX + j) % 20 == 0:
+                    self.print_message('\n')
+                self.print_value(array[i][j])
+
+    def kernel(self, ex: list, ey: list, hz: list, _fict_: list):
+# scop begin
+# --pluto-noskew
+#        if((self.NY >= 1) and (self.TMAX >= 1)):
+#            if((self.NX >= 2) and (self.NY >= 2)):
+#                for c0 in range (self.TMAX):
+#                    ey[0][0] = _fict_[c0]
+#                    for c2 in range (1 , self.NX):
+#                        ey[c2][0] = ey[c2][0] - 0.5*(hz[c2][0]-hz[c2-1][0])
+#                    for c1 in range (1 , self.NY):
+#                        ex[0][c1] = ex[0][c1] - 0.5*(hz[0][c1]-hz[0][c1-1])
+#                        hz[0][c1-1] = hz[0][c1-1] - 0.7* (ex[0][c1] - ex[0][c1-1] + ey[1][c1-1] - ey[0][c1-1])
+#                        ey[0][c1] = _fict_[c0]
+#                        for c2 in range (1 , self.NX-1):
+#                            ex[c2][c1] = ex[c2][c1] - 0.5*(hz[c2][c1]-hz[c2][c1-1])
+#                            hz[c2][c1-1] = hz[c2][c1-1] - 0.7* (ex[c2][c1] - ex[c2][c1-1] + ey[c2+1][c1-1] - ey[c2][c1-1])
+#                            ey[c2][c1] = ey[c2][c1] - 0.5*(hz[c2][c1]-hz[c2-1][c1])
+#                        ex[self.NX-1][c1] = ex[self.NX-1][c1]-0.5*(hz[self.NX-1][c1]-hz[self.NX-1][c1-1])
+#                        ey[self.NX-1][c1] = ey[self.NX-1][c1] - 0.5*(hz[self.NX-1][c1]-hz[self.NX-2][c1])
+#            if((self.NX>=2) and (self.NY == 1) ):
+#                for c0 in range (self.TMAX):
+#                    ey[0][0] = _fict_[c0]
+#                    for c2 in range (1 , self.NX):
+#                        ey[c2][0] = ey[c2][0] - 0.5*(hz[c2][0]-hz[c2-1][0])
+#            if((self.NX==1) and (self.NY>=2)):
+#                for c0 in range (self.TMAX):
+#                    ey[0][0] = _fict_[c0]
+#                    for c1 in range (1 , self.NY):
+#                        ex[0][c1] = ex[0][c1] - 0.5*(hz[0][c1]-hz[0][c1-1])
+#                        ey[0][c1] = _fict_[c0]
+#            if((self.NX<=1) and (self.NY == 1 )):
+#                for c0 in range (self.TMAX):
+#                    ey[0][0] = _fict_[c0]
+#            if((self.NX<= 0) and (self.NY>=2)):
+#                for c0 in range (self.TMAX):
+#                    for c1 in range (self.NY):
+#                        ey[0][c1] = _fict_[c0]
+        if((self.NY-1>= 0) and (self.TMAX-1>= 0)):
+            if((self.NX-2>= 0) and (self.NY-2>= 0)):
+                for c0 in range ((self.TMAX-1)+1):
+                    ey[0][0] = _fict_[c0]
+                    for c2 in range (c0 + 1 , (self.NX + c0-1)+1):
+                        ey[(-1 * c0) + c2][0] = ey[(-1 * c0) + c2][0] - 0.5*(hz[(-1 * c0) + c2][0]-hz[(-1 * c0) + c2-1][0])
+                    for c1 in range (c0 + 1 , (self.NY + c0-1)+1):
+                        ex[0][(-1 * c0) + c1] = ex[0][(-1 * c0) + c1] - 0.5*(hz[0][(-1 * c0) + c1]-hz[0][(-1 * c0) + c1-1])
+                        ey[0][(-1 * c0) + c1] = _fict_[c0]
+                        for c2 in range (c0 + 1 , (self.NX + c0-1)+1):
+                            hz[((-1 * c0) + c2) + -1][((-1 * c0) + c1) + -1] = hz[((-1 * c0) + c2) + -1][((-1 * c0) + c1) + -1] - 0.7* (ex[((-1 * c0) + c2) + -1][((-1 * c0) + c1) + -1 +1] - ex[((-1 * c0) + c2) + -1][((-1 * c0) + c1) + -1] + ey[((-1 * c0) + c2) + -1 +1][((-1 * c0) + c1) + -1] - ey[((-1 * c0) + c2) + -1][((-1 * c0) + c1) + -1])
+                            ey[(-1 * c0) + c2][(-1 * c0) + c1] = ey[(-1 * c0) + c2][(-1 * c0) + c1] - 0.5*(hz[(-1 * c0) + c2][(-1 * c0) + c1]-hz[(-1 * c0) + c2-1][(-1 * c0) + c1])
+                            ex[(-1 * c0) + c2][(-1 * c0) + c1] = ex[(-1 * c0) + c2][(-1 * c0) + c1] - 0.5*(hz[(-1 * c0) + c2][(-1 * c0) + c1]-hz[(-1 * c0) + c2][(-1 * c0) + c1-1])
+            if((self.NX-2>= 0) and (self.NY==1)):
+                for c0 in range ((self.TMAX-1)+1):
+                    ey[0][0] = _fict_[c0]
+                    for c2 in range (c0 + 1 , (self.NX + c0-1)+1):
+                        ey[(-1 * c0) + c2][0] = ey[(-1 * c0) + c2][0] - 0.5*(hz[(-1 * c0) + c2][0]-hz[(-1 * c0) + c2-1][0])
+            if((self.NX== 1) and (self.NY-2>= 0)):
+                for c0 in range ((self.TMAX-1)+1):
+                    ey[0][0] = _fict_[c0]
+                    for c1 in range (c0 + 1 , (self.NY + c0-1)+1):
+                        ex[0][(-1 * c0) + c1] = ex[0][(-1 * c0) + c1] - 0.5*(hz[0][(-1 * c0) + c1]-hz[0][(-1 * c0) + c1-1])
+                        ey[0][(-1 * c0) + c1] = _fict_[c0]
+            if((self.NX*-1+1>= 0) and (self.NY==1)):
+                for c0 in range ((self.TMAX-1)+1):
+                    ey[0][0] = _fict_[c0]
+            if((self.NX*-1>= 0) and (self.NY-2>= 0)):
+                for c0 in range ((self.TMAX-1)+1):
+                    for c1 in range (c0 , (self.NY + c0-1)+1):
+                        ey[0][(-1 * c0) + c1] = _fict_[c0]
+# scop end
 
 class _StrategyListFlattened(Fdtd_2d):
 
@@ -163,6 +262,42 @@ class _StrategyListFlattened(Fdtd_2d):
                     hz[self.NY * i + j] = hz[self.NY * i + j] - 0.7 * (ex[self.NY * i + j + 1] - ex[self.NY * i + j] + ey[self.NY * (i + 1) + j] - ey[self.NY * i + j])
 # scop end
 
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def kernel(self, ex: list, ey: list, hz: list, _fict_: list):
+# scop begin
+        if((self.NY-1>= 0) and (self.TMAX-1>= 0)):
+            if((self.NX-2>= 0) and (self.NY-2>= 0)):
+                for c0 in range ((self.TMAX-1)+1):
+                    ey[0 * self.NY + 0] = _fict_[c0]
+                    for c2 in range (c0 + 1 , (self.NX + c0-1)+1):
+                        ey[((-1 * c0) + c2)*self.NY + 0] = ey[((-1 * c0) + c2)*self.NY+0] - 0.5*(hz[((-1 * c0) + c2)*self.NY + 0]-hz[((-1 * c0) + c2-1)*self.NY+0])
+                    for c1 in range (c0 + 1 , (self.NY + c0-1)+1):
+                        ex[0*self.NY + (-1 * c0) + c1] = ex[0*self.NY + (-1 * c0) + c1] - 0.5*(hz[0*self.NY + (-1 * c0) + c1]-hz[0*self.NY + (-1 * c0) + c1-1])
+                        ey[0*self.NY + (-1 * c0) + c1] = _fict_[c0]
+                        for c2 in range (c0 + 1 , (self.NX + c0-1)+1):
+                            hz[(((-1 * c0) + c2) + -1)*self.NY+((-1 * c0) + c1) + -1] = hz[(((-1 * c0) + c2) + -1)*self.NY + ((-1 * c0) + c1) + -1] - 0.7* (ex[(((-1 * c0) + c2) + -1)*self.NY + ((-1 * c0) + c1) + -1 +1] - ex[(((-1 * c0) + c2) + -1)*self.NY + ((-1 * c0) + c1) + -1] + ey[(((-1 * c0) + c2) + -1 +1)*self.NY + ((-1 * c0) + c1) + -1] - ey[(((-1 * c0) + c2) + -1)*self.NY + ((-1 * c0) + c1) + -1])
+                            ey[((-1 * c0) + c2)*self.NY + (-1 * c0) + c1] = ey[((-1 * c0) + c2)*self.NY + (-1 * c0) + c1] - 0.5*(hz[((-1 * c0) + c2)*self.NY + (-1 * c0) + c1]-hz[((-1 * c0) + c2-1)*self.NY + (-1 * c0) + c1])
+                            ex[((-1 * c0) + c2)*self.NY + (-1 * c0) + c1] = ex[((-1 * c0) + c2)*self.NY + (-1 * c0) + c1] - 0.5*(hz[((-1 * c0) + c2)*self.NY + (-1 * c0) + c1]-hz[((-1 * c0) + c2)*self.NY + (-1 * c0) + c1-1])
+            if((self.NX-2>= 0) and (self.NY==1)):
+                for c0 in range ((self.TMAX-1)+1):
+                    ey[0*self.NY + 0] = _fict_[c0]
+                    for c2 in range (c0 + 1 , (self.NX + c0-1)+1):
+                        ey[((-1 * c0) + c2)*self.NY + 0] = ey[((-1 * c0) + c2)*self.NY + 0] - 0.5*(hz[((-1 * c0) + c2)*self.NY + 0]-hz[((-1 * c0) + c2-1)*self.NY + 0])
+            if((self.NX==1) and (self.NY-2>= 0)):
+                for c0 in range ((self.TMAX-1)+1):
+                    ey[0*self.NY + 0] = _fict_[c0]
+                    for c1 in range (c0 + 1 , (self.NY + c0-1)+1):
+                        ex[0*self.NY + (-1 * c0) + c1] = ex[0*self.NY + (-1 * c0) + c1] - 0.5*(hz[0*self.NY + (-1 * c0) + c1]-hz[0*self.NY + (-1 * c0) + c1-1])
+                        ey[0*self.NY + (-1 * c0) + c1] = _fict_[c0]
+            if((self.NX*-1+1>= 0) and (self.NY==1)):
+                for c0 in range ((self.TMAX-1)+1):
+                    ey[0*self.NY + 0] = _fict_[c0]
+            if((self.NX*-1>= 0) and (self.NY-2>= 0)):
+                for c0 in range ((self.TMAX-1)+1):
+                    for c1 in range (c0 , (self.NY + c0-1)+1):
+                        ey[0*self.NY + (-1 * c0) + c1] = _fict_[c0]
+# scop end
 
 class _StrategyNumPy(Fdtd_2d):
 
@@ -193,18 +328,8 @@ class _StrategyNumPy(Fdtd_2d):
     def kernel(self, ex: ndarray, ey: ndarray, hz: ndarray, _fict_: ndarray):
 # scop begin
         for t in range(0, self.TMAX):
-            for j in range(0, self.NY):
-                ey[0, j] = _fict_[t]
-
-            for i in range(1, self.NX):
-                for j in range(0, self.NY):
-                    ey[i, j] = ey[i, j] - 0.5 * (hz[i, j]-hz[i-1, j])
-
-            for i in range(0, self.NX):
-                for j in range(1, self.NY):
-                    ex[i, j] = ex[i, j] - 0.5 * (hz[i, j]-hz[i, j-1])
-
-            for i in range(0, self.NX - 1):
-                for j in range(0, self.NY - 1):
-                    hz[i, j] = hz[i, j] - 0.7 * (ex[i, j+1] - ex[i, j] + ey[i+1, j] - ey[i, j])
+            ey[0,0:self.NY] = _fict_[t]
+            ey[1:self.NX,0:self.NY] = ey[1:self.NX,0:self.NY] - 0.5 * (hz[1:self.NX,0:self.NY]-hz[0:self.NX-1,0:self.NY])
+            ex[0:self.NX,1:self.NY] = ex[0:self.NX,1:self.NY] - 0.5 * (hz[0:self.NX,1:self.NY] - hz[0:self.NX,0:self.NY-1])
+            hz[0:self.NX-1,0:self.NY-1] = hz[0:self.NX-1,0:self.NY-1] - 0.7 * (ex[0:self.NX-1,1:self.NY] - ex[0:self.NX-1,0:self.NY-1] + ey[1:self.NX,0:self.NY-1] - ey[0:self.NX-1,0:self.NY-1])
 # scop end

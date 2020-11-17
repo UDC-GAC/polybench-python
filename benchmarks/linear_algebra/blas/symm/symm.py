@@ -18,7 +18,7 @@ from benchmarks.polybench import PolyBench
 from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
-
+import numpy as np
 
 class Symm(PolyBench):
 
@@ -26,10 +26,14 @@ class Symm(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyList, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -54,7 +58,7 @@ class Symm(PolyBench):
         B = self.create_array(2, [self.M, self.N], self.DATA_TYPE(0))
 
         # Initialize data structures
-        self.initialize_array(C, A, B)
+        self.initialize_array(alpha, beta, C, A, B)
 
         # Benchmark the kernel
         self.time_kernel(alpha, beta, C, A, B)
@@ -81,7 +85,7 @@ class _StrategyList(Symm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, C: list, A: list, B: list):
+    def initialize_array(self, alpha, beta, C: list, A: list, B: list):
         for i in range(0, self.M):
             for j in range(0, self.N):
                 C[i][j] = self.DATA_TYPE((i+j) % 100) / self.M
@@ -119,6 +123,27 @@ class _StrategyList(Symm):
                 C[i][j] = beta * C[i][j] + alpha * B[i][j] * A[i][i] + alpha * temp2
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, alpha, beta, C: list, A: list, B: list):
+# scop begin
+        if((self.M-1>= 0) and (self.N-1>= 0)):
+            for c2 in range ((self.N-1)+1):
+                temp2 = 0
+                C[0][c2] = beta * C[0][c2] + alpha*B[0][c2] * A[0][0] + alpha * temp2
+            for c1 in range (1 , (self.M-1)+1):
+                for c2 in range ((self.N-1)+1):
+                    C[0][c2] += alpha*B[c1][c2] * A[c1][0]
+                    temp2 = 0
+                    temp2 += B[0][c2] * A[c1][0]
+                    for c3 in range (1 , (c1-1)+1):
+                        C[c3][c2] += alpha*B[c1][c2] * A[c1][c3]
+                        temp2 += B[c3][c2] * A[c1][c3]
+                    C[c1][c2] = beta * C[c1][c2] + alpha*B[c1][c2] * A[c1][c1] + alpha * temp2
+# scop end
 
 class _StrategyListFlattened(Symm):
 
@@ -128,7 +153,7 @@ class _StrategyListFlattened(Symm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, C: list, A: list, B: list):
+    def initialize_array(self, alpha, beta, C: list, A: list, B: list):
         for i in range(0, self.M):
             for j in range(0, self.N):
                 C[self.N * i + j] = self.DATA_TYPE((i + j) % 100) / self.M
@@ -167,7 +192,7 @@ class _StrategyNumPy(Symm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, C: ndarray, A: ndarray, B: ndarray):
+    def initialize_array(self, alpha, beta, C: list, A: list, B: list):
         for i in range(0, self.M):
             for j in range(0, self.N):
                 C[i, j] = self.DATA_TYPE((i+j) % 100) / self.M
@@ -197,10 +222,44 @@ class _StrategyNumPy(Symm):
         # note that due to Fortran array layout, the code below more closely resembles upper triangular case in BLAS
 # scop begin
         for i in range(0, self.M):
-            for j in range(0, self.N):
+            C[0:i,0:self.N] += alpha * np.dot( A[i,0:i,np.newaxis], B[np.newaxis,i,0:self.N] )
+            temp2 = np.dot( A[i,0:i], B[0:i,0:self.N] )
+            C[i,0:self.N] = beta * C[i,0:self.N] + alpha * B[i,0:self.N] * A[i,i] + alpha * temp2[0:self.N]
+# scop end
+
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, alpha, beta, C: list, A: list, B: list):
+# scop begin
+        if((self.M-1>= 0) and (self.N-1>= 0)):
+            for c2 in range ((self.N-1)+1):
                 temp2 = 0
-                for k in range(0, i):
-                    C[k, j] += alpha * B[i, j] * A[i, k]
-                    temp2 += B[k, j] * A[i, k]
-                C[i, j] = beta * C[i, j] + alpha * B[i, j] * A[i, i] + alpha * temp2
+                C[self.N*(0) + c2] = beta * C[self.N*(0) + c2] + alpha*B[self.N*(0) + c2] * A[self.M*(0) + 0] + alpha * temp2
+            for c1 in range (1 , (self.M-1)+1):
+                for c2 in range ((self.N-1)+1):
+                    C[self.N*(0) + c2] += alpha*B[self.N*(c1) + c2] * A[self.M*(c1) + 0]
+                    temp2 = 0
+                    temp2 += B[self.N*(0) + c2] * A[self.M*(c1) + 0]
+                    for c3 in range (1 , (c1-1)+1):
+                        C[self.N*(c3) + c2] += alpha*B[self.N*(c1) + c2] * A[self.M*(c1) + c3]
+                        temp2 += B[self.N*(c3) + c2] * A[self.M*(c1) + c3]
+                    C[self.N*(c1) + c2] = beta * C[self.N*(c1) + c2] + alpha*B[self.N*(c1) + c2] * A[self.M*(c1) + c1] + alpha * temp2
+
+# --pluto --pluto-fuse maxfuse
+#        if((self.M-1>= 0) and (self.N-1>= 0)):
+#            for c1 in range ((self.N-1)+1):
+#                temp2 = 0
+#                C[(0)*self.N + c1] = beta * C[(0)*self.N + c1] + alpha*B[(0)*self.N + c1] * A[(0)*self.M + 0] + alpha * temp2
+#            for c0 in range (1 , (self.M-1)+1):
+#                for c1 in range ((self.N-1)+1):
+#                    C[(0)*self.N + c1] += alpha*B[(c0)*self.N + c1] * A[(c0)*self.M + 0]
+#                    temp2 = 0
+#                    temp2 += B[(0)*self.N + c1] * A[(c0)*self.M + 0]
+#                    for c2 in range (1 , (c0-1)+1):
+#                        C[(c2)*self.N + c1] += alpha*B[(c0)*self.N + c1] * A[(c0)*self.M + c2]
+#                        temp2 += B[(c2)*self.N + c1] * A[(c0)*self.M + c2]
+#                    C[(c0)*self.N + c1] = beta * C[(c0)*self.N + c1] + alpha*B[(c0)*self.N + c1] * A[(c0)*self.M + c0] + alpha * temp2
 # scop end

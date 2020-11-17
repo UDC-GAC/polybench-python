@@ -18,6 +18,7 @@ from benchmarks.polybench import PolyBench
 from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
+import numpy as np
 
 
 class Trisolv(PolyBench):
@@ -26,10 +27,14 @@ class Trisolv(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -99,6 +104,19 @@ class _StrategyList(Trisolv):
             x[i] = x[i] / L[i][i]
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, L: list, x: list, b: list):
+# scop begin
+        for i in range(0, self.N):
+            x[i] = b[i]
+            for j in range(0, i):
+                x[i] -= L[i][j] * x[j]
+            x[i] = x[i] / L[i][i]
+# scop end
 
 class _StrategyListFlattened(Trisolv):
 
@@ -117,11 +135,17 @@ class _StrategyListFlattened(Trisolv):
 
     def kernel(self, L: list, x: list, b: list):
 # scop begin
-        for i in range(0, self.N):
-            x[i] = b[i]
-            for j in range(0, i):
-                x[i] -= L[self.N * i + j] * x[j]
-            x[i] = x[i] / L[self.N * i + i]
+        if((self.N-1>= 0)):
+            for c1 in range ((self.N-1)+1):
+                x[c1] = b[c1]
+            x[0] = x[0] / L[self.N*0+0]
+            for c1 in range (1 , (self.N-1)+1):
+#                tmp = x[c1] # load elimination
+                for c2 in range ((c1-1)+1):
+                    x[c1] -= L[self.N * c1 + c2] * x[c2]
+#                    tmp -= L[self.N * c1 + c2] * x[c2] # load elimination
+                x[c1] = x[c1] / L[self.N * c1 + c1]
+#                x[c1] = tmp / L[self.N * c1 + c1] # load elimination
 # scop end
 
 
@@ -142,9 +166,32 @@ class _StrategyNumPy(Trisolv):
 
     def kernel(self, L: ndarray, x: ndarray, b: ndarray):
 # scop begin
+        x[0:self.N] = b[0:self.N]
+        for i in range(0, self.N):
+            x[i] -= np.dot( L[i,0:i], x[0:i] )
+            x[i] = x[i] / L[i, i]
+# scop end
+
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, L: list, x: list, b: list):
+# scop begin
         for i in range(0, self.N):
             x[i] = b[i]
             for j in range(0, i):
-                x[i] -= L[i, j] * x[j]
-            x[i] = x[i] / L[i, i]
+                x[i] -= L[self.N*(i) + j] * x[j]
+            x[i] = x[i] / L[self.N*(i) + i]
+
+# --pluto-fuse maxfuse
+#        if((self.N-1>= 0)):
+#            x[0] = b[0]
+#            x[0] = x[0] / L[(0)*self.N + 0]
+#            for c0 in range (1 , (self.N-1)+1):
+#                x[c0] = b[c0]
+#                for c1 in range (c0 , (c0 * 2-1)+1):
+#                    x[c0] -= L[(c0)*self.N + (-1 * c0) + c1] * x[(-1 * c0) + c1]
+#                x[c0] = x[c0] / L[(c0)*self.N + c0]
 # scop end

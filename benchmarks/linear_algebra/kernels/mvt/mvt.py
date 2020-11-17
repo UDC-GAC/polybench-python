@@ -18,6 +18,7 @@ from benchmarks.polybench import PolyBench
 from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
+import numpy as np
 
 
 class Mvt(PolyBench):
@@ -26,10 +27,14 @@ class Mvt(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -106,6 +111,19 @@ class _StrategyList(Mvt):
                 x2[i] = x2[i] + A[j][i] * y_2[j]
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, x1: list, x2: list, y_1: list, y_2: list, A: list):
+# scop begin
+        if((self.N-1>= 0)):
+            for c1 in range ((self.N-1)+1):
+                for c2 in range ((self.N-1)+1):
+                    x1[c1] = x1[c1] + A[c1][c2] * y_1[c2]
+                    x2[c1] = x2[c1] + A[c2][c1] * y_2[c2]
+# scop end
 
 class _StrategyListFlattened(Mvt):
 
@@ -127,12 +145,18 @@ class _StrategyListFlattened(Mvt):
     def kernel(self, x1: list, x2: list, y_1: list, y_2: list, A: list):
 # scop begin
         for i in range(0, self.N):
+#            tmp = x1[i] # load elimination
             for j in range(0, self.N):
                 x1[i] = x1[i] + A[self.N * i + j] * y_1[j]
+#                tmp = tmp + A[self.N * i + j] * y_1[j] # load elimination
+#            x1[i] = tmp # load elimination
 
         for i in range(0, self.N):
+#            tmp = x2[i] # load elimination
             for j in range(0, self.N):
                 x2[i] = x2[i] + A[self.N * j + i] * y_2[j]
+#                tmp = tmp + A[self.N * j + i] * y_2[j] # load elimination
+#            x2[i] = tmp # load elimination
 # scop end
 
 
@@ -155,11 +179,34 @@ class _StrategyNumPy(Mvt):
 
     def kernel(self, x1: ndarray, x2: ndarray, y_1: ndarray, y_2: ndarray, A: ndarray):
 # scop begin
-        for i in range(0, self.N):
-            for j in range(0, self.N):
-                x1[i] = x1[i] + A[i, j] * y_1[j]
+        x1[0:self.N] = x1[0:self.N] + np.dot( A[0:self.N,0:self.N], y_1[0:self.N] )
+        x2[0:self.N] = x2[0:self.N] + np.dot( A[0:self.N,0:self.N].T, y_2[0:self.N] )
+# scop end
 
-        for i in range(0, self.N):
-            for j in range(0, self.N):
-                x2[i] = x2[i] + A[j, i] * y_2[j]
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, x1: list, x2: list, y_1: list, y_2: list, A: list):
+# scop begin
+#        if((self.N-1>= 0)):
+#            for c1 in range ((self.N-1)+1):
+#                for c2 in range ((self.N-1)+1):
+#                    x1[c1] = x1[c1] + A[self.N*(c1) + c2] * y_1[c2]
+#                    x2[c1] = x2[c1] + A[self.N*(c2) + c1] * y_2[c2]
+
+# --pluto --pluto-prevector --vectorizer --pragmatizer
+#        if((self.N-1>= 0)):
+#            for c2 in range ((self.N-1)+1):
+#                for c1 in range ((self.N-1)+1):
+#                    x1[c1] = x1[c1] + A[self.N*(c1) + c2] * y_1[c2]
+#                    x2[c1] = x2[c1] + A[self.N*(c2) + c1] * y_2[c2]
+
+# --pluto --pluto-fuse maxfuse
+        if((self.N-1>= 0)):
+            for c0 in range ((self.N-1)+1):
+                for c1 in range ((self.N-1)+1):
+                    x1[c0] = x1[c0] + A[(c0)*self.N + c1] * y_1[c1]
+                    x2[c0] = x2[c0] + A[(c1)*self.N + c0] * y_2[c1]
 # scop end

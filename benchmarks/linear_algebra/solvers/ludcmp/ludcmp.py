@@ -18,6 +18,7 @@ from benchmarks.polybench import PolyBench
 from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
+import numpy as np
 
 
 class Ludcmp(PolyBench):
@@ -26,10 +27,14 @@ class Ludcmp(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -141,6 +146,52 @@ class _StrategyList(Ludcmp):
             x[i] = w / A[i][i]
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, A: list, b: list, x: list, y: list):
+# scop begin
+        if((self.N-1>= 0)):
+            for c5 in range ((self.N-1)+1):
+                w = A[0][c5]
+                A[0][c5] = w
+            if((self.N-2>= 0)):
+                w = A[1][0]
+                A[1][0] = w / A[0][0]
+                for c5 in range (1 , (self.N-1)+1):
+                    w = A[1][c5]
+                    w -= A[1][0] * A[0][c5]
+                    A[1][c5] = w
+            for c3 in range (2 , (self.N-1)+1):
+                w = A[c3][0]
+                A[c3][0] = w / A[0][0]
+                for c5 in range (1 , (c3-1)+1):
+                    w = A[c3][c5]
+                    for c6 in range ((c5-1)+1):
+                        w -= A[c3][c6] * A[c6][c5]
+                    A[c3][c5] = w / A[c5][c5]
+                for c5 in range (c3 , (self.N-1)+1):
+                    w = A[c3][c5]
+                    for c6 in range ((c3-1)+1):
+                        w -= A[c3][c6] * A[c6][c5]
+                    A[c3][c5] = w
+            w = b[0]
+            y[0] = w
+            for c3 in range (1 , (self.N-1)+1):
+                w = b[c3]
+                for c5 in range ((c3-1)+1):
+                    w -= A[c3][c5] * y[c5]
+                y[c3] = w
+            w = y[self.N-1-0]
+            x[self.N-1-0] = w / A[self.N-1-0][self.N-1-0]
+            for c3 in range (1 , (self.N-1)+1):
+                w = y[self.N-1-c3]
+                for c5 in range (self.N + c3 * -1 , (self.N-1)+1):
+                    w -= A[self.N-1-c3][c5] * x[c5]
+                x[self.N-1-c3] = w / A[self.N-1-c3][self.N-1-c3]
+# scop end
 
 class _StrategyListFlattened(Ludcmp):
 
@@ -236,39 +287,202 @@ class _StrategyNumPy(Ludcmp):
         # not necessary for LU, but using same code as cholesky
         B = self.create_array(2, [self.N], self.DATA_TYPE(0))
 
-        for t in range(0, self.N):
-            for r in range(0, self.N):
-                for s in range(0, self.N):
-                    B[r, s] += A[r, t] * A[s, t]
-
-        for r in range(0, self.N):
-            for s in range(0, self.N):
-                A[r, s] = B[r, s]
+        B[0:self.N,0:self.N] = np.dot( A[0:self.N,0:self.N], A[0:self.N,0:self.N].T )
+        A[0:self.N,0:self.N] = B[0:self.N,0:self.N]
 
     def kernel(self, A: ndarray, b: ndarray, x: ndarray, y: ndarray):
 # scop begin
         for i in range(0, self.N):
             for j in range(0, i):
                 w = A[i, j]
-                for k in range(0, j):
-                    w -= A[i, k] * A[k, j]
+                w -= np.dot( A[i,0:j], A[0:j,j] )
                 A[i, j] = w / A[j, j]
 
             for j in range(i, self.N):
                 w = A[i, j]
-                for k in range(0, i):
-                    w -= A[i, k] * A[k, j]
+                w -= np.dot( A[i,0:i], A[0:i,j] )
                 A[i, j] = w
 
+        w = b[0:self.N]
         for i in range(0, self.N):
-            w = b[i]
-            for j in range(0, i):
-                w -= A[i, j] * y[j]
-            y[i] = w
+            w[i] -= np.dot( A[i,0:i], y[0:i] )
+            y[i] = w[i]
 
         for i in range(self.N - 1, -1, -1):
             w = y[i]
-            for j in range(i + 1, self.N):
-                w -= A[i, j] * x[j]
+            w -= np.dot( A[i,i+1:self.N], x[i+1:self.N] )
             x[i] = w / A[i, i]
+# scop end
+
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, A: list, b: list, x: list, y: list):
+# scop begin
+#        if((self.N-1>= 0)):
+#            for c5 in range ((self.N-1)+1):
+#                w = A[self.N*(0) + c5]
+#                A[self.N*(0) + c5] = w
+#            if((self.N-2>= 0)):
+#                w = A[self.N*(1) + 0]
+#                A[self.N*(1) + 0] = w / A[self.N*(0) + 0]
+#                for c5 in range (1 , (self.N-1)+1):
+#                    w = A[self.N*(1) + c5]
+#                    w -= A[self.N*(1) + 0] * A[self.N*(0) + c5]
+#                    A[self.N*(1) + c5] = w
+#            for c3 in range (2 , (self.N-1)+1):
+#                w = A[self.N*(c3) + 0]
+#                A[self.N*(c3) + 0] = w / A[self.N*(0) + 0]
+#                for c5 in range (1 , (c3-1)+1):
+#                    w = A[self.N*(c3) + c5]
+#                    for c6 in range ((c5-1)+1):
+#                        w -= A[self.N*(c3) + c6] * A[self.N*(c6) + c5]
+#                    A[self.N*(c3) + c5] = w / A[self.N*(c5) + c5]
+#                for c5 in range (c3 , (self.N-1)+1):
+#                    w = A[self.N*(c3) + c5]
+#                    for c6 in range ((c3-1)+1):
+#                        w -= A[self.N*(c3) + c6] * A[self.N*(c6) + c5]
+#                    A[self.N*(c3) + c5] = w
+#            w = b[0]
+#            y[0] = w
+#            for c3 in range (1 , (self.N-1)+1):
+#                w = b[c3]
+#                for c5 in range ((c3-1)+1):
+#                    w -= A[self.N*(c3) + c5] * y[c5]
+#                y[c3] = w
+#            w = y[self.N-1-0]
+#            x[self.N-1-0] = w / A[self.N*(self.N-1-0) + self.N-1-0]
+#            for c3 in range (1 , (self.N-1)+1):
+#                w = y[self.N-1-c3]
+#                for c5 in range (self.N + c3 * -1 , (self.N-1)+1):
+#                    w -= A[self.N*(self.N-1-c3) + c5] * x[c5]
+#                x[self.N-1-c3] = w / A[self.N*(self.N-1-c3) + self.N-1-c3]
+#
+# --pluto-maxfuse
+#        if (self.N >= 1):
+#          for c7 in range( self.N ):
+#              w = A[(0)*self.N + c7];
+#              A[(0)*self.N + c7] = w;
+#          if (self.N >= 2):
+#            w = A[(1)*self.N + 0];
+#            A[(1)*self.N + 0] = w / A[(0)*self.N + 0];
+#            for c7 in range( 1, self.N ):
+#                w = A[(1)*self.N + c7];
+#                w -= A[(1)*self.N + 0] * A[(0)*self.N + c7];
+#                A[(1)*self.N + c7] = w;
+#
+#          for c4 in range( 2, self.N ):
+#              w = A[(c4)*self.N + 0];
+#              A[(c4)*self.N + 0] = w / A[(0)*self.N + 0];
+#              for c7 in range( 1, c4 ):
+#                  w = A[(c4)*self.N + c7];
+#                  for c8 in range( c7 ):
+#                      w -= A[(c4)*self.N + c8] * A[(c8)*self.N + c7];
+#                  A[(c4)*self.N + c7] = w / A[(c7)*self.N + c7];
+#              for c7 in range( c4, self.N ):
+#                  w = A[(c4)*self.N + c7];
+#                  for c8 in range( c4 ):
+#                      w -= A[(c4)*self.N + c8] * A[(c8)*self.N + c7];
+#                  A[(c4)*self.N + c7] = w;
+#          w = b[0];
+#          y[0] = w;
+#          for c4 in range( 1, self.N ):
+#              w = b[c4];
+#              for c7 in range( c4 ):
+#                  w -= A[(c4)*self.N + c7] * y[c7];
+#              y[c4] = w;
+#          w = y[self.N-1-0];
+#          x[self.N-1-0] = w / A[(self.N-1-0)*self.N + self.N-1-0];
+#          for c4 in range( 1, self.N ):
+#              w = y[self.N-1-c4];
+#              for c7 in range( -c4 + self.N, self.N ):
+#                  w -= A[(self.N-1-c4)*self.N + c7] * x[c7];
+#              x[self.N-1-c4] = w / A[(self.N-1-c4)*self.N + self.N-1-c4];
+
+# --pluto-fuse maxfuse --pluto-scalpriv
+#        if (self.N >= 1):
+#          for c4 in range( 1, self.N ):
+#              for c7 in range( c4 ):
+#                  w = A[(c4)*self.N + c7];
+#          for c7 in range( self.N ):
+#              w = A[(0)*self.N + c7];
+#          for c7 in range( self.N ):
+#              A[(0)*self.N + c7] = w;
+#          if (self.N >= 2):
+#            A[(1)*self.N + 0] = w / A[(0)*self.N + 0];
+#            for c7 in range( 1, self.N ):
+#                w = A[(1)*self.N + c7];
+#            for c7 in range( 1, self.N ):
+#                w -= A[(1)*self.N + 0] * A[(0)*self.N + c7];
+#            for c7 in range( 1, self.N ):
+#                A[(1)*self.N + c7] = w;
+#          for c4 in range( 2, self.N ):
+#              A[(c4)*self.N + 0] = w / A[(0)*self.N + 0];
+#              for c7 in range( 1, c4 ):
+#                  for c8 in range( c7 ):
+#                      w -= A[(c4)*self.N + c8] * A[(c8)*self.N + c7];
+#                  A[(c4)*self.N + c7] = w / A[(c7)*self.N + c7];
+#              for c7 in range( c4, self.N ):
+#                  w = A[(c4)*self.N + c7];
+#              for c7 in range( c4, self.N ):
+#                  for c8 in range( c4 ):
+#                      w -= A[(c4)*self.N + c8] * A[(c8)*self.N + c7];
+#              for c7 in range( c4, self.N ):
+#                  A[(c4)*self.N + c7] = w;
+#          for c4 in range( self.N ):
+#              w = b[c4];
+#          y[0] = w;
+#          for c4 in range( 1, self.N ):
+#              for c7 in range( c4 ):
+#                  w -= A[(c4)*self.N + c7] * y[c7];
+#              y[c4] = w;
+#          for c4 in range( self.N ):
+#              w = y[self.N-1-c4];
+#          x[self.N-1-0] = w / A[(self.N-1-0)*self.N + self.N-1-0];
+#          for c4 in range( 1, self.N ):
+#              for c7 in range( -c4 + self.N, self.N ):
+#                  w -= A[(self.N-1-c4)*self.N + c7] * x[c7];
+#              x[self.N-1-c4] = w / A[(self.N-1-c4)*self.N + self.N-1-c4];
+
+# --pluto --pluto-prevector --pluto-scalpriv --vectorizer --pragmatizer
+        if (self.N >= 1):
+          for c5 in range( self.N ):
+              w = A[(0)*self.N + c5];
+              A[(0)*self.N + c5] = w;
+          if (self.N >= 2):
+            w = A[(1)*self.N + 0];
+            A[(1)*self.N + 0] = w / A[(0)*self.N + 0];
+            for c5 in range(1, self.N):
+                w = A[(1)*self.N + c5];
+                w -= A[(1)*self.N + 0] * A[(0)*self.N + c5];
+                A[(1)*self.N + c5] = w;
+          for c3 in range( 2, self.N ):
+              w = A[(c3)*self.N + 0];
+              A[(c3)*self.N + 0] = w / A[(0)*self.N + 0];
+              for c5 in range( 1, c3 ):
+                  w = A[(c3)*self.N + c5];
+                  for c6 in range( c5 ):
+                      w -= A[(c3)*self.N + c6] * A[(c6)*self.N + c5];
+                  A[(c3)*self.N + c5] = w / A[(c5)*self.N + c5];
+              for c5 in range( c3, self.N ):
+                  w = A[(c3)*self.N + c5];
+                  for c6 in range( 0, c3 ):
+                      w -= A[(c3)*self.N + c6] * A[(c6)*self.N + c5];
+                  A[(c3)*self.N + c5] = w;
+          w = b[0];
+          y[0] = w;
+          for c3 in range( 1, self.N ):
+              w = b[c3];
+              for c5 in range( c3 ):
+                  w -= A[(c3)*self.N + c5] * y[c5];
+              y[c3] = w;
+          w = y[self.N-1-0];
+          x[self.N-1-0] = w / A[(self.N-1-0)*self.N + self.N-1-0];
+          for c3 in range( 1, self.N ):
+              w = y[self.N-1-c3];
+              for c5 in range( -c3 + self.N, self.N ):
+                  w -= A[(self.N-1-c3)*self.N + c5] * x[c5];
+              x[self.N-1-c3] = w / A[(self.N-1-c3)*self.N + self.N-1-c3];
 # scop end

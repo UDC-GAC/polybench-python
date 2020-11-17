@@ -18,7 +18,7 @@ from benchmarks.polybench import PolyBench
 from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
-
+import numpy as np
 
 class Floyd_warshall(PolyBench):
 
@@ -26,10 +26,14 @@ class Floyd_warshall(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -94,12 +98,26 @@ class _StrategyList(Floyd_warshall):
         for k in range(0, self.N):
             for i in range(0, self.N):
                 for j in range(0, self.N):
-                    if path[i][j] < path[i][k] + path[k][j]:
-                        path[i][j] = path[i][j]
-                    else:
-                        path[i][j] = path[i][k] + path[k][j]
+                    path[i][j] = path[i][j] if path[i][j] < path[i][k] + path[k][j] else path[i][k]+path[k][j]
+#                    if path[i][j] < path[i][k] + path[k][j]:
+#                        path[i][j] = path[i][j]
+#                    else:
+#                        path[i][j] = path[i][k] + path[k][j]
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, path: list):
+# scop begin
+        if((self.N-1>= 0)):
+            for c0 in range ((self.N-1)+1):
+                for c1 in range ((self.N-1)+1):
+                    for c2 in range ((self.N-1)+1):
+                        path[c1][c2] = path[c1][c2] if path[c1][c2] < path[c1][c0] + path[c0][c2] else path[c1][c0]+path[c0][c2]
+# scop end
 
 class _StrategyListFlattened(Floyd_warshall):
 
@@ -160,10 +178,29 @@ class _StrategyNumPy(Floyd_warshall):
     def kernel(self, path: ndarray):
 # scop begin
         for k in range(0, self.N):
-            for i in range(0, self.N):
-                for j in range(0, self.N):
-                    if path[i, j] < path[i, k] + path[k, j]:
-                        path[i, j] = path[i, j]
-                    else:
-                        path[i, j] = path[i, k] + path[k, j]
+            path_add = path[0:k+1,k,np.newaxis] + path[k, 0:self.N]
+            if k > 0: path[ 0:k, 0:self.N ] = np.minimum( path[0:k,0:self.N], path_add[:k] )
+
+            path[k,0:self.N] = np.minimum( path[k,0:self.N], path_add[k] )
+
+            path_add = path[k+1:,k,np.newaxis] + path[k, 0:self.N]
+            if k < self.N-1: path[ k+1:, 0:self.N ] = np.minimum( path[k+1:,0:self.N], path_add )
+
+# Without index set splitting
+#            for i in range(0, self.N):
+#                path[i,0:self.N] = np.where( path[i,0:self.N] < path[i,k] + path[k,0:self.N], path[i,0:self.N], path[i,k] + path[k,0:self.N] )
+# scop end
+
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, path: list):
+# scop begin
+        if((self.N-1>= 0)):
+            for c0 in range ((self.N-1)+1):
+                for c1 in range ((self.N-1)+1):
+                    for c2 in range ((self.N-1)+1):
+                        path[self.N*(c1) + c2] = path[self.N*(c1) + c2] if path[self.N*(c1) + c2] < path[self.N*(c1) + c0] + path[self.N*(c0) + c2] else path[self.N*(c1) + c0]+path[self.N*(c0) + c2]
 # scop end

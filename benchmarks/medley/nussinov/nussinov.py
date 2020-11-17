@@ -18,6 +18,7 @@ from benchmarks.polybench import PolyBench
 from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
+import numpy as np
 
 
 class Nussinov(PolyBench):
@@ -26,10 +27,14 @@ class Nussinov(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -100,64 +105,46 @@ class _StrategyList(Nussinov):
         #     else:
         #         return s2
         #
-        # def match(b1, b2):
-        #     if b1 + b2 == 3:
-        #         return 1
-        #     else:
-        #         return 0
-
+        def match(b1, b2): return b1+b2==3
 # scop begin
-        for i in range(self.N - 1, -1, -1):
-            for j in range(i + 1, self.N):
-                if j - 1 >= 0:
-                    # table[i][j] = max_score(table[i][j], table[i][j - 1])
-                    # NOTE: expanded macro max_score
-                    if table[i][j] >= table[i][j - 1]:
-                       table[i][j] = table[i][j]
-                    else:
-                       table[i][j] = table[i][j - 1]
-                if i+1 < self.N:
-                    # table[i][j] = max_score(table[i][j], table[i + 1][j])
-                    # NOTE: expanded macro max_score
-                    if table[i][j] >= table[i + 1][j]:
-                        table[i][j] = table[i][j]
-                    else:
-                        table[i][j] = table[i + 1][j]
-
-                if j - 1 >= 0 and i + 1 < self.N:
-                    # don't allow adjacent elements to bond
-                    if i < j - 1:
-                        # table[i][j] = max_score(table[i][j], table[i + 1][j - 1] + match(seq[i], seq[j]))
-                        # NOTE: expand macro match first
-                        if seq[i] + seq[j] == 3:
-                            # NOTE: expanded macro max_score; match = +1
-                            if table[i][j] >= table[i + 1][j - 1] + 1:
-                                table[i][j] = table[i][j]
-                            else:
-                                table[i][j] = table[i + 1][j - 1] + 1
-                        else:
-                            # NOTE: expanded macro max_score; match = +0
-                            if table[i][j] >= table[i + 1][j - 1] + 0:
-                                table[i][j] = table[i][j]
-                            else:
-                                table[i][j] = table[i + 1][j - 1] + 0
-                    else:
-                        # table[i][j] = max_score(table[i][j], table[i + 1][j - 1])
-                        # NOTE: expanded macro max_score
-                        if table[i][j] >= table[i+1][j-1]:
-                            table[i][j] = table[i][j]
-                        else:
-                            table[i][j] = table[i+1][j-1]
-
-                for k in range(i + 1, j):
-                    # table[i][j] = max_score(table[i][j], table[i][k] + table[k + 1][j])
-                    # NOTE: expanded macro max_score
-                    if table[i][j] >= table[i][k] + table[k+1][j]:
-                        table[i][j] = table[i][j]
-                    else:
-                        table[i][j] = table[i][k] + table[k+1][j]
+        for i in range ((self.N-1)+1):
+            for j in range (self.N + i * -1 , (self.N-1)+1):
+                if((j-1>= 0)):
+                    table[self.N-1-i][j] = max(table[self.N-1-i][j], table[self.N-1-i][j-1])
+                if((i-1>= 0)):
+                    table[self.N-1-i][j] = max(table[self.N-1-i][j], table[self.N-1-i+1][j])
+                if((i-1>= 0) and (j-1>= 0) and (self.N*-1+i+j-1>= 0)):
+                    table[self.N-1-i][j] = max(table[self.N-1-i][j], table[self.N-1-i+1][j-1]+match(seq[self.N-1-i], seq[j]))
+                if((i-1>= 0) and (j-1>= 0) and (self.N+i*-1+j*-1>= 0)):
+                    table[self.N-1-i][j] = max(table[self.N-1-i][j], table[self.N-1-i+1][j-1])
+                for k in range (self.N + i * -1 , (j-1)+1):
+                    table[self.N-1-i][j] = max(table[self.N-1-i][j], table[self.N-1-i][k] + table[k+1][j])
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, seq: list, table: list):
+        def match(b1,b2):
+            return b1+b2 == 3
+# scop begin
+        if((self.N-2>= 0)):
+            table[self.N-1-1][self.N + -1] = max(table[self.N-1-1][self.N + -1], table[self.N-1-1][self.N + -1 -1])
+            table[self.N-1-1][self.N + -1] = max(table[self.N-1-1][self.N + -1], table[self.N-1-1 +1][self.N + -1])
+            table[self.N-1-1][self.N + -1] = max(table[self.N-1-1][self.N + -1], table[self.N-1-1 +1][self.N + -1 -1])
+            for c0 in range (2 , (self.N-1)+1):
+                table[self.N-1-c0][(-1 * c0) + self.N] = max(table[self.N-1-c0][(-1 * c0) + self.N], table[self.N-1-c0][(-1 * c0) + self.N-1])
+                table[self.N-1-c0][(-1 * c0) + self.N] = max(table[self.N-1-c0][(-1 * c0) + self.N], table[self.N-1-c0+1][(-1 * c0) + self.N])
+                table[self.N-1-c0][(-1 * c0) + self.N] = max(table[self.N-1-c0][(-1 * c0) + self.N], table[self.N-1-c0+1][(-1 * c0) + self.N-1])
+                for c1 in range (self.N + c0 * -1 + 1 , (self.N-1)+1):
+                    table[self.N-1-c0][c1] = max(table[self.N-1-c0][c1], table[self.N-1-c0][c1-1])
+                    table[self.N-1-c0][c1] = max(table[self.N-1-c0][c1], table[self.N-1-c0+1][c1])
+                    table[self.N-1-c0][c1] = max(table[self.N-1-c0][c1], table[self.N-1-c0+1][c1-1]+match(seq[self.N-1-c0], seq[c1]))
+                    for c2 in range (self.N + c0 * -1 , (c1-1)+1):
+                        table[self.N-1-c0][c1] = max(table[self.N-1-c0][c1], table[self.N-1-c0][c2] + table[c2+1][c1])
+# scop end
 
 class _StrategyListFlattened(Nussinov):
 
@@ -185,56 +172,20 @@ class _StrategyListFlattened(Nussinov):
                 t += 1
 
     def kernel(self, seq: list, table: list):
+        def match(b1,b2): return b1+b2==3
 # scop begin
-        for i in range(self.N - 1, -1, -1):
-            for j in range(i + 1, self.N):
-                if j - 1 >= 0:
-                    # table[i][j] = max_score(table[i][j], table[i][j - 1])
-                    # NOTE: expanded macro max_score
-                    if table[self.N * i + j] >= table[self.N * i + j - 1]:
-                        table[self.N * i + j] = table[self.N * i + j]
-                    else:
-                        table[self.N * i + j] = table[self.N * i + j - 1]
-                if i + 1 < self.N:
-                    # table[i][j] = max_score(table[i][j], table[i + 1][j])
-                    # NOTE: expanded macro max_score
-                    if table[self.N * i + j] >= table[self.N * (i + 1) + j]:
-                        table[self.N * i + j] = table[self.N * i + j]
-                    else:
-                        table[self.N * i + j] = table[self.N * (i + 1) + j]
-
-                if j - 1 >= 0 and i + 1 < self.N:
-                    # don't allow adjacent elements to bond
-                    if i < j - 1:
-                        # table[i][j] = max_score(table[i][j], table[i + 1][j - 1] + match(seq[i], seq[j]))
-                        # NOTE: expand macro match first
-                        if seq[i] + seq[j] == 3:
-                            # NOTE: expanded macro max_score; match = +1
-                            if table[self.N * i + j] >= table[self.N * (i + 1) + j - 1] + 1:
-                                table[self.N * i + j] = table[self.N * i + j]
-                            else:
-                                table[self.N * i + j] = table[self.N * (i + 1) + j - 1] + 1
-                        else:
-                            # NOTE: expanded macro max_score; match = +0
-                            if table[self.N * i + j] >= table[self.N * (i + 1) + j - 1] + 0:
-                                table[self.N * i + j] = table[self.N * i + j]
-                            else:
-                                table[self.N * i + j] = table[self.N * (i + 1) + j - 1] + 0
-                    else:
-                        # table[i][j] = max_score(table[i][j], table[i + 1][j - 1])
-                        # NOTE: expanded macro max_score
-                        if table[self.N * i + j] >= table[self.N * (i + 1) + j - 1]:
-                            table[self.N * i + j] = table[self.N * i + j]
-                        else:
-                            table[self.N * i + j] = table[self.N * (i + 1) + j - 1]
-
-                for k in range(i + 1, j):
-                    # table[i][j] = max_score(table[i][j], table[i][k] + table[k + 1][j])
-                    # NOTE: expanded macro max_score
-                    if table[self.N * i + j] >= table[self.N * i + k] + table[self.N * (k + 1) + j]:
-                        table[self.N * i + j] = table[self.N * i + j]
-                    else:
-                        table[self.N * i + j] = table[self.N * i + k] + table[self.N * (k + 1) + j]
+        for i in range ((self.N-1)+1):
+            for j in range (self.N + i * -1 , (self.N-1)+1):
+                if((j-1>= 0)):
+                    table[self.N*(self.N-1-i) + j] = max(table[self.N*(self.N-1-i)+j], table[self.N*(self.N-1-i)+j-1])
+                if((i-1>= 0)):
+                    table[self.N*(self.N-1-i) + j] = max(table[self.N*(self.N-1-i)+j], table[self.N*(self.N-1-i+1)+j])
+                if((i-1>= 0) and (j-1>= 0) and (self.N*-1+i+j-1>= 0)):
+                    table[self.N*(self.N-1-i)+j] = max(table[self.N*(self.N-1-i)+j], table[self.N*(self.N-1-i+1)+j-1]+match(seq[self.N-1-i], seq[j]))
+                if((i-1>= 0) and (j-1>= 0) and (self.N+i*-1+j*-1>= 0)):
+                    table[self.N*(self.N-1-i)+j] = max(table[self.N*(self.N-1-i)+j], table[self.N*(self.N-1-i+1)+j-1])
+                for k in range (self.N + i * -1 , (j-1)+1):
+                    table[self.N*(self.N-1-i)+j] = max(table[self.N*(self.N-1-i)+j], table[self.N*(self.N-1-i)+k] + table[self.N*(k+1)+j])
 # scop end
 
 
@@ -270,60 +221,45 @@ class _StrategyNumPy(Nussinov):
         #     else:
         #         return s2
         #
-        # def match(b1, b2):
-        #     if b1 + b2 == 3:
-        #         return 1
-        #     else:
-        #         return 0
-
+        def match(b1, b2): return b1+b2 == 3
+        table_flattened = table.ravel()
 # scop begin
-        for i in range(self.N - 1, -1, -1):
-            for j in range(i + 1, self.N):
-                if j - 1 >= 0:
-                    # table[i][j] = max_score(table[i][j], table[i][j - 1])
-                    # NOTE: expanded macro max_score
-                    if table[i, j] >= table[i, j - 1]:
-                        table[i, j] = table[i, j]
-                    else:
-                        table[i, j] = table[i, j - 1]
-                if i + 1 < self.N:
-                    # table[i][j] = max_score(table[i][j], table[i + 1][j])
-                    # NOTE: expanded macro max_score
-                    if table[i, j] >= table[i + 1, j]:
-                        table[i, j] = table[i, j]
-                    else:
-                        table[i, j] = table[i + 1, j]
+        for i in range(self.N):
+            diag_i = np.arange( 0, self.N-i-1 )
+            diag_j = np.arange( i+1, self.N )
+            slice_W      = slice( i , i + self.N*(self.N-i-1) , self.N+1 )
+            slice_center = slice( i+1 , i+1 + self.N*(self.N-i-1) , self.N+1 )
+            slice_SW = slice( i+self.N , i + self.N*(self.N-i) , self.N+1 )
+            slice_S = slice( i+1+self.N , i+1 + self.N*(self.N-i) , self.N+1 )
+            table_flattened[slice_center] = np.maximum( table_flattened[slice_center], table_flattened[slice_W] )
+            table_flattened[slice_center] = np.maximum( table_flattened[slice_center], table_flattened[slice_S] )
+            if i > 0: table_flattened[ slice_center ] = np.maximum( table_flattened[slice_center], table_flattened[slice_SW] + match( seq[0:self.N-1-i], seq[i+1:self.N] ) )
+            else: table_flattened[ slice_center] = np.maximum( table_flattened[slice_center], table_flattened[slice_SW] )
+            if i < self.N-1: table_flattened[slice_center] = np.maximum( table_flattened[slice_center], np.max( table[0:self.N-i-1, i+1:self.N], axis=0 ) )
 
-                if j - 1 >= 0 and i + 1 < self.N:
-                    # don't allow adjacent elements to bond
-                    if i < j - 1:
-                        # table[i][j] = max_score(table[i][j], table[i + 1][j - 1] + match(seq[i], seq[j]))
-                        # NOTE: expand macro match first
-                        if seq[i] + seq[j] == 3:
-                            # NOTE: expanded macro max_score; match = +1
-                            if table[i, j] >= table[i + 1, j - 1] + 1:
-                                table[i, j] = table[i, j]
-                            else:
-                                table[i, j] = table[i + 1, j - 1] + 1
-                        else:
-                            # NOTE: expanded macro max_score; match = +0
-                            if table[i, j] >= table[i + 1, j - 1] + 0:
-                                table[i, j] = table[i, j]
-                            else:
-                                table[i, j] = table[i + 1, j - 1] + 0
-                    else:
-                        # table[i][j] = max_score(table[i][j], table[i + 1][j - 1])
-                        # NOTE: expanded macro max_score
-                        if table[i, j] >= table[i + 1, j - 1]:
-                            table[i, j] = table[i, j]
-                        else:
-                            table[i, j] = table[i + 1, j - 1]
+# scop end
 
-                for k in range(i + 1, j):
-                    # table[i][j] = max_score(table[i][j], table[i][k] + table[k + 1][j])
-                    # NOTE: expanded macro max_score
-                    if table[i, j] >= table[i, k] + table[k + 1, j]:
-                        table[i, j] = table[i, j]
-                    else:
-                        table[i, j] = table[i, k] + table[k + 1, j]
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, seq: list, table: list):
+        def match(b1,b2):
+            return b1+b2 == 3
+# scop begin
+        if((self.N-2>= 0)):
+            table[self.N*(self.N-1-1) + self.N + -1] = max(table[self.N*(self.N-1-1) + self.N + -1], table[self.N*(self.N-1-1) + self.N + -1 -1])
+            table[self.N*(self.N-1-1) + self.N + -1] = max(table[self.N*(self.N-1-1) + self.N + -1], table[self.N*(self.N-1-1 +1) + self.N + -1])
+            table[self.N*(self.N-1-1) + self.N + -1] = max(table[self.N*(self.N-1-1) + self.N + -1], table[self.N*(self.N-1-1 +1) + self.N + -1 -1])
+            for c0 in range (2 , (self.N-1)+1):
+                table[self.N*(self.N-1-c0) + (-1 * c0) + self.N] = max(table[self.N*(self.N-1-c0) + (-1 * c0) + self.N], table[self.N*(self.N-1-c0) + (-1 * c0) + self.N-1])
+                table[self.N*(self.N-1-c0) + (-1 * c0) + self.N] = max(table[self.N*(self.N-1-c0) + (-1 * c0) + self.N], table[self.N*(self.N-1-c0+1) + (-1 * c0) + self.N])
+                table[self.N*(self.N-1-c0) + (-1 * c0) + self.N] = max(table[self.N*(self.N-1-c0) + (-1 * c0) + self.N], table[self.N*(self.N-1-c0+1) + (-1 * c0) + self.N-1])
+                for c1 in range (self.N + c0 * -1 + 1 , (self.N-1)+1):
+                    table[self.N*(self.N-1-c0) + c1] = max(table[self.N*(self.N-1-c0) + c1], table[self.N*(self.N-1-c0) + c1-1])
+                    table[self.N*(self.N-1-c0) + c1] = max(table[self.N*(self.N-1-c0) + c1], table[self.N*(self.N-1-c0+1) + c1])
+                    table[self.N*(self.N-1-c0) + c1] = max(table[self.N*(self.N-1-c0) + c1], table[self.N*(self.N-1-c0+1) + c1-1]+match(seq[self.N-1-c0], seq[c1]))
+                    for c2 in range (self.N + c0 * -1 , (c1-1)+1):
+                        table[self.N*(self.N-1-c0) + c1] = max(table[self.N*(self.N-1-c0) + c1], table[self.N*(self.N-1-c0) + c2] + table[self.N*(c2+1) + c1])
 # scop end

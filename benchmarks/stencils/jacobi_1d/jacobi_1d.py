@@ -15,10 +15,25 @@
 """<replace_with_module_description>"""
 
 from benchmarks.polybench import PolyBench
+from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
+from numpy.core.multiarray import ndarray
 
 
 class Jacobi_1d(PolyBench):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
+        if implementation == ArrayImplementation.LIST:
+            return _StrategyList.__new__(_StrategyList, options, parameters)
+        if implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED:
+            return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.NUMPY:
+            return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -33,26 +48,6 @@ class Jacobi_1d(PolyBench):
         self.TSTEPS = params.get('TSTEPS')
         self.N = params.get('N')
 
-    def initialize_array(self, A: list, B: list):
-        for i in range(0, self.N):
-            A[i] = (self.DATA_TYPE(i) + 2) / self.N
-            B[i] = (self.DATA_TYPE(i) + 3) / self.N
-
-    def print_array_custom(self, A: list, name: str):
-        for i in range(0, self.N):
-            if i % 20 == 0:
-                self.print_message('\n')
-            self.print_value(A[i])
-
-    def kernel(self, A: list, B: list):
-# scop begin
-        for t in range(0, self.TSTEPS):
-            for i in range(1, self.N - 1):
-                B[i] = 0.33333 * (A[i-1] + A[i] + A[i + 1])
-
-            for i in range(1, self.N - 1):
-                A[i] = 0.33333 * (B[i-1] + B[i] + B[i + 1])
-# scop end
 
     def run_benchmark(self):
         # Create data structures (arrays, auxiliary variables, etc.)
@@ -77,3 +72,88 @@ class Jacobi_1d(PolyBench):
         #   - For multiple data structure results:
         #     return [('matrix1', m1), ('matrix2', m2), ... ]
         return [('A', A)]
+
+class _StrategyList(Jacobi_1d):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyList)
+
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+    def initialize_array(self, A: list, B: list):
+        for i in range(0, self.N):
+            A[i] = (self.DATA_TYPE(i) + 2) / self.N
+            B[i] = (self.DATA_TYPE(i) + 3) / self.N
+
+    def print_array_custom(self, A: list, name: str):
+        for i in range(0, self.N):
+            if i % 20 == 0:
+                self.print_message('\n')
+            self.print_value(A[i])
+
+    def kernel(self, A: list, B: list):
+# scop begin
+        for t in range(0, self.TSTEPS):
+            for i in range(1, self.N - 1):
+                B[i] = 0.33333 * (A[i-1] + A[i] + A[i + 1])
+
+            for i in range(1, self.N - 1):
+                A[i] = 0.33333 * (B[i-1] + B[i] + B[i + 1])
+#scop end
+
+class _StrategyListPluto(Jacobi_1d):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+    def initialize_array(self, A: list, B: list):
+        for i in range(0, self.N):
+            A[i] = (self.DATA_TYPE(i) + 2) / self.N
+            B[i] = (self.DATA_TYPE(i) + 3) / self.N
+
+    def print_array_custom(self, A: list, name: str):
+        for i in range(0, self.N):
+            if i % 20 == 0:
+                self.print_message('\n')
+            self.print_value(A[i])
+
+    def kernel(self, A: list, B: list):
+# scop begin
+        if((self.N-3>= 0) and (self.TSTEPS-1>= 0)):
+            for c0 in range ((self.TSTEPS-1)+1):
+                B[1] = 0.33333 * (A[1 -1] + A[1] + A[1 + 1])
+                for c1 in range (c0 * 2 + 2 , (self.N + c0 * 2-2)+1):
+                    B[(-2 * c0) + c1] = 0.33333 * (A[(-2 * c0) + c1-1] + A[(-2 * c0) + c1] + A[(-2 * c0) + c1 + 1])
+                    A[((-2 * c0) + c1) + -1] = 0.33333 * (B[((-2 * c0) + c1) + -1 -1] + B[((-2 * c0) + c1) + -1] + B[((-2 * c0) + c1) + -1 + 1])
+                A[self.N + -2] = 0.33333 * (B[self.N + -2 -1] + B[self.N + -2] + B[self.N + -2 + 1])
+# scop end
+
+class _StrategyNumPy(Jacobi_1d):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyNumPy)
+
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+    def initialize_array(self, A: ndarray, B: ndarray):
+        for i in range(0, self.N):
+            A[i] = (self.DATA_TYPE(i) + 2) / self.N
+            B[i] = (self.DATA_TYPE(i) + 3) / self.N
+
+    def print_array_custom(self, A: ndarray, name: str):
+        for i in range(0, self.N):
+            if i % 20 == 0:
+                self.print_message('\n')
+            self.print_value(A[i])
+
+    def kernel(self, A: ndarray, B: ndarray):
+# scop begin
+        for t in range(0, self.TSTEPS):
+            B[1:self.N-1] = 0.33333 * (A[0:self.N-2] + A[1:self.N-1] + A[2:self.N])
+            A[1:self.N-1] = 0.33333 * (B[0:self.N-2] + B[1:self.N-1] + B[2:self.N])
+#scop end

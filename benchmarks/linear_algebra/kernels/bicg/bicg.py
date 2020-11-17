@@ -18,6 +18,7 @@ from benchmarks.polybench import PolyBench
 from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
+import numpy as np
 
 
 class Bicg(PolyBench):
@@ -26,10 +27,14 @@ class Bicg(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -64,7 +69,7 @@ class Bicg(PolyBench):
         r = self.create_array(1, [self.N], self.DATA_TYPE(0))
 
         # Initialize data structures
-        self.initialize_array(A, r, p)
+        self.initialize_array(A, s, q, p, r)
 
         # Benchmark the kernel
         self.time_kernel(A, s, q, p, r)
@@ -91,7 +96,7 @@ class _StrategyList(Bicg):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: list, r: list, p: list):
+    def initialize_array(self, A: list, s: list, q: list, p: list, r: list):
         for i in range(0, self.M):
             p[i] = self.DATA_TYPE(i % self.M) / self.M
 
@@ -112,6 +117,26 @@ class _StrategyList(Bicg):
                 q[i] = q[i] + A[i][j] * p[j]
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, A: list, s: list, q: list, p: list, r: list):
+# scop begin
+        for c1 in range ((self.N-1)+1):
+            q[c1] = 0.0
+        if((self.M-1>= 0)):
+            for c1 in range ((self.N-1)+1):
+                for c2 in range ((self.M-1)+1):
+                    q[c1] = q[c1] + A[c1][c2] * p[c2]
+        for c1 in range ((self.M-1)+1):
+            s[c1] = 0
+        if((self.N-1>= 0)):
+            for c1 in range ((self.M-1)+1):
+                for c2 in range ((self.N-1)+1):
+                    s[c1] = s[c1] + r[c2] * A[c2][c1]
+# scop end
 
 class _StrategyListFlattened(Bicg):
 
@@ -121,7 +146,7 @@ class _StrategyListFlattened(Bicg):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: list, r: list, p: list):
+    def initialize_array(self, A: list, s: list, q: list, p: list, r: list):
         for i in range(0, self.M):
             p[i] = self.DATA_TYPE(i % self.M) / self.M
 
@@ -151,7 +176,7 @@ class _StrategyNumPy(Bicg):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: ndarray, r: ndarray, p: ndarray):
+    def initialize_array(self, A: list, s: list, q: list, p: list, r: list):
         for i in range(0, self.M):
             p[i] = self.DATA_TYPE(i % self.M) / self.M
 
@@ -162,12 +187,71 @@ class _StrategyNumPy(Bicg):
 
     def kernel(self, A: ndarray, s: ndarray, q: ndarray, p: ndarray, r: ndarray):
 # scop begin
-        for i in range(0, self.M):
-            s[i] = 0
+        s[0:self.M] = np.dot( r[0:self.N], A[0:self.N,0:self.M] )
+        q[0:self.N] = np.dot( A[0:self.N,0:self.M], p[0:self.M] )
+# scop end
 
-        for i in range(0, self.N):
-            q[i] = 0.0
-            for j in range(0, self.M):
-                s[j] = s[j] + r[i] * A[i, j]
-                q[i] = q[i] + A[i, j] * p[j]
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, A: list, s: list, q: list, p: list, r: list):
+# scop begin
+#        for c1 in range ((self.N-1)+1):
+#            q[c1] = 0.0
+#        if((self.M-1>= 0)):
+#            for c1 in range ((self.N-1)+1):
+#                for c2 in range ((self.M-1)+1):
+#                    q[c1] = q[c1] + A[self.M*(c1) + c2] * p[c2]
+#        for c1 in range ((self.M-1)+1):
+#            s[c1] = 0
+#        if((self.N-1>= 0)):
+#            for c1 in range ((self.M-1)+1):
+#                for c2 in range ((self.N-1)+1):
+#                    s[c1] = s[c1] + r[c2] * A[self.M*(c2) + c1]
+
+# --pluto --pluto-prevector --pragmatizer --vectorizer
+#        for c1 in range ((self.N-1)+1):
+#            q[c1] = 0.0
+#        if((self.M-1>= 0)):
+#            for c1 in range ((self.N-1)+1):
+#                for c2 in range ((self.M-1)+1):
+#                    q[c1] = q[c1] + A[self.M*(c1) + c2] * p[c2]
+#        for c1 in range ((self.M-1)+1):
+#            s[c1] = 0
+#        if((self.N-1>= 0)):
+#            for c2 in range ((self.N-1)+1):
+#                for c1 in range ((self.M-1)+1):
+#                    s[c1] = s[c1] + r[c2] * A[self.M*(c2) + c1]
+
+# --pluto --pluto-fuse maxfuse
+        for c0 in range (min((self.M-1)+1 , (self.N-1)+1)):
+            q[c0] = 0.0
+            q[c0] = q[c0] + A[(c0)*self.M + 0] * p[0]
+            s[c0] = 0
+            s[c0] = s[c0] + r[0] * A[(0)*self.M + c0]
+            for c1 in range (c0 + 1 , min((self.M + c0-1)+1 , (self.N + c0-1)+1)):
+                q[c0] = q[c0] + A[(c0)*self.M + (-1 * c0) + c1] * p[(-1 * c0) + c1]
+                s[c0] = s[c0] + r[(-1 * c0) + c1] * A[((-1 * c0) + c1)*self.M + c0]
+            for c1 in range (self.M + c0 , (self.N + c0-1)+1):
+                s[c0] = s[c0] + r[(-1 * c0) + c1] * A[((-1 * c0) + c1)*self.M + c0]
+            for c1 in range (self.N + c0 , (self.M + c0-1)+1):
+                q[c0] = q[c0] + A[(c0)*self.M + (-1 * c0) + c1] * p[(-1 * c0) + c1]
+        if((self.N-1>= 0)):
+            for c0 in range (self.N , (self.M-1)+1):
+                s[c0] = 0
+                for c1 in range (c0 , (self.N + c0-1)+1):
+                    s[c0] = s[c0] + r[(-1 * c0) + c1] * A[((-1 * c0) + c1)*self.M + c0]
+        if((self.N*-1>= 0)):
+            for c0 in range ((self.M-1)+1):
+                s[c0] = 0
+        if((self.M-1>= 0)):
+            for c0 in range (self.M , (self.N-1)+1):
+                q[c0] = 0.0
+                for c1 in range (c0 , (self.M + c0-1)+1):
+                    q[c0] = q[c0] + A[(c0)*self.M + (-1 * c0) + c1] * p[(-1 * c0) + c1]
+        if((self.M*-1>= 0)):
+            for c0 in range ((self.N-1)+1):
+                q[c0] = 0.0
 # scop end

@@ -19,6 +19,7 @@ from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
 import math
+import numpy as np
 
 
 class Gramschmidt(PolyBench):
@@ -27,10 +28,14 @@ class Gramschmidt(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -121,6 +126,45 @@ class _StrategyList(Gramschmidt):
                     A[i][j] = A[i][j] - Q[i][k] * R[k][j]
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, A: list, R: list, Q: list):
+# scop begin
+        if((self.N-1>= 0)):
+            for c1 in range ((self.N-2)+1):
+                for c3 in range (c1 + 1 , (self.N-1)+1):
+                    R[c1][c3] = 0.0
+            if((self.M-1>= 0)):
+                for c1 in range ((self.N-2)+1):
+                    nrm = 0.0
+                    for c3 in range ((self.M-1)+1):
+                        nrm += A[c3][c1] * A[c3][c1]
+                    R[c1][c1] = math.sqrt(nrm)
+                    for c3 in range ((self.M-1)+1):
+                        Q[c3][c1] = A[c3][c1] / R[c1][c1]
+                    for c3 in range (c1 + 1 , (self.N-1)+1):
+                        for c6 in range ((self.M-1)+1):
+                            R[c1][c3] += Q[c6][c1] * A[c6][c3]
+                        for c6 in range ((self.M-1)+1):
+                            A[c6][c3] = A[c6][c3] - Q[c6][c1] * R[c1][c3]
+            if((self.M-1>= 0)):
+                nrm = 0.0
+            if((self.M-1>= 0)):
+                for c3 in range ((self.M-1)+1):
+                    nrm += A[c3][self.N + -1] * A[c3][self.N + -1]
+            if((self.M-1>= 0)):
+                R[self.N + -1][self.N + -1] = math.sqrt(nrm)
+            if((self.M-1>= 0)):
+                for c3 in range ((self.M-1)+1):
+                    Q[c3][self.N + -1] = A[c3][self.N + -1] / R[self.N + -1][self.N + -1]
+            if((self.M*-1>= 0)):
+                for c1 in range ((self.N-1)+1):
+                    nrm = 0.0
+                    R[c1][c1] = math.sqrt(nrm)
+# scop end
 
 class _StrategyListFlattened(Gramschmidt):
 
@@ -206,19 +250,121 @@ class _StrategyNumPy(Gramschmidt):
     def kernel(self, A: ndarray, R: ndarray, Q: ndarray):
 # scop begin
         for k in range(0, self.N):
-            nrm = 0.0
-            for i in range(0, self.M):
-                nrm += A[i, k] * A[i, k]
+            nrm = np.dot( A[0:self.M,k], A[0:self.M,k] )
             R[k, k] = math.sqrt(nrm)
+            Q[0:self.M,k] = A[0:self.M,k] / R[k,k]
+            R[k, k+1:self.N] = np.dot( Q[0:self.M, k].T, A[0:self.M,k+1:self.N] )
+            A[0:self.M,k+1:self.N] = A[0:self.M,k+1:self.N] - np.dot(Q[0:self.M,k,np.newaxis], R[np.newaxis,k,k+1:self.N])
+# scop end
 
-            for i in range(0, self.M):
-                Q[i, k] = A[i, k] / R[k, k]
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
 
-            for j in range(k + 1, self.N):
-                R[k, j] = 0.0
-                for i in range(0, self.M):
-                    R[k, j] += Q[i, k] * A[i, j]
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
 
-                for i in range(0, self.M):
-                    A[i, j] = A[i, j] - Q[i, k] * R[k, j]
+    def kernel(self, A: list, R: list, Q: list):
+# scop begin
+#        if((self.N-1>= 0)):
+#            for c1 in range ((self.N-2)+1):
+#                for c3 in range (c1 + 1 , (self.N-1)+1):
+#                    R[self.N*(c1) + c3] = 0.0
+#            if((self.M-1>= 0)):
+#                for c1 in range ((self.N-2)+1):
+#                    nrm = 0.0
+#                    for c3 in range ((self.M-1)+1):
+#                        nrm += A[self.N*(c3) + c1] * A[self.N*(c3) + c1]
+#                    R[self.N*(c1) + c1] = math.sqrt(nrm)
+#                    for c3 in range ((self.M-1)+1):
+#                        Q[self.N*(c3) + c1] = A[self.N*(c3) + c1] / R[self.N*(c1) + c1]
+#                    for c3 in range (c1 + 1 , (self.N-1)+1):
+#                        for c6 in range ((self.M-1)+1):
+#                            R[self.N*(c1) + c3] += Q[self.N*(c6) + c1] * A[self.N*(c6) + c3]
+#                        for c6 in range ((self.M-1)+1):
+#                            A[self.N*(c6) + c3] = A[self.N*(c6) + c3] - Q[self.N*(c6) + c1] * R[self.N*(c1) + c3]
+#            if((self.M-1>= 0)):
+#                nrm = 0.0
+#            if((self.M-1>= 0)):
+#                for c3 in range ((self.M-1)+1):
+#                    nrm += A[self.N*(c3) + self.N + -1] * A[self.N*(c3) + self.N + -1]
+#            if((self.M-1>= 0)):
+#                R[self.N*(self.N + -1) + self.N + -1] = math.sqrt(nrm)
+#            if((self.M-1>= 0)):
+#                for c3 in range ((self.M-1)+1):
+#                    Q[self.N*(c3) + self.N + -1] = A[self.N*(c3) + self.N + -1] / R[self.N*(self.N + -1) + self.N + -1]
+#            if((self.M*-1>= 0)):
+#                for c1 in range ((self.N-1)+1):
+#                    nrm = 0.0
+#                    R[self.N*(c1) + c1] = math.sqrt(nrm)
+
+# --pluto --pluto-prevector --pluto-scalpriv --vectorizer --pragmatizer
+#        if (self.N >= 1):
+#          ub1 = (self.N + -2);
+#          for c1 in range( ub1+1 ):
+#              for c3 in range( c1+1, self.N ):
+#                  R[(c1)*self.N + c3] = 0.0;
+#          if (self.M >= 1):
+#            for c1 in range( self.N-1 ):
+#                nrm = 0.0;
+#                for c3 in range( self.M ):
+#                    nrm += A[(c3)*self.N + c1] * A[(c3)*self.N + c1];
+#                R[(c1)*self.N + c1] = math.sqrt(nrm);
+#                for c3 in range( self.M ):
+#                    Q[(c3)*self.N + c1] = A[(c3)*self.N + c1] / R[(c1)*self.N + c1];
+#                lb1 = (c1 + 1);
+#                ub1 = (self.N + -1);
+#                for c3 in range( lb1, ub1+1 ):
+#                    for c6 in range( self.M ):
+#                        R[(c1)*self.N + c3] += Q[(c6)*self.N + c1] * A[(c6)*self.N + c3];
+#                    for c6 in range( self.M ):
+#                        A[(c6)*self.N + c3] = A[(c6)*self.N + c3] - Q[(c6)*self.N + c1] * R[(c1)*self.N + c3];
+#          if (self.M >= 1):
+#            nrm = 0.0;
+#            for c3 in range( self.M ):
+#                nrm += A[(c3)*self.N + self.N + -1] * A[(c3)*self.N + self.N + -1];
+#            R[(self.N + -1)*self.N + self.N + -1] = math.sqrt(nrm);
+#            for c3 in range( self.M ):
+#                Q[(c3)*self.N + self.N + -1] = A[(c3)*self.N + self.N + -1] / R[(self.N + -1)*self.N + self.N + -1];
+#          if (self.M <= 0):
+#            for c1 in range( self.N ):
+#                nrm = 0.0;
+#                R[(c1)*self.N + c1] = math.sqrt(nrm);
+
+# --pluto --pluto-fuse maxfuse
+        if((self.N-1>= 0)):
+            if((self.M-1>= 0)):
+                for c0 in range ((self.N-2)+1):
+                    for c3 in range (c0 + 1 , (self.N-1)+1):
+                        R[(c0)*self.N + c3] = 0.0
+                    nrm = 0.0
+                    for c3 in range ((self.M-1)+1):
+                        nrm += A[(c3)*self.N + c0] * A[(c3)*self.N + c0]
+                    R[(c0)*self.N + c0] = math.sqrt(nrm)
+                    for c3 in range ((self.M-1)+1):
+                        Q[(c3)*self.N + c0] = A[(c3)*self.N + c0] / R[(c0)*self.N + c0]
+                    for c3 in range (c0 + 1 , (self.N-1)+1):
+                        for c6 in range ((self.M-1)+1):
+                            R[(c0)*self.N + c3] += Q[(c6)*self.N + c0] * A[(c6)*self.N + c3]
+                        for c6 in range ((self.M-1)+1):
+                            A[(c6)*self.N + c3] = A[(c6)*self.N + c3] - Q[(c6)*self.N + c0] * R[(c0)*self.N + c3]
+            if((self.M-1>= 0)):
+                nrm = 0.0
+            if((self.M-1>= 0)):
+                for c3 in range ((self.M-1)+1):
+                    nrm += A[(c3)*self.N + self.N + -1] * A[(c3)*self.N + self.N + -1]
+            if((self.M-1>= 0)):
+                R[(self.N + -1)*self.N + self.N + -1] = math.sqrt(nrm)
+            if((self.M-1>= 0)):
+                for c3 in range ((self.M-1)+1):
+                    Q[(c3)*self.N + self.N + -1] = A[(c3)*self.N + self.N + -1] / R[(self.N + -1)*self.N + self.N + -1]
+            if((self.M*-1>= 0)):
+                for c0 in range ((self.N-2)+1):
+                    for c3 in range (c0 + 1 , (self.N-1)+1):
+                        R[(c0)*self.N + c3] = 0.0
+                    nrm = 0.0
+                    R[(c0)*self.N + c0] = math.sqrt(nrm)
+            if((self.M*-1>= 0)):
+                nrm = 0.0
+            if((self.M*-1>= 0)):
+                R[(self.N + -1)*self.N + self.N + -1] = math.sqrt(nrm)
+
 # scop end

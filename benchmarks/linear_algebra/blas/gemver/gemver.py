@@ -18,7 +18,7 @@ from benchmarks.polybench import PolyBench
 from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
-
+import numpy as np
 
 class Gemver(PolyBench):
 
@@ -26,10 +26,14 @@ class Gemver(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -65,7 +69,7 @@ class Gemver(PolyBench):
         z = self.create_array(1, [self.N], self.DATA_TYPE(0))
 
         # Initialize data structures
-        self.initialize_array(A, u1, v1, u2, v2, w, x, y, z)
+        self.initialize_array(alpha, beta, A, u1, v1, u2, v2, w, x, y, z)
 
         # Benchmark the kernel
         self.time_kernel(alpha, beta, A, u1, v1, u2, v2, w, x, y, z)
@@ -92,7 +96,7 @@ class _StrategyList(Gemver):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: list, u1: list, v1: list, u2: list, v2: list, w: list, x: list, y: list, z: list):
+    def initialize_array(self, alpha, beta, A: list, u1: list, v1: list, u2: list, v2: list, w: list, x: list, y: list, z: list):
         fn = self.DATA_TYPE(self.N)
 
         for i in range(0, self.N):
@@ -125,6 +129,24 @@ class _StrategyList(Gemver):
                 w[i] = w[i] + alpha * A[i][j] * x[j]
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, alpha, beta, A: list, u1: list, v1: list, u2: list, v2: list, w: list, x: list, y: list, z: list):
+# scop begin
+        if((self.N-1>= 0)):
+            for c1 in range ((self.N-1)+1):
+                for c2 in range ((self.N-1)+1):
+                    A[c2][c1] = A[c2][c1] + u1[c2] * v1[c1] + u2[c2] * v2[c1]
+                    x[c1] = x[c1] + beta * A[c2][c1] * y[c2]
+            for c1 in range ((self.N-1)+1):
+                x[c1] = x[c1] + z[c1]
+            for c1 in range ((self.N-1)+1):
+                for c2 in range ((self.N-1)+1):
+                    w[c1] = w[c1] + alpha * A[c1][c2] * x[c2]
+# scop end
 
 class _StrategyListFlattened(Gemver):
 
@@ -134,7 +156,7 @@ class _StrategyListFlattened(Gemver):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: list, u1: list, v1: list, u2: list, v2: list, w: list, x: list, y: list, z: list):
+    def initialize_array(self, alpha, beta, A: list, u1: list, v1: list, u2: list, v2: list, w: list, x: list, y: list, z: list):
         fn = self.DATA_TYPE(self.N)
 
         for i in range(0, self.N):
@@ -176,8 +198,7 @@ class _StrategyNumPy(Gemver):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: ndarray, u1: ndarray, v1: ndarray, u2: ndarray, v2: ndarray,
-                         w: ndarray, x: ndarray, y: ndarray, z: ndarray):
+    def initialize_array(self, alpha, beta, A: list, u1: list, v1: list, u2: list, v2: list, w: list, x: list, y: list, z: list):
         fn = self.DATA_TYPE(self.N)
 
         for i in range(0, self.N):
@@ -195,18 +216,52 @@ class _StrategyNumPy(Gemver):
     def kernel(self, alpha, beta, A: ndarray, u1: ndarray, v1: ndarray, u2: ndarray, v2: ndarray,
                w: ndarray, x: ndarray, y: ndarray, z: ndarray):
 # scop begin
-        for i in range(0, self.N):
-            for j in range(0, self.N):
-                A[i, j] = A[i, j] + u1[i] * v1[j] + u2[i] * v2[j]
+        A[0:self.N,0:self.N] = A[0:self.N,0:self.N] + np.dot( u1[:,np.newaxis], v1[np.newaxis,:] ) + np.dot( u2[:,np.newaxis], v2[np.newaxis,:] )
 
-        for i in range(0, self.N):
-            for j in range(0, self.N):
-                x[i] = x[i] + beta * A[j, i] * y[j]
+        x[0:self.N] = x[0:self.N] + beta * np.dot( A[0:self.N,0:self.N].T, y[0:self.N] )
 
-        for i in range(0, self.N):
-            x[i] = x[i] + z[i]
+        x[0:self.N] = x[0:self.N] + z[0:self.N]
 
-        for i in range(0, self.N):
-            for j in range(0, self.N):
-                w[i] = w[i] + alpha * A[i, j] * x[j]
+        w[0:self.N] = w[0:self.N] + alpha * np.dot( A[0:self.N,0:self.N], x[0:self.N] )
+# scop end
+
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, alpha, beta, A: list, u1: list, v1: list, u2: list, v2: list, w: list, x: list, y: list, z: list):
+# scop begin
+#        if((self.N-1>= 0)):
+#            for c1 in range ((self.N-1)+1):
+#                for c2 in range ((self.N-1)+1):
+#                    A[self.N*(c2) + c1] = A[self.N*(c2) + c1] + u1[c2] * v1[c1] + u2[c2] * v2[c1]
+#                    x[c1] = x[c1] + beta * A[self.N*(c2) + c1] * y[c2]
+#            for c1 in range ((self.N-1)+1):
+#                x[c1] = x[c1] + z[c1]
+#            for c1 in range ((self.N-1)+1):
+#                for c2 in range ((self.N-1)+1):
+#                    w[c1] = w[c1] + alpha * A[self.N*(c1) + c2] * x[c2]
+
+# --pluto --pluto-prevector --vectorizer --pragmatizer
+#        if((self.N-1>= 0)):
+#            for c2 in range ((self.N-1)+1):
+#                for c1 in range ((self.N-1)+1):
+#                    A[self.N*(c2) + c1] = A[self.N*(c2) + c1] + u1[c2] * v1[c1] + u2[c2] * v2[c1]
+#                    x[c1] = x[c1] + beta * A[self.N*(c2) + c1] * y[c2]
+#            for c1 in range ((self.N-1)+1):
+#                x[c1] = x[c1] + z[c1]
+#            for c1 in range ((self.N-1)+1):
+#                for c2 in range ((self.N-1)+1):
+#                    w[c1] = w[c1] + alpha * A[self.N*(c1) + c2] * x[c2]
+
+# --pluto --pluto-fuse maxfuse
+        if((self.N-1>= 0)):
+            for c0 in range ((self.N-1)+1):
+                for c3 in range ((self.N-1)+1):
+                    A[(c3)*self.N + c0] = A[(c3)*self.N + c0] + u1[c3] * v1[c0] + u2[c3] * v2[c0]
+                    x[c0] = x[c0] + beta * A[(c3)*self.N + c0] * y[c3]
+                x[c0] = x[c0] + z[c0]
+                for c3 in range ((self.N-1)+1):
+                    w[c3] = w[c3] + alpha * A[(c3)*self.N + c0] * x[c0]
 # scop end

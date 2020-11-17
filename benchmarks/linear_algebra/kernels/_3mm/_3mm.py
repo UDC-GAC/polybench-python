@@ -18,6 +18,7 @@ from benchmarks.polybench import PolyBench
 from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
+import numpy as np
 
 
 class _3mm(PolyBench):
@@ -26,10 +27,14 @@ class _3mm(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -58,7 +63,7 @@ class _3mm(PolyBench):
         G = self.create_array(2, [self.NI, self.NL], self.DATA_TYPE(0))
 
         # Initialize data structures
-        self.initialize_array(A, B, C, D)
+        self.initialize_array(E, A, B, F, C, D, G)
 
         # Benchmark the kernel
         self.time_kernel(E, A, B, F, C, D, G)
@@ -85,7 +90,7 @@ class _StrategyList(_3mm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: list, B: list, C: list, D: list):
+    def initialize_array(self, E: list, A: list, B: list, F: list, C: list, D: list, G: list):
         for i in range(0, self.NI):
             for j in range(0, self.NK):
                 A[i][j] = self.DATA_TYPE((i * j + 1) % self.NI) / (5 * self.NI)
@@ -133,6 +138,53 @@ class _StrategyList(_3mm):
                     G[i][j] += E[i][k] * F[k][j]
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, E: list, A: list, B: list, F: list, C: list, D: list, G: list):
+# scop begin
+        if((self.NL-1>= 0)):
+            for c1 in range (min((self.NI-1)+1 , (self.NJ-1)+1)):
+                for c2 in range ((self.NL-1)+1):
+                    G[c1][c2] = 0.0
+                    F[c1][c2] = 0.0
+        if((self.NL-1>= 0)):
+            for c1 in range (max(0 , self.NI) , (self.NJ-1)+1):
+                for c2 in range ((self.NL-1)+1):
+                    F[c1][c2] = 0.0
+        if((self.NL-1>= 0)):
+            for c1 in range (max(0 , self.NJ) , (self.NI-1)+1):
+                for c2 in range ((self.NL-1)+1):
+                    G[c1][c2] = 0.0
+        if((self.NL-1>= 0) and (self.NM-1>= 0)):
+            for c1 in range ((self.NJ-1)+1):
+                for c2 in range ((self.NL-1)+1):
+                    for c5 in range ((self.NM-1)+1):
+                        F[c1][c2] += C[c1][c5] * D[c5][c2]
+        if((self.NJ-1>= 0)):
+            for c1 in range ((self.NI-1)+1):
+                for c2 in range ((self.NJ-1)+1):
+                    E[c1][c2] = 0.0
+        if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL-1>= 0)):
+            for c1 in range ((self.NI-1)+1):
+                for c2 in range ((self.NJ-1)+1):
+                    for c5 in range ((self.NK-1)+1):
+                        E[c1][c2] += A[c1][c5] * B[c5][c2]
+                    for c5 in range ((self.NL-1)+1):
+                        G[c1][c5] += E[c1][c2] * F[c2][c5]
+        if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL*-1>= 0)):
+            for c1 in range ((self.NI-1)+1):
+                for c2 in range ((self.NJ-1)+1):
+                    for c5 in range ((self.NK-1)+1):
+                        E[c1][c2] += A[c1][c5] * B[c5][c2]
+        if((self.NJ-1>= 0) and (self.NK*-1>= 0) and (self.NL-1>= 0)):
+            for c1 in range ((self.NI-1)+1):
+                for c2 in range ((self.NJ-1)+1):
+                    for c5 in range ((self.NL-1)+1):
+                        G[c1][c5] += E[c1][c2] * F[c2][c5]
+# scop end
 
 class _StrategyListFlattened(_3mm):
 
@@ -142,7 +194,7 @@ class _StrategyListFlattened(_3mm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: list, B: list, C: list, D: list):
+    def initialize_array(self, E: list, A: list, B: list, F: list, C: list, D: list, G: list):
         for i in range(0, self.NI):
             for j in range(0, self.NK):
                 A[self.NK * i + j] = self.DATA_TYPE((i * j + 1) % self.NI) / (5 * self.NI)
@@ -171,23 +223,32 @@ class _StrategyListFlattened(_3mm):
         # E := A * B
         for i in range(0, self.NI):
             for j in range(0, self.NJ):
-                E[self.NJ * i + j] = 0.0
+#                E[self.NJ * i + j] = 0.0
+                tmp = 0.0
                 for k in range(0, self.NK):
-                    E[self.NJ * i + j] += A[self.NK * i + k] * B[self.NJ * k + j]
+#                    E[self.NJ * i + j] += A[self.NK * i + k] * B[self.NJ * k + j]
+                    tmp += A[self.NK * i + k] * B[self.NJ * k + j]
+                E[self.NJ * i + j] = tmp
 
         # F := C * D
         for i in range(0, self.NJ):
             for j in range(0, self.NL):
                 F[self.NL * i + j] = 0.0
+#                tmp = 0.0 # load elimination
                 for k in range(0, self.NM):
                     F[self.NL * i + j] += C[self.NM * i + k] * D[self.NL * k + j]
+#                    tmp += C[self.NM * i + k] * D[self.NL * k + j] # load elimination
+#                F[self.NL * i + j] = tmp # load elimination
 
         # G := E * F
         for i in range(0, self.NI):
             for j in range(0, self.NL):
                 G[self.NL * i + j] = 0.0
+#                tmp = 0.0 # load elimination
                 for k in range(0, self.NJ):
                     G[self.NL * i + j] += E[self.NJ * i + k] * F[self.NL * k + j]
+#                    tmp += E[self.NJ * i + k] * F[self.NL * k + j] # load elimination
+#                G[self.NL * i + j] = tmp # load elimination
 # scop end
 
 
@@ -199,7 +260,7 @@ class _StrategyNumPy(_3mm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: ndarray, B: ndarray, C: ndarray, D: ndarray):
+    def initialize_array(self, E: list, A: list, B: list, F: list, C: list, D: list, G: list):
         for i in range(0, self.NI):
             for j in range(0, self.NK):
                 A[i, j] = self.DATA_TYPE((i * j + 1) % self.NI) / (5 * self.NI)
@@ -226,23 +287,336 @@ class _StrategyNumPy(_3mm):
     def kernel(self, E: ndarray, A: ndarray, B: ndarray, F: ndarray, C: ndarray, D: ndarray, G: ndarray):
 # scop begin
         # E := A * B
-        for i in range(0, self.NI):
-            for j in range(0, self.NJ):
-                E[i, j] = 0.0
-                for k in range(0, self.NK):
-                    E[i, j] += A[i, k] * B[k, j]
+        E[0:self.NI, 0:self.NJ] = np.dot( A[0:self.NI,0:self.NK], B[0:self.NK, 0:self.NJ] )
 
         # F := C * D
-        for i in range(0, self.NJ):
-            for j in range(0, self.NL):
-                F[i, j] = 0.0
-                for k in range(0, self.NM):
-                    F[i, j] += C[i, k] * D[k, j]
+        F[0:self.NJ,0:self.NL] = np.dot( C[0:self.NJ, 0:self.NM], D[0:self.NM,0:self.NL] )
 
         # G := E * F
-        for i in range(0, self.NI):
-            for j in range(0, self.NL):
-                G[i, j] = 0.0
-                for k in range(0, self.NJ):
-                    G[i, j] += E[i, k] * F[k, j]
+        G[0:self.NI,0:self.NL] = np.dot( E[0:self.NI,0:self.NJ], F[0:self.NJ,0:self.NL] )
+# scop end
+
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, E: list, A: list, B: list, F: list, C: list, D: list, G: list):
+# scop begin
+#        if((self.NL-1>= 0)):
+#            for c1 in range (min((self.NI-1)+1 , (self.NJ-1)+1)):
+#                for c2 in range ((self.NL-1)+1):
+#                    G[self.NL*(c1) + c2] = 0.0
+#                    F[self.NL*(c1) + c2] = 0.0
+#        if((self.NL-1>= 0)):
+#            for c1 in range (max(0 , self.NI) , (self.NJ-1)+1):
+#                for c2 in range ((self.NL-1)+1):
+#                    F[self.NL*(c1) + c2] = 0.0
+#        if((self.NL-1>= 0)):
+#            for c1 in range (max(0 , self.NJ) , (self.NI-1)+1):
+#                for c2 in range ((self.NL-1)+1):
+#                    G[self.NL*(c1) + c2] = 0.0
+#        if((self.NL-1>= 0) and (self.NM-1>= 0)):
+#            for c1 in range ((self.NJ-1)+1):
+#                for c2 in range ((self.NL-1)+1):
+#                    for c5 in range ((self.NM-1)+1):
+#                        F[self.NL*(c1) + c2] += C[self.NM*(c1) + c5] * D[self.NL*(c5) + c2]
+#        if((self.NJ-1>= 0)):
+#            for c1 in range ((self.NI-1)+1):
+#                for c2 in range ((self.NJ-1)+1):
+#                    E[self.NJ*(c1) + c2] = 0.0
+#        if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL-1>= 0)):
+#            for c1 in range ((self.NI-1)+1):
+#                for c2 in range ((self.NJ-1)+1):
+#                    for c5 in range ((self.NK-1)+1):
+#                        E[self.NJ*(c1) + c2] += A[self.NK*(c1) + c5] * B[self.NJ*(c5) + c2]
+#                    for c5 in range ((self.NL-1)+1):
+#                        G[self.NL*(c1) + c5] += E[self.NJ*(c1) + c2] * F[self.NL*(c2) + c5]
+#        if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL*-1>= 0)):
+#            for c1 in range ((self.NI-1)+1):
+#                for c2 in range ((self.NJ-1)+1):
+#                    for c5 in range ((self.NK-1)+1):
+#                        E[self.NJ*(c1) + c2] += A[self.NK*(c1) + c5] * B[self.NJ*(c5) + c2]
+#        if((self.NJ-1>= 0) and (self.NK*-1>= 0) and (self.NL-1>= 0)):
+#            for c1 in range ((self.NI-1)+1):
+#                for c2 in range ((self.NJ-1)+1):
+#                    for c5 in range ((self.NL-1)+1):
+#                        G[self.NL*(c1) + c5] += E[self.NJ*(c1) + c2] * F[self.NL*(c2) + c5]
+
+# --pluto --pluto-prevector --vectorizer --pragmatizer
+#        if((self.NL-1>= 0)):
+#            for c1 in range (min((self.NI-1)+1 , (self.NJ-1)+1)):
+#                for c2 in range ((self.NL-1)+1):
+#                    G[self.NL*(c1) + c2] = 0.0
+#                    F[self.NL*(c1) + c2] = 0.0
+#        if((self.NL-1>= 0)):
+#            for c1 in range (max(0 , self.NI) , (self.NJ-1)+1):
+#                for c2 in range ((self.NL-1)+1):
+#                    F[self.NL*(c1) + c2] = 0.0
+#        if((self.NL-1>= 0)):
+#            for c1 in range (max(0 , self.NJ) , (self.NI-1)+1):
+#                for c2 in range ((self.NL-1)+1):
+#                    G[self.NL*(c1) + c2] = 0.0
+#        if((self.NL-1>= 0) and (self.NM-1>= 0)):
+#            for c1 in range ((self.NJ-1)+1):
+#                for c5 in range ((self.NM-1)+1):
+#                    for c2 in range ((self.NL-1)+1):
+#                        F[self.NL*(c1) + c2] += C[self.NM*(c1) + c5] * D[self.NL*(c5) + c2]
+#        if((self.NJ-1>= 0)):
+#            for c1 in range ((self.NI-1)+1):
+#                for c2 in range ((self.NJ-1)+1):
+#                    E[self.NJ*(c1) + c2] = 0.0
+#        if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL-1>= 0)):
+#            for c1 in range ((self.NI-1)+1):
+#                for c2 in range ((self.NJ-1)+1):
+#                    for c5 in range ((self.NK-1)+1):
+#                        E[self.NJ*(c1) + c2] += A[self.NK*(c1) + c5] * B[self.NJ*(c5) + c2]
+#                    for c5 in range ((self.NL-1)+1):
+#                        G[self.NL*(c1) + c5] += E[self.NJ*(c1) + c2] * F[self.NL*(c2) + c5]
+#        if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL*-1>= 0)):
+#            for c1 in range ((self.NI-1)+1):
+#                for c5 in range ((self.NK-1)+1):
+#                    for c2 in range ((self.NJ-1)+1):
+#                        E[self.NJ*(c1) + c2] += A[self.NK*(c1) + c5] * B[self.NJ*(c5) + c2]
+#        if((self.NJ-1>= 0) and (self.NK*-1>= 0) and (self.NL-1>= 0)):
+#            for c1 in range ((self.NI-1)+1):
+#                for c2 in range ((self.NJ-1)+1):
+#                    for c5 in range ((self.NL-1)+1):
+#                        G[self.NL*(c1) + c5] += E[self.NJ*(c1) + c2] * F[self.NL*(c2) + c5]
+        if((self.NI-1>= 0) and (self.NK-1>= 0) and (self.NM-1>= 0)):
+            for c0 in range (min((self.NJ-1)+1 , (self.NL-1)+1)):
+                for c1 in range (min((self.NI-1)+1 , (self.NL-1)+1)):
+                    G[(c1)*self.NL + c0] = 0.0
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range ((self.NM-1)+1):
+                        F[(c0)*self.NL + c1] += C[(c0)*self.NM + c6] * D[(c6)*self.NL + c1]
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range ((self.NK-1)+1):
+                        E[(c1)*self.NJ + c0] += A[(c1)*self.NK + c6] * B[(c6)*self.NJ + c0]
+                    for c6 in range (max(0 , c0 * -1 + c1) , (c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NL , (self.NI-1)+1):
+                    G[(c1)*self.NL + c0] = 0.0
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range ((self.NK-1)+1):
+                        E[(c1)*self.NJ + c0] += A[(c1)*self.NK + c6] * B[(c6)*self.NJ + c0]
+                    for c6 in range (c0 * -1 + c1 , (c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NI , min((self.NL-1)+1 , (self.NI + c0-1)+1)):
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range ((self.NM-1)+1):
+                        F[(c0)*self.NL + c1] += C[(c0)*self.NM + c6] * D[(c6)*self.NL + c1]
+                    for c6 in range (max(0 , c0 * -1 + c1) , (self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NI + c0 , (self.NL-1)+1):
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range ((self.NM-1)+1):
+                        F[(c0)*self.NL + c1] += C[(c0)*self.NM + c6] * D[(c6)*self.NL + c1]
+                for c1 in range (max(self.NI , self.NL) , (self.NI + c0-1)+1):
+                    for c6 in range (c0 * -1 + c1 , (self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+        if((self.NI-1>= 0) and (self.NK-1>= 0) and (self.NL-1>= 0) and (self.NM-1>= 0)):
+            for c0 in range (self.NL , (self.NJ-1)+1):
+                for c1 in range (min((self.NI-1)+1 , (self.NL-1)+1)):
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range ((self.NM-1)+1):
+                        F[(c0)*self.NL + c1] += C[(c0)*self.NM + c6] * D[(c6)*self.NL + c1]
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range ((self.NK-1)+1):
+                        E[(c1)*self.NJ + c0] += A[(c1)*self.NK + c6] * B[(c6)*self.NJ + c0]
+                    for c6 in range ((c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NL , (self.NI-1)+1):
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range ((self.NK-1)+1):
+                        E[(c1)*self.NJ + c0] += A[(c1)*self.NK + c6] * B[(c6)*self.NJ + c0]
+                    for c6 in range (self.NL * -1 + c1 + 1 , (c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NI , (self.NL-1)+1):
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range ((self.NM-1)+1):
+                        F[(c0)*self.NL + c1] += C[(c0)*self.NM + c6] * D[(c6)*self.NL + c1]
+                    for c6 in range ((self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (max(self.NI , self.NL) , (self.NI + self.NL-2)+1):
+                    for c6 in range (self.NL * -1 + c1 + 1 , (self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+        if((self.NI-1>= 0) and (self.NK-1>= 0) and (self.NM*-1>= 0)):
+            for c0 in range (min((self.NJ-1)+1 , (self.NL-1)+1)):
+                for c1 in range (min((self.NI-1)+1 , (self.NL-1)+1)):
+                    G[(c1)*self.NL + c0] = 0.0
+                    F[(c0)*self.NL + c1] = 0.0
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range ((self.NK-1)+1):
+                        E[(c1)*self.NJ + c0] += A[(c1)*self.NK + c6] * B[(c6)*self.NJ + c0]
+                    for c6 in range (max(0 , c0 * -1 + c1) , (c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NL , (self.NI-1)+1):
+                    G[(c1)*self.NL + c0] = 0.0
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range ((self.NK-1)+1):
+                        E[(c1)*self.NJ + c0] += A[(c1)*self.NK + c6] * B[(c6)*self.NJ + c0]
+                    for c6 in range (c0 * -1 + c1 , (c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NI , min((self.NL-1)+1 , (self.NI + c0-1)+1)):
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range (max(0 , c0 * -1 + c1) , (self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NI + c0 , (self.NL-1)+1):
+                    F[(c0)*self.NL + c1] = 0.0
+                for c1 in range (max(self.NI , self.NL) , (self.NI + c0-1)+1):
+                    for c6 in range (c0 * -1 + c1 , (self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+        if((self.NI-1>= 0) and (self.NK-1>= 0) and (self.NL-1>= 0) and (self.NM*-1>= 0)):
+            for c0 in range (self.NL , (self.NJ-1)+1):
+                for c1 in range (min((self.NI-1)+1 , (self.NL-1)+1)):
+                    F[(c0)*self.NL + c1] = 0.0
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range ((self.NK-1)+1):
+                        E[(c1)*self.NJ + c0] += A[(c1)*self.NK + c6] * B[(c6)*self.NJ + c0]
+                    for c6 in range ((c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NL , (self.NI-1)+1):
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range ((self.NK-1)+1):
+                        E[(c1)*self.NJ + c0] += A[(c1)*self.NK + c6] * B[(c6)*self.NJ + c0]
+                    for c6 in range (self.NL * -1 + c1 + 1 , (c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NI , (self.NL-1)+1):
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range ((self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (max(self.NI , self.NL) , (self.NI + self.NL-2)+1):
+                    for c6 in range (self.NL * -1 + c1 + 1 , (self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+        if((self.NI-1>= 0) and (self.NK-1>= 0) and (self.NL*-1>= 0)):
+            for c0 in range ((self.NJ-1)+1):
+                for c1 in range ((self.NI-1)+1):
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range ((self.NK-1)+1):
+                        E[(c1)*self.NJ + c0] += A[(c1)*self.NK + c6] * B[(c6)*self.NJ + c0]
+        if((self.NI-1>= 0) and (self.NK*-1>= 0) and (self.NM-1>= 0)):
+            for c0 in range (min((self.NJ-1)+1 , (self.NL-1)+1)):
+                for c1 in range (min((self.NI-1)+1 , (self.NL-1)+1)):
+                    G[(c1)*self.NL + c0] = 0.0
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range ((self.NM-1)+1):
+                        F[(c0)*self.NL + c1] += C[(c0)*self.NM + c6] * D[(c6)*self.NL + c1]
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range (max(0 , c0 * -1 + c1) , (c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NL , (self.NI-1)+1):
+                    G[(c1)*self.NL + c0] = 0.0
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range (c0 * -1 + c1 , (c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NI , min((self.NL-1)+1 , (self.NI + c0-1)+1)):
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range ((self.NM-1)+1):
+                        F[(c0)*self.NL + c1] += C[(c0)*self.NM + c6] * D[(c6)*self.NL + c1]
+                    for c6 in range (max(0 , c0 * -1 + c1) , (self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NI + c0 , (self.NL-1)+1):
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range ((self.NM-1)+1):
+                        F[(c0)*self.NL + c1] += C[(c0)*self.NM + c6] * D[(c6)*self.NL + c1]
+                for c1 in range (max(self.NI , self.NL) , (self.NI + c0-1)+1):
+                    for c6 in range (c0 * -1 + c1 , (self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+        if((self.NI-1>= 0) and (self.NK*-1>= 0) and (self.NL-1>= 0) and (self.NM-1>= 0)):
+            for c0 in range (self.NL , (self.NJ-1)+1):
+                for c1 in range (min((self.NI-1)+1 , (self.NL-1)+1)):
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range ((self.NM-1)+1):
+                        F[(c0)*self.NL + c1] += C[(c0)*self.NM + c6] * D[(c6)*self.NL + c1]
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range ((c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NL , (self.NI-1)+1):
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range (self.NL * -1 + c1 + 1 , (c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NI , (self.NL-1)+1):
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range ((self.NM-1)+1):
+                        F[(c0)*self.NL + c1] += C[(c0)*self.NM + c6] * D[(c6)*self.NL + c1]
+                    for c6 in range ((self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (max(self.NI , self.NL) , (self.NI + self.NL-2)+1):
+                    for c6 in range (self.NL * -1 + c1 + 1 , (self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+        if((self.NI-1>= 0) and (self.NK*-1>= 0) and (self.NM*-1>= 0)):
+            for c0 in range (min((self.NJ-1)+1 , (self.NL-1)+1)):
+                for c1 in range (min((self.NI-1)+1 , (self.NL-1)+1)):
+                    G[(c1)*self.NL + c0] = 0.0
+                    F[(c0)*self.NL + c1] = 0.0
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range (max(0 , c0 * -1 + c1) , (c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NL , (self.NI-1)+1):
+                    G[(c1)*self.NL + c0] = 0.0
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range (c0 * -1 + c1 , (c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NI , min((self.NL-1)+1 , (self.NI + c0-1)+1)):
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range (max(0 , c0 * -1 + c1) , (self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NI + c0 , (self.NL-1)+1):
+                    F[(c0)*self.NL + c1] = 0.0
+                for c1 in range (max(self.NI , self.NL) , (self.NI + c0-1)+1):
+                    for c6 in range (c0 * -1 + c1 , (self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+        if((self.NI-1>= 0) and (self.NK*-1>= 0) and (self.NL-1>= 0) and (self.NM*-1>= 0)):
+            for c0 in range (self.NL , (self.NJ-1)+1):
+                for c1 in range (min((self.NI-1)+1 , (self.NL-1)+1)):
+                    F[(c0)*self.NL + c1] = 0.0
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range ((c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NL , (self.NI-1)+1):
+                    E[(c1)*self.NJ + c0] = 0.0
+                    for c6 in range (self.NL * -1 + c1 + 1 , (c1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (self.NI , (self.NL-1)+1):
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range ((self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (max(self.NI , self.NL) , (self.NI + self.NL-2)+1):
+                    for c6 in range (self.NL * -1 + c1 + 1 , (self.NI-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+        if((self.NI-1>= 0) and (self.NK*-1>= 0) and (self.NL*-1>= 0)):
+            for c0 in range ((self.NJ-1)+1):
+                for c1 in range ((self.NI-1)+1):
+                    E[(c1)*self.NJ + c0] = 0.0
+        if((self.NI*-1>= 0) and (self.NL-1>= 0) and (self.NM-1>= 0)):
+            for c0 in range ((self.NJ-1)+1):
+                for c1 in range ((self.NL-1)+1):
+                    F[(c0)*self.NL + c1] = 0.0
+                    for c6 in range ((self.NM-1)+1):
+                        F[(c0)*self.NL + c1] += C[(c0)*self.NM + c6] * D[(c6)*self.NL + c1]
+        if((self.NI*-1>= 0) and (self.NL-1>= 0) and (self.NM*-1>= 0)):
+            for c0 in range ((self.NJ-1)+1):
+                for c1 in range ((self.NL-1)+1):
+                    F[(c0)*self.NL + c1] = 0.0
+        if((self.NI-1>= 0) and (self.NJ-1>= 0)):
+            for c0 in range (self.NJ , (self.NL-1)+1):
+                for c1 in range (min((self.NI-1)+1 , (self.NJ * -1 + c0)+1)):
+                    G[(c1)*self.NL + c0] = 0.0
+                for c1 in range (self.NJ * -1 + c0 + 1 , (self.NI-1)+1):
+                    G[(c1)*self.NL + c0] = 0.0
+                    for c6 in range (max(0 , c0 * -1 + c1) , (self.NJ + c0 * -1 + c1-1)+1):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+                for c1 in range (max(self.NI , self.NJ * -1 + c0 + 1) , (self.NI + c0-1)+1):
+                    for c6 in range (max(0 , c0 * -1 + c1) , min((self.NI-1)+1 , (self.NJ + c0 * -1 + c1-1)+1)):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
+        if((self.NI-1>= 0) and (self.NJ*-1>= 0)):
+            for c0 in range ((self.NL-1)+1):
+                for c1 in range ((self.NI-1)+1):
+                    G[(c1)*self.NL + c0] = 0.0
+        if((self.NI-1>= 0)):
+            for c0 in range (max(self.NJ , self.NL) , (self.NJ + self.NL-2)+1):
+                for c1 in range (self.NJ * -1 + c0 + 1 , (self.NI + self.NL-2)+1):
+                    for c6 in range (max(0 , self.NL * -1 + c1 + 1) , min((self.NI-1)+1 , (self.NJ + c0 * -1 + c1-1)+1)):
+                        G[(c6)*self.NL + c1 + (-1 * c6)] += E[(c6)*self.NJ + (c0 + (-1 * c1)) + c6] * F[((c0 + (-1 * c1)) + c6)*self.NL + c1 + (-1 * c6)]
 # scop end

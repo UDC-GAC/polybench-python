@@ -18,6 +18,7 @@ from benchmarks.polybench import PolyBench
 from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
+import numpy as np
 
 
 class Jacobi_2d(PolyBench):
@@ -26,10 +27,14 @@ class Jacobi_2d(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -102,6 +107,26 @@ class _StrategyList(Jacobi_2d):
                     A[i][j] = 0.2 * (B[i][j] + B[i][j-1] + B[i][1+j] + B[1+i][j] + B[i-1][j])
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, A: list, B: list):
+# scop begin
+        if((self.N-3>= 0) and (self.TSTEPS-1>= 0)):
+            for c0 in range ((self.TSTEPS-1)+1):
+                for c2 in range (c0 * 2 + 1 , (self.N + c0 * 2-2)+1):
+                    B[1][(-2 * c0) + c2] = 0.2 * (A[1][(-2 * c0) + c2] + A[1][(-2 * c0) + c2-1] + A[1][1+(-2 * c0) + c2] + A[1+1][(-2 * c0) + c2] + A[1 -1][(-2 * c0) + c2])
+                for c1 in range (c0 * 2 + 2 , (self.N + c0 * 2-2)+1):
+                    B[(-2 * c0) + c1][1] = 0.2 * (A[(-2 * c0) + c1][1] + A[(-2 * c0) + c1][1 -1] + A[(-2 * c0) + c1][1+1] + A[1+(-2 * c0) + c1][1] + A[(-2 * c0) + c1-1][1])
+                    for c2 in range (c0 * 2 + 2 , (self.N + c0 * 2-2)+1):
+                        A[((-2 * c0) + c1) + -1][((-2 * c0) + c2) + -1] = 0.2 * (B[((-2 * c0) + c1) + -1][((-2 * c0) + c2) + -1] + B[((-2 * c0) + c1) + -1][((-2 * c0) + c2) + -1 -1] + B[((-2 * c0) + c1) + -1][1+((-2 * c0) + c2) + -1] + B[1+((-2 * c0) + c1) + -1][((-2 * c0) + c2) + -1] + B[((-2 * c0) + c1) + -1 -1][((-2 * c0) + c2) + -1])
+                        B[(-2 * c0) + c1][(-2 * c0) + c2] = 0.2 * (A[(-2 * c0) + c1][(-2 * c0) + c2] + A[(-2 * c0) + c1][(-2 * c0) + c2-1] + A[(-2 * c0) + c1][1+(-2 * c0) + c2] + A[1+(-2 * c0) + c1][(-2 * c0) + c2] + A[(-2 * c0) + c1-1][(-2 * c0) + c2])
+                    A[((-2 * c0) + c1) + -1][self.N + -2] = 0.2 * (B[((-2 * c0) + c1) + -1][self.N + -2] + B[((-2 * c0) + c1) + -1][self.N + -2 -1] + B[((-2 * c0) + c1) + -1][1+self.N + -2] + B[1+((-2 * c0) + c1) + -1][self.N + -2] + B[((-2 * c0) + c1) + -1 -1][self.N + -2])
+                for c2 in range (c0 * 2 + 2 , (self.N + c0 * 2-1)+1):
+                    A[self.N + -2][((-2 * c0) + c2) + -1] = 0.2 * (B[self.N + -2][((-2 * c0) + c2) + -1] + B[self.N + -2][((-2 * c0) + c2) + -1 -1] + B[self.N + -2][1+((-2 * c0) + c2) + -1] + B[1+self.N + -2][((-2 * c0) + c2) + -1] + B[self.N + -2 -1][((-2 * c0) + c2) + -1])
+# scop end
 
 class _StrategyListFlattened(Jacobi_2d):
 
@@ -138,6 +163,51 @@ class _StrategyListFlattened(Jacobi_2d):
                                                + B[self.N * (1 + i) + j] + B[self.N * (i - 1) + j])
 # scop end
 
+class _StrategyListFlattenedPluto(Jacobi_2d):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattened)
+
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+    def initialize_array(self, A: list, B: list):
+        for i in range(0, self.N):
+            for j in range(0, self.N):
+                A[self.N * i + j] = (self.DATA_TYPE(i) * (j+2) + 2) / self.N
+                B[self.N * i + j] = (self.DATA_TYPE(i) * (j+3) + 3) / self.N
+
+    def print_array_custom(self, A: list, name: str):
+        for i in range(0, self.N):
+            for j in range(0, self.N):
+                if (i * self.N + j) % 20 == 0:
+                    self.print_message('\n')
+                self.print_value(A[self.N * i + j])
+
+    def kernel(self, A: list, B: list):
+# scop begin
+        for t in range(0, self.TSTEPS):
+            for i in range(1, self.N - 1):
+                for j in range(1, self.N - 1):
+                    B[self.N * i + j] = 0.2 * (A[self.N * i + j] + A[self.N * i + j - 1] + A[self.N * i + 1 + j]
+                                               + A[self.N * (1 + i) + j] + A[self.N * (i - 1) + j])
+
+            for i in range(1, self.N - 1):
+                for j in range(1, self.N - 1):
+                    A[self.N * i + j] = 0.2 * (B[self.N * i + j] + B[self.N * i + j - 1] + B[self.N * i + 1 + j]
+                                               + B[self.N * (1 + i) + j] + B[self.N * (i - 1) + j])
+
+            for c0 in range( 0, TSTEPS ):
+                if((N+TSTEPS*-1+c0*-1-1>= 0) and (optimization_iterator_1*-1+TSTEPS*-1-1>= 0) and (N+TSTEPS*-1-1>= 0)):
+                    B[1]=(0.33333*(((A[(1 +(-1*1))])+(A[1]))+(A[(1 +1)])))
+                if((TSTEPS+c0*-1-1>= 0) and (N*-1-1>= 0) and (TSTEPS-1>= 0)):
+                    for c1 in range (c0 * 2 + 2 , (N * -1 + c0 * 2)+1):
+                        B[(-2 * c0) + c1]=(0.33333*(((A[((-2 * c0) + c1+(-1*1))])+(A[(-2 * c0) + c1]))+(A[((-2 * c0) + c1+1)])))
+                        A[((-2 * c0) + c1) + -1]=(0.33333*(((B[(((-2 * c0) + c1) + -1 +(-1*1))])+(B[((-2 * c0) + c1) + -1]))+(B[(((-2 * c0) + c1) + -1 +1)])))
+                if((N+TSTEPS*-1+c0*-1-1>= 0) and (optimization_iterator_1*-1+TSTEPS*-1-1>= 0) and (N+TSTEPS*-1-1>= 0)):
+                    A[1-N + -1]=(0.33333*(((B[(1-N + -1 +(-1*1))])+(B[1-N + -1]))+(B[(1-N + -1 +1)])))
+
+# scop end
 
 class _StrategyNumPy(Jacobi_2d):
 
@@ -163,11 +233,27 @@ class _StrategyNumPy(Jacobi_2d):
     def kernel(self, A: ndarray, B: ndarray):
 # scop begin
         for t in range(0, self.TSTEPS):
-            for i in range(1, self.N - 1):
-                for j in range(1, self.N - 1):
-                    B[i, j] = 0.2 * (A[i, j] + A[i, j-1] + A[i, 1+j] + A[1+i, j] + A[i-1, j])
+            B[1:self.N-1, 1:self.N-1] = 0.2 * (A[1:self.N-1, 1:self.N-1] + A[1:self.N-1, 0:self.N-2] + A[1:self.N-1, 2:self.N] + A[2:self.N, 1:self.N-1] + A[0:self.N-2, 1:self.N-1])
+            A[1:self.N-1, 1:self.N-1] = 0.2 * (B[1:self.N-1, 1:self.N-1] + B[1:self.N-1, 0:self.N-2] + B[1:self.N-1, 2:self.N] + B[2:self.N, 1:self.N-1] + B[0:self.N-2, 1:self.N-1])
+# scop end
 
-            for i in range(1, self.N - 1):
-                for j in range(1, self.N - 1):
-                    A[i, j] = 0.2 * (B[i, j] + B[i, j-1] + B[i, 1+j] + B[1+i, j] + B[i-1, j])
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, A: list, B: list):
+# scop begin
+        if((self.N-3>= 0) and (self.TSTEPS-1>= 0)):
+            for c0 in range ((self.TSTEPS-1)+1):
+                for c2 in range (c0 * 2 + 1 , (self.N + c0 * 2-2)+1):
+                    B[self.N*(1) + (-2 * c0) + c2] = 0.2 * (A[self.N*(1) + (-2 * c0) + c2] + A[self.N*(1) + (-2 * c0) + c2-1] + A[self.N*(1) + 1+(-2 * c0) + c2] + A[self.N*(1+1) + (-2 * c0) + c2] + A[self.N*(1 -1) + (-2 * c0) + c2])
+                for c1 in range (c0 * 2 + 2 , (self.N + c0 * 2-2)+1):
+                    B[self.N*((-2 * c0) + c1) + 1] = 0.2 * (A[self.N*((-2 * c0) + c1) + 1] + A[self.N*((-2 * c0) + c1) + 1 -1] + A[self.N*((-2 * c0) + c1) + 1+1] + A[self.N*(1+(-2 * c0) + c1) + 1] + A[self.N*((-2 * c0) + c1-1) + 1])
+                    for c2 in range (c0 * 2 + 2 , (self.N + c0 * 2-2)+1):
+                        A[self.N*(((-2 * c0) + c1) + -1) + ((-2 * c0) + c2) + -1] = 0.2 * (B[self.N*(((-2 * c0) + c1) + -1) + ((-2 * c0) + c2) + -1] + B[self.N*(((-2 * c0) + c1) + -1) + ((-2 * c0) + c2) + -1 -1] + B[self.N*(((-2 * c0) + c1) + -1) + 1+((-2 * c0) + c2) + -1] + B[self.N*(1+((-2 * c0) + c1) + -1) + ((-2 * c0) + c2) + -1] + B[self.N*(((-2 * c0) + c1) + -1 -1) + ((-2 * c0) + c2) + -1])
+                        B[self.N*((-2 * c0) + c1) + (-2 * c0) + c2] = 0.2 * (A[self.N*((-2 * c0) + c1) + (-2 * c0) + c2] + A[self.N*((-2 * c0) + c1) + (-2 * c0) + c2-1] + A[self.N*((-2 * c0) + c1) + 1+(-2 * c0) + c2] + A[self.N*(1+(-2 * c0) + c1) + (-2 * c0) + c2] + A[self.N*((-2 * c0) + c1-1) + (-2 * c0) + c2])
+                    A[self.N*(((-2 * c0) + c1) + -1) + self.N + -2] = 0.2 * (B[self.N*(((-2 * c0) + c1) + -1) + self.N + -2] + B[self.N*(((-2 * c0) + c1) + -1) + self.N + -2 -1] + B[self.N*(((-2 * c0) + c1) + -1) + 1+self.N + -2] + B[self.N*(1+((-2 * c0) + c1) + -1) + self.N + -2] + B[self.N*(((-2 * c0) + c1) + -1 -1) + self.N + -2])
+                for c2 in range (c0 * 2 + 2 , (self.N + c0 * 2-1)+1):
+                    A[self.N*(self.N + -2) + ((-2 * c0) + c2) + -1] = 0.2 * (B[self.N*(self.N + -2) + ((-2 * c0) + c2) + -1] + B[self.N*(self.N + -2) + ((-2 * c0) + c2) + -1 -1] + B[self.N*(self.N + -2) + 1+((-2 * c0) + c2) + -1] + B[self.N*(1+self.N + -2) + ((-2 * c0) + c2) + -1] + B[self.N*(self.N + -2 -1) + ((-2 * c0) + c2) + -1])
 # scop end

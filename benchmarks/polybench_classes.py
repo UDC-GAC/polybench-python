@@ -60,6 +60,8 @@ class ArrayImplementation(Enum):
     LIST = auto()
     LIST_FLATTENED = auto()
     NUMPY = auto()
+    LIST_PLUTO = auto()
+    LIST_FLATTENED_PLUTO = auto()
 
 
 class PolyBenchOptions(_CustomDict):

@@ -253,8 +253,6 @@ if __name__ == '__main__':
         # Process array implementation
         if str(args.array_implementation).isnumeric():
             n = int(args.array_implementation)
-            if n < 0 or n > 2:
-                n = 0  # default
 
             if n == 0:
                 result['polybench_options'].POLYBENCH_ARRAY_IMPLEMENTATION = ArrayImplementation.LIST
@@ -262,6 +260,12 @@ if __name__ == '__main__':
                 result['polybench_options'].POLYBENCH_ARRAY_IMPLEMENTATION = ArrayImplementation.LIST_FLATTENED
             elif n == 2:
                 result['polybench_options'].POLYBENCH_ARRAY_IMPLEMENTATION = ArrayImplementation.NUMPY
+            elif n == 3:
+                result['polybench_options'].POLYBENCH_ARRAY_IMPLEMENTATION = ArrayImplementation.LIST_PLUTO
+            elif n == 4:
+                result['polybench_options'].POLYBENCH_ARRAY_IMPLEMENTATION = ArrayImplementation.LIST_FLATTENED_PLUTO
+            else:
+                raise AssertionError( 'Argument "array-implementation=%d" not valid.' % (n) )
         else:
             raise AssertionError('Argument "array-implementation" must be a number.')
 

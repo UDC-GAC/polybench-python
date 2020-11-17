@@ -26,10 +26,14 @@ class Syr2k(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -54,7 +58,7 @@ class Syr2k(PolyBench):
         B = self.create_array(2, [self.N, self.M], self.DATA_TYPE(0))
 
         # Initialize data structures
-        self.initialize_array(C, A, B)
+        self.initialize_array(alpha, beta, C, A, B)
 
         # Benchmark the kernel
         self.time_kernel(alpha, beta, C, A, B)
@@ -81,7 +85,7 @@ class _StrategyList(Syr2k):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, C: list, A: list, B: list):
+    def initialize_array(self, alpha, beta, C: list, A: list, B: list):
         for i in range(0, self.N):
             for j in range(0, self.M):
                 A[i][j] = self.DATA_TYPE((i * j + 1) % self.N) / self.N
@@ -115,6 +119,23 @@ class _StrategyList(Syr2k):
                     C[i][j] += A[j][k]*alpha*B[i][k] + B[j][k]*alpha*A[i][k]
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, alpha, beta, C: list, A: list, B: list):
+# scop begin
+        if((self.N-1>= 0)):
+            for c1 in range ((self.N-1)+1):
+                for c2 in range ((c1)+1):
+                    C[c1][c2] *= beta
+            if((self.M-1>= 0)):
+                for c1 in range ((self.N-1)+1):
+                    for c2 in range ((c1)+1):
+                        for c3 in range ((self.M-1)+1):
+                            C[c1][c2] += A[c2][c3]*alpha*B[c1][c3] + B[c2][c3]*alpha*A[c1][c3]
+# scop end
 
 class _StrategyListFlattened(Syr2k):
 
@@ -124,7 +145,7 @@ class _StrategyListFlattened(Syr2k):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, C: list, A: list, B: list):
+    def initialize_array(self, alpha, beta, C: list, A: list, B: list):
         for i in range(0, self.N):
             for j in range(0, self.M):
                 A[self.M * i + j] = self.DATA_TYPE((i * j + 1) % self.N) / self.N
@@ -149,8 +170,7 @@ class _StrategyListFlattened(Syr2k):
 
             for k in range(0, self.M):
                 for j in range(0, i + 1):
-                    C[self.N * i + j] += A[self.M * j + k] * alpha * B[self.M * i + k] + B[self.M * j + k] * alpha * A[
-                        self.M * i + k]
+                    C[self.N * i + j] += A[self.M * j + k] * alpha * B[self.M * i + k] + B[self.M * j + k] * alpha * A[self.M * i + k]
 # scop end
 
 
@@ -162,7 +182,7 @@ class _StrategyNumPy(Syr2k):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, C: ndarray, A: ndarray, B: ndarray):
+    def initialize_array(self, alpha, beta, C: list, A: list, B: list):
         for i in range(0, self.N):
             for j in range(0, self.M):
                 A[i, j] = self.DATA_TYPE((i * j + 1) % self.N) / self.N
@@ -188,10 +208,37 @@ class _StrategyNumPy(Syr2k):
         # C is NxN
 # scop begin
         for i in range(0, self.N):
-            for j in range(0, i + 1):
-                C[i, j] *= beta
+            C[i,0:i+1] *= beta
+            C[i,0:i+1] += (A[0:i+1,0:self.M] * alpha * B[i,0:self.M]).sum(axis=1) + (B[0:i+1,0:self.M] * alpha * A[i,0:self.M]).sum(axis=1)
+# scop end
 
-            for k in range(0, self.M):
-                for j in range(0, i + 1):
-                    C[i, j] += A[j, k] * alpha * B[i, k] + B[j, k] * alpha * A[i, k]
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, alpha, beta, C: list, A: list, B: list):
+# scop begin
+        if((self.N-1>= 0)):
+            for c1 in range ((self.N-1)+1):
+                for c2 in range ((c1)+1):
+                    C[self.N*(c1) + c2] *= beta
+            if((self.M-1>= 0)):
+                for c1 in range ((self.N-1)+1):
+                    for c2 in range ((c1)+1):
+                        for c3 in range ((self.M-1)+1):
+                            C[self.N*(c1) + c2] += A[self.M*(c2) + c3]*alpha*B[self.M*(c1) + c3] + B[self.M*(c2) + c3]*alpha*A[self.M*(c1) + c3]
+
+# --pluto --pluto-fuse maxfuse
+#        if((self.N-1>= 0)):
+#            if((self.M-1>= 0)):
+#                for c0 in range ((self.N-1)+1):
+#                    for c1 in range ((c0)+1):
+#                        C[(c0)*self.N + c1] *= beta
+#                        for c2 in range (c0 , (self.M + c0-1)+1):
+#                            C[(c0)*self.N + c1] += A[(c1)*self.M + (-1 * c0) + c2]*alpha*B[(c0)*self.M + (-1 * c0) + c2] + B[(c1)*self.M + (-1 * c0) + c2]*alpha*A[(c0)*self.M + (-1 * c0) + c2]
+#            if((self.M*-1>= 0)):
+#                for c0 in range ((self.N-1)+1):
+#                    for c1 in range ((c0)+1):
+#                        C[(c0)*self.N + c1] *= beta
 # scop end

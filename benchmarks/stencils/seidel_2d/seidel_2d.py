@@ -18,6 +18,7 @@ from benchmarks.polybench import PolyBench
 from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
+import numpy as np
 
 
 class Seidel_2d(PolyBench):
@@ -26,10 +27,14 @@ class Seidel_2d(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        if implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -90,7 +95,7 @@ class _StrategyList(Seidel_2d):
 
     def kernel(self, A: list):
 # scop begin
-        for t in range(0, self.TSTEPS - 1):
+        for t in range(0, self.TSTEPS - 1 + 1):
             for i in range(1, self.N - 2 + 1):
                 for j in range(1, self.N - 2 + 1):
                     A[i][j] = (A[i - 1][j - 1] + A[i - 1][j] + A[i - 1][j + 1]
@@ -98,6 +103,19 @@ class _StrategyList(Seidel_2d):
                                + A[i + 1][j - 1] + A[i + 1][j] + A[i + 1][j + 1]) / 9.0
 #scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, A: list):
+# scop begin
+        if((self.N-3>= 0) and (self.TSTEPS-1>= 0)):
+            for c0 in range ((self.TSTEPS-1)+1):
+                for c1 in range (c0 + 1 , (self.N + c0-2)+1):
+                    for c2 in range (c0 + c1 + 1 , (self.N + c0 + c1-2)+1):
+                        A[(-1 * c0) + c1][((-1 * c0) + (-1 * c1)) + c2] = (A[(-1 * c0) + c1-1][((-1 * c0) + (-1 * c1)) + c2-1] + A[(-1 * c0) + c1-1][((-1 * c0) + (-1 * c1)) + c2] + A[(-1 * c0) + c1-1][((-1 * c0) + (-1 * c1)) + c2+1] + A[(-1 * c0) + c1][((-1 * c0) + (-1 * c1)) + c2-1] + A[(-1 * c0) + c1][((-1 * c0) + (-1 * c1)) + c2] + A[(-1 * c0) + c1][((-1 * c0) + (-1 * c1)) + c2+1] + A[(-1 * c0) + c1+1][((-1 * c0) + (-1 * c1)) + c2-1] + A[(-1 * c0) + c1+1][((-1 * c0) + (-1 * c1)) + c2] + A[(-1 * c0) + c1+1][((-1 * c0) + (-1 * c1)) + c2+1])/9.0
+#scop end
 
 class _StrategyListFlattened(Seidel_2d):
 
@@ -121,7 +139,7 @@ class _StrategyListFlattened(Seidel_2d):
 
     def kernel(self, A: list):
 # scop begin
-        for t in range(0, self.TSTEPS - 1):
+        for t in range(0, self.TSTEPS - 1 +1):
             for i in range(1, self.N - 2 + 1):
                 for j in range(1, self.N - 2 + 1):
                     A[self.N * i + j] = (A[self.N * (i - 1) + j - 1] + A[self.N * (i - 1) + j] + A[self.N * (i - 1) + j + 1]
@@ -152,10 +170,89 @@ class _StrategyNumPy(Seidel_2d):
 
     def kernel(self, A: ndarray):
 # scop begin
-        for t in range(0, self.TSTEPS - 1):
-            for i in range(1, self.N - 2 + 1):
-                for j in range(1, self.N - 2 + 1):
-                    A[i, j] = (A[i - 1, j - 1] + A[i - 1, j] + A[i - 1, j + 1]
-                               + A[i, j - 1] + A[i, j] + A[i, j + 1]
-                               + A[i + 1, j - 1] + A[i + 1, j] + A[i + 1, j + 1]) / 9.0
+#        for t in range(0, self.TSTEPS - 1 +1):
+#            for i in range(1, self.N - 2 + 1):
+#                for j in range(1, self.N - 2 + 1):
+#                    A[i,j] = (A[i - 1,j - 1] + A[i - 1,j] + A[i - 1,j + 1]              # Dependences prevent vectorization: A[i,j-1] -> A[i,j]
+#                               + A[i,j - 1] + A[i,j] + A[i,j + 1]
+#                               + A[i + 1,j - 1] + A[i + 1,j] + A[i + 1,j + 1]) / 9.0
+        A_flattened = A.ravel()
+        self_N_1 = self.N-1
+        self_Nx2 = self.N*2
+        for t in range( self.TSTEPS ):
+            for i in range( 1, self_N_1 ):
+                
+                end = i * self.N
+                slice_NW = slice(i-1, end-1, self_N_1 )
+                slice_N = slice(i, end, self_N_1 )
+                slice_NE = slice(i+1, end+1, self_N_1 )
+
+                start = self.N+i
+                end += self.N
+                slice_W = slice(start-1, end-1, self_N_1)
+                slice_center = slice(start, end, self_N_1)
+                slice_E = slice( start+1, end+1, self_N_1)
+
+                start += self.N
+                end += self.N
+                slice_SW = slice( start-1, end-1, self_N_1)
+                slice_S = slice( start, end, self_N_1)
+                slice_SE = slice( start+1, end, self_N_1)
+
+                A_flattened[slice_center] = ( A_flattened[slice_NW] + A_flattened[slice_N] + A_flattened[slice_NE]+ 
+                                              A_flattened[slice_W] + A_flattened[slice_center] + A_flattened[slice_E] + 
+                                              A_flattened[slice_SW] + A_flattened[slice_S] + A_flattened[slice_SE] ) / 9.0
+# diagonal version
+#                diag_i = np.arange(1,i+1)
+#                diag_j = np.arange(i,0,-1)
+#                A[diag_i,diag_j] = ( A[diag_i-1,diag_j-1] + A[diag_i-1,diag_j] + A[diag_i-1,diag_j+1]+ A[diag_i,diag_j-1] + A[diag_i,diag_j] + A[diag_i,diag_j+1] + A[diag_i+1,diag_j-1] + A[diag_i+1,diag_j] + A[diag_i+1,diag_j+1] ) / 9.0
+# scalar version
+#                for j in range( 1, i+1 ):
+#                    A[j,i-j+1] = (A[j-1,i-j] + A[j-1,i-j+1] + A[j-1,i-j+2]
+#                        + A[j,i-j] + A[j,i-j+1] + A[j,i-j+2]
+#                        + A[j+1,i-j] + A[j+1,i-j+1] + A[j+1,i-j+2] ) / 9.0
+            for i in range( 2, self.N ):
+                start = self.N*i-2
+                end = self.N**2 -3*self.N +i +1
+                slice_NW = slice( start-1, end-1, self.N-1 )
+                slice_N = slice( start, end, self.N-1 )
+                slice_NE = slice( start+1, end+1, self.N-1 )
+
+                start += self.N
+                end += self.N
+                slice_W = slice( start-1, end-1, self.N-1 )
+                slice_center = slice( start, end, self.N-1 )
+                slice_E = slice( start+1, end+1, self.N-1 )
+
+                start += self.N
+                end += self.N
+                slice_SW = slice( start-1, end-1, self.N-1 )
+                slice_S = slice( start, end, self.N-1 )
+                slice_SE = slice( start+1, end+1, self.N-1 )
+                A_flattened[slice_center] = ( A_flattened[slice_NW] + A_flattened[slice_N] + A_flattened[slice_NE]+ 
+                                              A_flattened[slice_W] + A_flattened[slice_center] + A_flattened[slice_E] + 
+                                              A_flattened[slice_SW] + A_flattened[slice_S] + A_flattened[slice_SE] ) / 9.0
+# diagonal version
+#                diag_i = np.arange( i, self.N-1 )
+#                diag_j = np.arange( self.N-2, i-1, -1 )
+#                A[diag_i,diag_j] = ( A[diag_i-1,diag_j-1] + A[diag_i-1,diag_j] + A[diag_i-1,diag_j+1]+ A[diag_i,diag_j-1] + A[diag_i,diag_j] + A[diag_i,diag_j+1] + A[diag_i+1,diag_j-1] + A[diag_i+1,diag_j] + A[diag_i+1,diag_j+1] ) / 9.0
+# scalar version
+#                for j in range( self.N-2, i-1, -1 ):
+#                    A[i+self.N-j-2,j] = ( A[i+self.N-j-3,j-1] + A[i+self.N-j-3,j] + A[i+self.N-j-3,j+1] 
+#                            + A[i+self.N-j-2,j-1] + A[i+self.N-j-2,j] + A[i+self.N-j-2,j+1] 
+#                            + A[i+self.N-j-1,j-1] + A[i+self.N-j-1,j] + A[i+self.N-j-1,j+1] ) / 9.0
+#scop end
+
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, A: list):
+# scop begin
+        if((self.N-3>= 0) and (self.TSTEPS-1>= 0)):
+            for c0 in range ((self.TSTEPS-1)+1):
+                for c1 in range (c0 + 1 , (self.N + c0-2)+1):
+                    for c2 in range (c0 + c1 + 1 , (self.N + c0 + c1-2)+1):
+                        A[self.N*((-1 * c0) + c1) + ((-1 * c0) + (-1 * c1)) + c2] = (A[self.N*((-1 * c0) + c1-1) + ((-1 * c0) + (-1 * c1)) + c2-1] + A[self.N*((-1 * c0) + c1-1) + ((-1 * c0) + (-1 * c1)) + c2] + A[self.N*((-1 * c0) + c1-1) + ((-1 * c0) + (-1 * c1)) + c2+1] + A[self.N*((-1 * c0) + c1) + ((-1 * c0) + (-1 * c1)) + c2-1] + A[self.N*((-1 * c0) + c1) + ((-1 * c0) + (-1 * c1)) + c2] + A[self.N*((-1 * c0) + c1) + ((-1 * c0) + (-1 * c1)) + c2+1] + A[self.N*((-1 * c0) + c1+1) + ((-1 * c0) + (-1 * c1)) + c2-1] + A[self.N*((-1 * c0) + c1+1) + ((-1 * c0) + (-1 * c1)) + c2] + A[self.N*((-1 * c0) + c1+1) + ((-1 * c0) + (-1 * c1)) + c2+1])/9.0
 #scop end

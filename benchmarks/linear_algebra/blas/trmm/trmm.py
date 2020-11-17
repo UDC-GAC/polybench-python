@@ -18,6 +18,7 @@ from benchmarks.polybench import PolyBench
 from benchmarks.polybench_classes import ArrayImplementation
 from benchmarks.polybench_classes import PolyBenchOptions, PolyBenchSpec
 from numpy.core.multiarray import ndarray
+import numpy as np
 
 
 class Trmm(PolyBench):
@@ -26,10 +27,14 @@ class Trmm(PolyBench):
         implementation = options.POLYBENCH_ARRAY_IMPLEMENTATION
         if implementation == ArrayImplementation.LIST:
             return _StrategyList.__new__(_StrategyList, options, parameters)
+        elif implementation == ArrayImplementation.LIST_PLUTO:
+            return _StrategyListPluto.__new__(_StrategyListPluto, options, parameters)
         elif implementation == ArrayImplementation.LIST_FLATTENED:
             return _StrategyListFlattened.__new__(_StrategyListFlattened, options, parameters)
         elif implementation == ArrayImplementation.NUMPY:
             return _StrategyNumPy.__new__(_StrategyNumPy, options, parameters)
+        elif implementation == ArrayImplementation.LIST_FLATTENED_PLUTO:
+            return _StrategyListFlattenedPluto.__new__(_StrategyListFlattenedPluto, options, parameters)
 
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
@@ -52,7 +57,7 @@ class Trmm(PolyBench):
         B = self.create_array(2, [self.M, self.N], self.DATA_TYPE(0))
 
         # Initialize data structures
-        self.initialize_array(A, B)
+        self.initialize_array(alpha, A, B)
 
         # Benchmark the kernel
         self.time_kernel(alpha, A, B)
@@ -79,7 +84,7 @@ class _StrategyList(Trmm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: list, B: list):
+    def initialize_array(self, alpha, A: list, B: list):
         for i in range(0, self.M):
             for j in range(0, i):
                 A[i][j] = self.DATA_TYPE((i + j) % self.M) / self.M
@@ -113,6 +118,23 @@ class _StrategyList(Trmm):
                 B[i][j] = alpha * B[i][j]
 # scop end
 
+class _StrategyListPluto(_StrategyList):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListPluto)
+
+    def kernel(self, alpha, A: list, B: list):
+# scop begin
+        if((self.M-1>= 0) and (self.N-1>= 0)):
+            if((self.M-2>= 0)):
+                for c1 in range ((self.N-1)+1):
+                    for c2 in range ((self.M-2)+1):
+                        for c3 in range (c2 + 1 , (self.M-1)+1):
+                            B[c2][c1] += A[c3][c2] * B[c3][c1]
+            for c1 in range ((self.M-1)+1):
+                for c2 in range ((self.N-1)+1):
+                    B[c1][c2] = alpha * B[c1][c2]
+# scop end
 
 class _StrategyListFlattened(Trmm):
 
@@ -122,7 +144,7 @@ class _StrategyListFlattened(Trmm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: list, B: list):
+    def initialize_array(self, alpha, A: list, B: list):
         for i in range(0, self.M):
             for j in range(0, i):
                 A[self.M * i + j] = self.DATA_TYPE((i+j) % self.M) / self.M
@@ -143,9 +165,12 @@ class _StrategyListFlattened(Trmm):
 # scrop begin
         for i in range(0, self.M):
             for j in range(0, self.N):
+#                tmp = B[self.N*i+j] # load elimination
                 for k in range(i + 1, self.M):
                     B[self.N * i + j] += A[self.M * k + i] * B[self.N * k + j]
+#                    tmp += A[self.M * k + i] * B[self.N * k + j] # load elimination
                 B[self.N * i + j] = alpha * B[self.N * i + j]
+#                B[self.N * i + j] = alpha * tmp # load elimination
 # scop end
 
 
@@ -157,7 +182,7 @@ class _StrategyNumPy(Trmm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
-    def initialize_array(self, A: ndarray, B: ndarray):
+    def initialize_array(self, alpha, A: list, B: list):
         for i in range(0, self.M):
             for j in range(0, i):
                 A[i, j] = self.DATA_TYPE((i + j) % self.M) / self.M
@@ -183,10 +208,39 @@ class _StrategyNumPy(Trmm):
         # = > Form  B := alpha * A ** T * B.
         # A is MxM
         # B is MxN
-# scrop begin
+# scop begin
         for i in range(0, self.M):
-            for j in range(0, self.N):
-                for k in range(i + 1, self.M):
-                    B[i, j] += A[k, i] * B[k, j]
-                B[i, j] = alpha * B[i, j]
+            B[i,0:self.N] += (A[i+1:self.M,i,np.newaxis] * B[i+1:self.M,0:self.N]).sum(axis=0)
+            B[i,0:self.N] = alpha * B[i,0:self.N]
+# scop end
+
+class _StrategyListFlattenedPluto(_StrategyListFlattened):
+
+    def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        return object.__new__(_StrategyListFlattenedPluto)
+
+    def kernel(self, alpha, A: list, B: list):
+# scop begin
+        if((self.M-1>= 0) and (self.N-1>= 0)):
+            if((self.M-2>= 0)):
+                for c1 in range ((self.N-1)+1):
+                    for c2 in range ((self.M-2)+1):
+                        for c3 in range (c2 + 1 , (self.M-1)+1):
+                            B[self.N*(c2) + c1] += A[self.M*(c3) + c2] * B[self.N*(c3) + c1]
+            for c1 in range ((self.M-1)+1):
+                for c2 in range ((self.N-1)+1):
+                    B[self.N*(c1) + c2] = alpha * B[self.N*(c1) + c2]
+
+# --pluto --pluto-fuse maxfuse
+#        if((self.M-1>= 0) and (self.N-1>= 0)):
+#            if((self.M-2>= 0)):
+#                for c0 in range ((self.N-1)+1):
+#                    for c1 in range ((self.M-2)+1):
+#                        for c4 in range (c1 + 1 , (self.M-1)+1):
+#                            B[(c1)*self.N + c0] += A[(c4)*self.M + c1] * B[(c4)*self.N + c0]
+#                        B[(c1)*self.N + c0] = alpha * B[(c1)*self.N + c0]
+#                    B[(self.M + -1)*self.N + c0] = alpha * B[(self.M + -1)*self.N + c0]
+#            if self.M == 1:
+#                for c0 in range ((self.N-1)+1):
+#                    B[(0)*self.N + c0] = alpha * B[(0)*self.N + c0]
 # scop end

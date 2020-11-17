@@ -298,9 +298,9 @@ class PolyBench:
 
         # At this point it is safe to say that both dimensions and sizes are valid.
         # Use the appropriate "array" implementation.
-        if self.POLYBENCH_ARRAY_IMPLEMENTATION == ArrayImplementation.LIST:
+        if self.POLYBENCH_ARRAY_IMPLEMENTATION == ArrayImplementation.LIST or self.POLYBENCH_ARRAY_IMPLEMENTATION == ArrayImplementation.LIST_PLUTO:
             return self.__create_array_rec(dimensions, new_sizes, initialization_value)
-        elif self.POLYBENCH_ARRAY_IMPLEMENTATION == ArrayImplementation.LIST_FLATTENED:
+        elif self.POLYBENCH_ARRAY_IMPLEMENTATION == ArrayImplementation.LIST_FLATTENED or self.POLYBENCH_ARRAY_IMPLEMENTATION == ArrayImplementation.LIST_FLATTENED_PLUTO:
             # A flattened list only has one dimension, whose value is the product of all dimensions.
             dimension_size = 1
             for dim_size in new_sizes:
@@ -508,7 +508,9 @@ class PolyBench:
                     is_available = True
                     break
             if not is_available:
-                print(f'WARNING: counter "{usr_counter}" not available.')
+                if usr_counter.startswith( "0x" ): self.__papi_counters.append( int(usr_counter,16) )
+                else: self.__papi_counters.append( int(usr_counter) )
+#                else: print(f'WARNING: counter "{usr_counter}" not available.')
 
     def __papi_print(self):
         def papi_counter_names():
@@ -522,6 +524,8 @@ class PolyBench:
                     if usr_counter == avlbl_counter[1]:
                         result.append(avlbl_counter[0])
                         break
+                else:
+                    result.append( "native: " + hex(usr_counter) )
             return result
 
         self.polybench_result = {}
