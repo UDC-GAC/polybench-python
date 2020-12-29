@@ -241,13 +241,13 @@ class _StrategyListFlattened(Adi):
                 p[self.N * i + 0] = 0.0
                 q[self.N * i + 0] = v[self.N * 0 + i]
                 for j in range(1, self.N - 1):
-                    tmp_pm1 = p[self.N * i + j - 1]
-#                    p[self.N * i + j] = -c / (a * p[self.N * i + j - 1] + b)
-                    p[self.N * i + j] = -c / (a * tmp_pm1 + b)
+                    p[self.N * i + j] = -c / (a * p[self.N * i + j - 1] + b)
+#                    tmp_pm1 = p[self.N * i + j - 1] # load elimination
+#                    p[self.N * i + j] = -c / (a * tmp_pm1 + b) # load elimination
                     q[self.N * i + j] = (-d * u[self.N * j + i - 1] + (1.0 + 2.0 * d) * u[self.N * j + i]
                                          - f * u[self.N * j + i + 1] - a * q[self.N * i + j - 1]) / (
-#                                a * p[self.N * i + j - 1] + b)
-                                a * tmp_pm1 + b)
+                                a * p[self.N * i + j - 1] + b)
+#                                a * tmp_pm1 + b) # load elimination
 
                 v[self.N * (self.N - 1) + i] = 1.0
                 for j in range(self.N - 2, 0, -1):
@@ -259,13 +259,13 @@ class _StrategyListFlattened(Adi):
                 p[self.N * i + 0] = 0.0
                 q[self.N * i + 0] = u[self.N * i + 0]
                 for j in range(1, self.N - 1):
-                    tmp_pm1 = p[self.N * i  + j - 1]
-#                    p[self.N * i + j] = -f / (d * p[self.N * i + j - 1] + e)
-                    p[self.N * i + j] = -f / (d * tmp_pm1 + e)
+                    p[self.N * i + j] = -f / (d * p[self.N * i + j - 1] + e)
+#                    tmp_pm1 = p[self.N * i  + j - 1] # load elimination
+#                    p[self.N * i + j] = -f / (d * tmp_pm1 + e) # load elimination
                     q[self.N * i + j] = (-a * v[self.N * (i - 1) + j] + (1.0 + 2.0 * a) * v[self.N * i + j]
                                          - c * v[self.N * (i + 1) + j] - d * q[self.N * i + j - 1]) / (
-#                                d * p[self.N * i + j - 1] + e)
-                                d * tmp_pm1 + e)
+                                d * p[self.N * i + j - 1] + e)
+#                                d * tmp_pm1 + e) # load elimination
 
                 u[self.N * i + self.N - 1] = 1.0
                 for j in range(self.N - 2, 0, -1):

@@ -176,16 +176,23 @@ class _StrategyListFlattened(Nussinov):
 # scop begin
         for i in range ((self.N-1)+1):
             for j in range (self.N + i * -1 , (self.N-1)+1):
+#                tmp = table[self.N*(self.N-1-i) + j] # load elimination
                 if((j-1>= 0)):
                     table[self.N*(self.N-1-i) + j] = max(table[self.N*(self.N-1-i)+j], table[self.N*(self.N-1-i)+j-1])
+#                    tmp = max(tmp, table[self.N*(self.N-1-i)+j-1]) # load elimination
                 if((i-1>= 0)):
                     table[self.N*(self.N-1-i) + j] = max(table[self.N*(self.N-1-i)+j], table[self.N*(self.N-1-i+1)+j])
+#                    tmp = max(tmp, table[self.N*(self.N-1-i+1)+j]) # load elimination
                 if((i-1>= 0) and (j-1>= 0) and (self.N*-1+i+j-1>= 0)):
                     table[self.N*(self.N-1-i)+j] = max(table[self.N*(self.N-1-i)+j], table[self.N*(self.N-1-i+1)+j-1]+match(seq[self.N-1-i], seq[j]))
+#                    tmp = max(tmp, table[self.N*(self.N-1-i+1)+j-1]+match(seq[self.N-1-i], seq[j])) # load elimination
                 if((i-1>= 0) and (j-1>= 0) and (self.N+i*-1+j*-1>= 0)):
                     table[self.N*(self.N-1-i)+j] = max(table[self.N*(self.N-1-i)+j], table[self.N*(self.N-1-i+1)+j-1])
+#                    tmp = max(tmp, table[self.N*(self.N-1-i+1)+j-1]) # load elimination
                 for k in range (self.N + i * -1 , (j-1)+1):
                     table[self.N*(self.N-1-i)+j] = max(table[self.N*(self.N-1-i)+j], table[self.N*(self.N-1-i)+k] + table[self.N*(k+1)+j])
+#                    tmp = max(tmp, table[self.N*(self.N-1-i)+k] + table[self.N*(k+1)+j]) # load elimination
+#                table[ self.N*(self.N-1-i)+j ] = tmp # load elimination
 # scop end
 
 
