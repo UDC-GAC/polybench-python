@@ -223,12 +223,12 @@ class _StrategyListFlattened(_3mm):
         # E := A * B
         for i in range(0, self.NI):
             for j in range(0, self.NJ):
-#                E[self.NJ * i + j] = 0.0
-                tmp = 0.0
+                E[self.NJ * i + j] = 0.0
+#                tmp = 0.0 # load elimination
                 for k in range(0, self.NK):
-#                    E[self.NJ * i + j] += A[self.NK * i + k] * B[self.NJ * k + j]
-                    tmp += A[self.NK * i + k] * B[self.NJ * k + j]
-                E[self.NJ * i + j] = tmp
+                    E[self.NJ * i + j] += A[self.NK * i + k] * B[self.NJ * k + j]
+#                    tmp += A[self.NK * i + k] * B[self.NJ * k + j] # load elimination
+#                E[self.NJ * i + j] = tmp # load elimination
 
         # F := C * D
         for i in range(0, self.NJ):
