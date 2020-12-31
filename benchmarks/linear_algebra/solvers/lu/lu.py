@@ -152,6 +152,9 @@ class _StrategyListFlattened(Lu):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
+        if options.LOAD_ELIMINATION: self.kernel = self.kernel_le
+        else: self.kernel = self.kernel_regular
+
     def initialize_array(self, A: list):
         for i in range(0, self.N):
             for j in range(0, i + 1):
@@ -181,23 +184,33 @@ class _StrategyListFlattened(Lu):
                     self.print_message('\n')
                 self.print_value(A[self.N * i + j])
 
-    def kernel(self, A: list):
+    def kernel_regular(self, A: list):
 # scop begin
         for i in range(0, self.N):
             for j in range(0, i):
-#                tmp = A[self.N*i+j] # load elimination
                 for k in range(0, j):
                     A[self.N * i + j] -= A[self.N * i + k] * A[self.N * k + j]
-#                    tmp -= A[self.N * i + k] * A[self.N * k + j] # load elimination
                 A[self.N * i + j] /= A[self.N * j + j]
-#                A[self.N * i + j] = tmp / A[self.N * j + j] # load elimination
 
             for j in range(i, self.N):
-#                tmp = A[self.N*i+j] # load elimination
                 for k in range(0, i):
                     A[self.N * i + j] -= A[self.N * i + k] * A[self.N * k + j]
-#                    tmp -= A[self.N * i + k] * A[self.N * k + j] # load elimination
-#                A[self.N * i + j] = tmp # load elimination
+# scop end
+
+    def kernel_le(self, A: list):
+# scop begin
+        for i in range(0, self.N):
+            for j in range(0, i):
+                tmp = A[self.N*i+j] # load elimination
+                for k in range(0, j):
+                    tmp -= A[self.N * i + k] * A[self.N * k + j] # load elimination
+                A[self.N * i + j] = tmp / A[self.N * j + j] # load elimination
+
+            for j in range(i, self.N):
+                tmp = A[self.N*i+j] # load elimination
+                for k in range(0, i):
+                    tmp -= A[self.N * i + k] * A[self.N * k + j] # load elimination
+                A[self.N * i + j] = tmp # load elimination
 # scop end
 
 

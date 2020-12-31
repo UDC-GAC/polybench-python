@@ -141,6 +141,9 @@ class _StrategyListFlattened(Doitgen):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
+        if options.LOAD_ELIMINATION: self.kernel = self.kernel_le
+        else: self.kernel = self.kernel_regular
+
     def initialize_array(self, A: list, C4: list, sum: list):
         for i in range(0, self.NR):
             for j in range(0, self.NQ):
@@ -159,22 +162,32 @@ class _StrategyListFlattened(Doitgen):
                         self.print_message('\n')
                     self.print_value(A[(self.NQ * i + j) * self.NP + k])
 
-    def kernel(self, A: list, C4: list, sum: list):
+    def kernel_regular(self, A: list, C4: list, sum: list):
 # scop begin
         for r in range(0, self.NR):
             for q in range(self.NQ):
                 for p in range(0, self.NP):
                     sum[p] = 0.0
-#                    tmp = 0.0 # load elimination
                     for s in range(self.NP):
                         sum[p] += A[(self.NQ * r + q) * self.NP + s] * C4[self.NP * s + p]
-#                        tmp += A[(self.NQ * r + q) * self.NP + s] * C4[self.NP * s + p] # load elimination
-#                    sum[p] = tmp # load elimination
 
                 for p in range(0, self.NP):
                     A[(self.NQ * r + q) * self.NP + p] = sum[p]
 # scop end
 
+    def kernel_le(self, A: list, C4: list, sum: list):
+# scop begin
+        for r in range(0, self.NR):
+            for q in range(self.NQ):
+                for p in range(0, self.NP):
+                    tmp = 0.0 # load elimination
+                    for s in range(self.NP):
+                        tmp += A[(self.NQ * r + q) * self.NP + s] * C4[self.NP * s + p] # load elimination
+                    sum[p] = tmp # load elimination
+
+                for p in range(0, self.NP):
+                    A[(self.NQ * r + q) * self.NP + p] = sum[p]
+# scop end
 
 class _StrategyNumPy(Doitgen):
 

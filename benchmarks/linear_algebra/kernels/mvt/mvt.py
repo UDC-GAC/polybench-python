@@ -133,6 +133,9 @@ class _StrategyListFlattened(Mvt):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
+        if options.LOAD_ELIMINATION: self.kernel = self.kernel_le
+        else: self.kernel = self.kernel_regular
+
     def initialize_array(self, x1: list, x2: list, y_1: list, y_2: list, A: list):
         for i in range(0, self.N):
             x1[i] = self.DATA_TYPE(i % self.N) / self.N
@@ -142,23 +145,31 @@ class _StrategyListFlattened(Mvt):
             for j in range(0, self.N):
                 A[self.N * i + j] = self.DATA_TYPE(i * j % self.N) / self.N
 
-    def kernel(self, x1: list, x2: list, y_1: list, y_2: list, A: list):
+    def kernel_regular(self, x1: list, x2: list, y_1: list, y_2: list, A: list):
 # scop begin
         for i in range(0, self.N):
-#            tmp = x1[i] # load elimination
             for j in range(0, self.N):
                 x1[i] = x1[i] + A[self.N * i + j] * y_1[j]
-#                tmp = tmp + A[self.N * i + j] * y_1[j] # load elimination
-#            x1[i] = tmp # load elimination
 
         for i in range(0, self.N):
-#            tmp = x2[i] # load elimination
             for j in range(0, self.N):
                 x2[i] = x2[i] + A[self.N * j + i] * y_2[j]
-#                tmp = tmp + A[self.N * j + i] * y_2[j] # load elimination
-#            x2[i] = tmp # load elimination
 # scop end
 
+    def kernel_le(self, x1: list, x2: list, y_1: list, y_2: list, A: list):
+# scop begin
+        for i in range(0, self.N):
+            tmp = x1[i] # load elimination
+            for j in range(0, self.N):
+                tmp = tmp + A[self.N * i + j] * y_1[j] # load elimination
+            x1[i] = tmp # load elimination
+
+        for i in range(0, self.N):
+            tmp = x2[i] # load elimination
+            for j in range(0, self.N):
+                tmp = tmp + A[self.N * j + i] * y_2[j] # load elimination
+            x2[i] = tmp # load elimination
+# scop end
 
 class _StrategyNumPy(Mvt):
 
