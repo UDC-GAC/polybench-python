@@ -182,6 +182,9 @@ class _StrategyListFlattened(_2mm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
+        if options.LOAD_ELIMINATION: self.kernel = self.kernel_le
+        else: self.kernel = self.kernel_regular
+
     def initialize_array(self, alpha, beta, tmp: list, A: list, B: list, C: list, D: list):
         for i in range(0, self.NI):
             for j in range(0, self.NK):
@@ -206,26 +209,38 @@ class _StrategyListFlattened(_2mm):
                     self.print_message('\n')
                 self.print_value(D[self.NL * i + j])
 
-    def kernel(self, alpha, beta, tmp: list, A: list, B: list, C: list, D: list):
+    def kernel_regular(self, alpha, beta, tmp: list, A: list, B: list, C: list, D: list):
 # scop begin
         # D := alpha * A * B * C + beta * D
         for i in range(self.NI):
             for j in range(self.NJ):
                 tmp[self.NJ * i + j] = 0.0
-#                tmp2 = 0.0 # load elimination
                 for k in range(0, self.NK):
                     tmp[self.NJ * i + j] += alpha * A[self.NK * i + k] * B[self.NJ * k + j]
-#                    tmp2 += alpha * A[self.NK * i + k] * B[self.NJ * k + j] # load elimination
-#                tmp[self.NJ * i + j] = tmp2 # load elimination
 
         for i in range(0, self.NI):
             for j in range(0, self.NL):
                 D[self.NL * i + j] *= beta
-#                tmp2 = D[self.NL * i + j] * beta # load elimination
                 for k in range(0, self.NJ):
                     D[self.NL * i + j] += tmp[self.NJ * i + k] * C[self.NL * k + j]
-#                    tmp2 += tmp[self.NJ * i + k] * C[self.NL * k + j] # load elimination
-#                D[self.NL * i + j] = tmp2 #load elimination
+# scop end
+
+    def kernel_le(self, alpha, beta, tmp: list, A: list, B: list, C: list, D: list):
+# scop begin
+        # D := alpha * A * B * C + beta * D
+        for i in range(self.NI):
+            for j in range(self.NJ):
+                tmp2 = 0.0 # load elimination
+                for k in range(0, self.NK):
+                    tmp2 += alpha * A[self.NK * i + k] * B[self.NJ * k + j] # load elimination
+                tmp[self.NJ * i + j] = tmp2 # load elimination
+
+        for i in range(0, self.NI):
+            for j in range(0, self.NL):
+                tmp2 = D[self.NL * i + j] * beta # load elimination
+                for k in range(0, self.NJ):
+                    tmp2 += tmp[self.NJ * i + k] * C[self.NL * k + j] # load elimination
+                D[self.NL * i + j] = tmp2 #load elimination
 # scop end
 
 

@@ -144,6 +144,9 @@ class _StrategyListFlattened(Trmm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
+        if options.LOAD_ELIMINATION: self.kernel = self.kernel_le
+        else: self.kernel = self.kernel_regular
+
     def initialize_array(self, alpha, A: list, B: list):
         for i in range(0, self.M):
             for j in range(0, i):
@@ -161,18 +164,26 @@ class _StrategyListFlattened(Trmm):
                     self.print_message('\n')
                 self.print_value(B[self.N * i + j])
 
-    def kernel(self, alpha, A: list, B: list):
+    # Regular version
+    def kernel_regular(self, alpha, A: list, B: list):
 # scrop begin
         for i in range(0, self.M):
             for j in range(0, self.N):
-#                tmp = B[self.N*i+j] # load elimination
                 for k in range(i + 1, self.M):
                     B[self.N * i + j] += A[self.M * k + i] * B[self.N * k + j]
-#                    tmp += A[self.M * k + i] * B[self.N * k + j] # load elimination
                 B[self.N * i + j] = alpha * B[self.N * i + j]
-#                B[self.N * i + j] = alpha * tmp # load elimination
 # scop end
 
+    # Load elimination
+    def kernel_le(self, alpha, A: list, B: list): 
+# scrop begin
+        for i in range(0, self.M):
+            for j in range(0, self.N):
+                tmp = B[self.N*i+j]
+                for k in range(i + 1, self.M):
+                    tmp += A[self.M * k + i] * B[self.N * k + j]
+                B[self.N * i + j] = alpha * tmp
+# scop end
 
 class _StrategyNumPy(Trmm):
 

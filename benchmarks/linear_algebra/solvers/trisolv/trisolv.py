@@ -126,6 +126,9 @@ class _StrategyListFlattened(Trisolv):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
+        if options.LOAD_ELIMINATION: self.kernel = self.kernel_le
+        else: self.kernel = self.kernel_regular
+
     def initialize_array(self, L: list, x: list, b: list):
         for i in range(0, self.N):
             x[i] = - 999
@@ -133,21 +136,30 @@ class _StrategyListFlattened(Trisolv):
             for j in range(0, i + 1):
                 L[self.N * i + j] = self.DATA_TYPE(i+self.N-j+1) * 2 / self.N
 
-    def kernel(self, L: list, x: list, b: list):
+    def kernel_regular(self, L: list, x: list, b: list):
 # scop begin
         if((self.N-1>= 0)):
             for c1 in range ((self.N-1)+1):
                 x[c1] = b[c1]
             x[0] = x[0] / L[self.N*0+0]
             for c1 in range (1 , (self.N-1)+1):
-#                tmp = x[c1] # load elimination
                 for c2 in range ((c1-1)+1):
                     x[c1] -= L[self.N * c1 + c2] * x[c2]
-#                    tmp -= L[self.N * c1 + c2] * x[c2] # load elimination
                 x[c1] = x[c1] / L[self.N * c1 + c1]
-#                x[c1] = tmp / L[self.N * c1 + c1] # load elimination
 # scop end
 
+    def kernel_le(self, L: list, x: list, b: list):
+# scop begin
+        if((self.N-1>= 0)):
+            for c1 in range ((self.N-1)+1):
+                x[c1] = b[c1]
+            x[0] = x[0] / L[self.N*0+0]
+            for c1 in range (1 , (self.N-1)+1):
+                tmp = x[c1] # load elimination
+                for c2 in range ((c1-1)+1):
+                    tmp -= L[self.N * c1 + c2] * x[c2] # load elimination
+                x[c1] = tmp / L[self.N * c1 + c1] # load elimination
+# scop end
 
 class _StrategyNumPy(Trisolv):
 

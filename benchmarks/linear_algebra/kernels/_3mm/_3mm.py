@@ -194,6 +194,9 @@ class _StrategyListFlattened(_3mm):
     def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
         super().__init__(options, parameters)
 
+        if options.LOAD_ELIMINATION: self.kernel = self.kernel_le
+        else: self.kernel = self.kernel_regular
+
     def initialize_array(self, E: list, A: list, B: list, F: list, C: list, D: list, G: list):
         for i in range(0, self.NI):
             for j in range(0, self.NK):
@@ -218,39 +221,56 @@ class _StrategyListFlattened(_3mm):
                     self.print_message('\n')
                 self.print_value(G[self.NL * i + j])
 
-    def kernel(self, E: list, A: list, B: list, F: list, C: list, D: list, G: list):
+    def kernel_regular(self, E: list, A: list, B: list, F: list, C: list, D: list, G: list):
 # scop begin
         # E := A * B
         for i in range(0, self.NI):
             for j in range(0, self.NJ):
                 E[self.NJ * i + j] = 0.0
-#                tmp = 0.0 # load elimination
                 for k in range(0, self.NK):
                     E[self.NJ * i + j] += A[self.NK * i + k] * B[self.NJ * k + j]
-#                    tmp += A[self.NK * i + k] * B[self.NJ * k + j] # load elimination
-#                E[self.NJ * i + j] = tmp # load elimination
 
         # F := C * D
         for i in range(0, self.NJ):
             for j in range(0, self.NL):
                 F[self.NL * i + j] = 0.0
-#                tmp = 0.0 # load elimination
                 for k in range(0, self.NM):
                     F[self.NL * i + j] += C[self.NM * i + k] * D[self.NL * k + j]
-#                    tmp += C[self.NM * i + k] * D[self.NL * k + j] # load elimination
-#                F[self.NL * i + j] = tmp # load elimination
 
         # G := E * F
         for i in range(0, self.NI):
             for j in range(0, self.NL):
                 G[self.NL * i + j] = 0.0
-#                tmp = 0.0 # load elimination
                 for k in range(0, self.NJ):
                     G[self.NL * i + j] += E[self.NJ * i + k] * F[self.NL * k + j]
-#                    tmp += E[self.NJ * i + k] * F[self.NL * k + j] # load elimination
-#                G[self.NL * i + j] = tmp # load elimination
 # scop end
 
+    def kernel_le(self, E: list, A: list, B: list, F: list, C: list, D: list, G: list):
+# scop begin
+        # E := A * B
+        for i in range(0, self.NI):
+            for j in range(0, self.NJ):
+                tmp = 0.0 # load elimination
+                for k in range(0, self.NK):
+                    tmp += A[self.NK * i + k] * B[self.NJ * k + j] # load elimination
+                E[self.NJ * i + j] = tmp # load elimination
+
+        # F := C * D
+        for i in range(0, self.NJ):
+            for j in range(0, self.NL):
+                tmp = 0.0 # load elimination
+                for k in range(0, self.NM):
+                    tmp += C[self.NM * i + k] * D[self.NL * k + j] # load elimination
+                F[self.NL * i + j] = tmp # load elimination
+
+        # G := E * F
+        for i in range(0, self.NI):
+            for j in range(0, self.NL):
+                tmp = 0.0 # load elimination
+                for k in range(0, self.NJ):
+                    tmp += E[self.NJ * i + k] * F[self.NL * k + j] # load elimination
+                G[self.NL * i + j] = tmp # load elimination
+# scop end
 
 class _StrategyNumPy(_3mm):
 

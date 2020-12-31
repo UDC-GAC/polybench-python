@@ -110,6 +110,8 @@ if __name__ == '__main__':
         parser.add_argument('--array-implementation', dest='array_implementation', default=0,
                             help='Allows to select the internal array implementation in use. 0: Python List; 1: Python '
                                  'List with flattened indexes; 2: NumPy array. Default: 0.')
+        parser.add_argument('--load-elimination', action="store_true", default=False,
+                            help="Enables load elimination (where applicable). Default: False." )
         # Parse the commandline arguments. This process will fail on error
         args = parser.parse_args()
 
@@ -274,6 +276,10 @@ if __name__ == '__main__':
             opts = result['polybench_options']
             if opts.POLYBENCH_TIME or opts.POLYBENCH_PAPI:
                 result['save_results'] = True
+
+        # Process load elimination
+        opts = result['polybench_options']
+        opts.LOAD_ELIMINATION = bool(args.load_elimination)
 
         return result
 
