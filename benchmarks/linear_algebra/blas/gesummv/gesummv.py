@@ -189,7 +189,14 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, alpha, beta, A: list, B: list, tmp: list, x: list, y: list):
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+        self.kernel_vectorizer = self.kernel_pluto
+        self.kernel = getattr( self, "kernel_%s" % (options.POCC) )
+
+    def kernel_pluto(self, alpha, beta, A: list, B: list, tmp: list, x: list, y: list):
+# --pluto
 # scop begin
         if((self.N-1>= 0)):
             for c1 in range ((self.N-1)+1):
@@ -204,15 +211,18 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
                     tmp[c1] = A[self.N*(c1) + c2] * x[c2] + tmp[c1]
             for c1 in range ((self.N-1)+1):
                 y[c1] = alpha * tmp[c1] + beta * y[c1]
+# scop end
 
+    def kernel_maxfuse(self, alpha, beta, A: list, B: list, tmp: list, x: list, y: list):
 # --pluto --pluto-fuse maxfuse
-#        if((self.N-1>= 0)):
-#            for c0 in range ((self.N-1)+1):
-#                y[c0] = 0.0
-#                for c3 in range ((self.N-1)+1):
-#                    y[c0] = B[(c0)*self.N + c3] * x[c3] + y[c0]
-#                tmp[c0] = 0.0
-#                for c3 in range ((self.N-1)+1):
-#                    tmp[c0] = A[(c0)*self.N + c3] * x[c3] + tmp[c0]
-#                y[c0] = alpha * tmp[c0] + beta * y[c0]
+# scop begin
+        if((self.N-1>= 0)):
+            for c0 in range ((self.N-1)+1):
+                y[c0] = 0.0
+                for c3 in range ((self.N-1)+1):
+                    y[c0] = B[(c0)*self.N + c3] * x[c3] + y[c0]
+                tmp[c0] = 0.0
+                for c3 in range ((self.N-1)+1):
+                    tmp[c0] = A[(c0)*self.N + c3] * x[c3] + tmp[c0]
+                y[c0] = alpha * tmp[c0] + beta * y[c0]
 # scop end

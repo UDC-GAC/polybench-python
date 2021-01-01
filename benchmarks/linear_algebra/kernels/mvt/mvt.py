@@ -199,22 +199,34 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, x1: list, x2: list, y_1: list, y_2: list, A: list):
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+        self.kernel = getattr( self, "kernel_%s" % (options.POCC) )
+
+    def kernel_pluto(self, x1: list, x2: list, y_1: list, y_2: list, A: list):
+# --pluto
 # scop begin
-#        if((self.N-1>= 0)):
-#            for c1 in range ((self.N-1)+1):
-#                for c2 in range ((self.N-1)+1):
-#                    x1[c1] = x1[c1] + A[self.N*(c1) + c2] * y_1[c2]
-#                    x2[c1] = x2[c1] + A[self.N*(c2) + c1] * y_2[c2]
+        if((self.N-1>= 0)):
+            for c1 in range ((self.N-1)+1):
+                for c2 in range ((self.N-1)+1):
+                    x1[c1] = x1[c1] + A[self.N*(c1) + c2] * y_1[c2]
+                    x2[c1] = x2[c1] + A[self.N*(c2) + c1] * y_2[c2]
+# scop end
 
+    def kernel_vectorizer(self, x1: list, x2: list, y_1: list, y_2: list, A: list):
 # --pluto --pluto-prevector --vectorizer --pragmatizer
-#        if((self.N-1>= 0)):
-#            for c2 in range ((self.N-1)+1):
-#                for c1 in range ((self.N-1)+1):
-#                    x1[c1] = x1[c1] + A[self.N*(c1) + c2] * y_1[c2]
-#                    x2[c1] = x2[c1] + A[self.N*(c2) + c1] * y_2[c2]
+# scop begin
+        if((self.N-1>= 0)):
+            for c2 in range ((self.N-1)+1):
+                for c1 in range ((self.N-1)+1):
+                    x1[c1] = x1[c1] + A[self.N*(c1) + c2] * y_1[c2]
+                    x2[c1] = x2[c1] + A[self.N*(c2) + c1] * y_2[c2]
+# scop end
 
+    def kernel_maxfuse(self, x1: list, x2: list, y_1: list, y_2: list, A: list):
 # --pluto --pluto-fuse maxfuse
+# scop begin
         if((self.N-1>= 0)):
             for c0 in range ((self.N-1)+1):
                 for c1 in range ((self.N-1)+1):

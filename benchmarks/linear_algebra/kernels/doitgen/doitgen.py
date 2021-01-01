@@ -229,32 +229,44 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, A: list, C4: list, sum: list):
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+        self.kernel = getattr( self, "kernel_%s" % (options.POCC) )
+
+    def kernel_pluto(self, A: list, C4: list, sum: list):
+# --pluto
 # scop begin
-#        if((self.NP-1>= 0) and (self.NQ-1>= 0) and (self.NR-1>= 0)):
-#            for c0 in range ((self.NR-1)+1):
-#                for c1 in range ((self.NQ-1)+1):
-#                    for c3 in range ((self.NP-1)+1):
-#                        sum[c3] = 0.0
-#                    for c3 in range ((self.NP-1)+1):
-#                        for c4 in range ((self.NP-1)+1):
-#                            sum[c3] += A[self.NQ*self.NP*c0+self.NP*c1+c4] * C4[self.NP*(c4) + c3]
-#                    for c3 in range ((self.NP-1)+1):
-#                        A[self.NQ*self.NP*c0+self.NP*c1+c3] = sum[c3]
+        if((self.NP-1>= 0) and (self.NQ-1>= 0) and (self.NR-1>= 0)):
+            for c0 in range ((self.NR-1)+1):
+                for c1 in range ((self.NQ-1)+1):
+                    for c3 in range ((self.NP-1)+1):
+                        sum[c3] = 0.0
+                    for c3 in range ((self.NP-1)+1):
+                        for c4 in range ((self.NP-1)+1):
+                            sum[c3] += A[self.NQ*self.NP*c0+self.NP*c1+c4] * C4[self.NP*(c4) + c3]
+                    for c3 in range ((self.NP-1)+1):
+                        A[self.NQ*self.NP*c0+self.NP*c1+c3] = sum[c3]
+# scop end
 
+    def kernel_vectorizer(self, A: list, C4: list, sum: list):
 # --pluto --pluto-prevector --vectorizer --pragmatizer
-#        if((self.NP-1>= 0) and (self.NQ-1>= 0) and (self.NR-1>= 0)):
-#            for c0 in range ((self.NR-1)+1):
-#                for c1 in range ((self.NQ-1)+1):
-#                    for c3 in range ((self.NP-1)+1):
-#                        sum[c3] = 0.0
-#                    for c4 in range ((self.NP-1)+1):
-#                        for c3 in range ((self.NP-1)+1):
-#                            sum[c3] += A[self.NQ*self.NP*c0+self.NP*c1+c4] * C4[self.NP*(c4) + c3]
-#                    for c3 in range ((self.NP-1)+1):
-#                        A[self.NQ*self.NP*c0+self.NP*c1+c3] = sum[c3]
+# scop begin
+        if((self.NP-1>= 0) and (self.NQ-1>= 0) and (self.NR-1>= 0)):
+            for c0 in range ((self.NR-1)+1):
+                for c1 in range ((self.NQ-1)+1):
+                    for c3 in range ((self.NP-1)+1):
+                        sum[c3] = 0.0
+                    for c4 in range ((self.NP-1)+1):
+                        for c3 in range ((self.NP-1)+1):
+                            sum[c3] += A[self.NQ*self.NP*c0+self.NP*c1+c4] * C4[self.NP*(c4) + c3]
+                    for c3 in range ((self.NP-1)+1):
+                        A[self.NQ*self.NP*c0+self.NP*c1+c3] = sum[c3]
+# scop end
 
+    def kernel_maxfuse(self, A: list, C4: list, sum: list):
 # --pluto --pluto-fuse maxfuse
+# scop begin
         if((self.NP-1>= 0) and (self.NQ-1>= 0) and (self.NR-1>= 0)):
             for c0 in range ((self.NR-1)+1):
                 for c1 in range ((self.NQ-1)+1):
@@ -265,5 +277,4 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
                             sum[c4] += A[c0*self.NQ*self.NP+c1*self.NP+c5] * C4[c5*self.NP+c4]
                     for c4 in range ((self.NP-1)+1):
                         A[c0*self.NQ*self.NP+c1*self.NP+c4] = sum[c4]
-
 # scop end

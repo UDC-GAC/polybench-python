@@ -224,63 +224,75 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, float_n: float, data: list, cov: list, mean: list):
-# scop begin
-#        if((self.M-1>= 0)):
-#            for c1 in range ((self.M-1)+1):
-#                for c2 in range (c1 , (self.M-1)+1):
-#                    cov[self.M*(c1) + c2] = 0.0
-#            for c1 in range ((self.M-1)+1):
-#                mean[c1] = 0.0
-#            if((self.N-1>= 0)):
-#                for c1 in range ((self.M-1)+1):
-#                    for c2 in range ((self.N-1)+1):
-#                        mean[c1] += data[self.M*(c2) + c1]
-#            for c1 in range ((self.M-1)+1):
-#                mean[c1] /= float_n
-#            for c1 in range ((self.N-1)+1):
-#                for c2 in range ((self.M-1)+1):
-#                    data[self.M*(c1) + c2] -= mean[c2]
-#            if((self.N-1>= 0)):
-#                for c1 in range ((self.M-1)+1):
-#                    for c2 in range (c1 , (self.M-1)+1):
-#                        for c3 in range ((self.N-1)+1):
-#                            cov[self.M*(c1) + c2] += data[self.M*(c3) + c1] * data[self.M*(c3) + c2]
-#            for c1 in range ((self.M-1)+1):
-#                for c2 in range (c1 , (self.M-1)+1):
-#                    cov[self.M*(c1) + c2] /= (float_n - 1.0)
-#                    cov[self.M*(c2) + c1] = cov[self.M*(c1) + c2]
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
 
+        self.kernel = getattr( self, "kernel_%s" % (options.POCC) )
+
+    def kernel_pluto(self, float_n: float, data: list, cov: list, mean: list):
+# --pluto
+# scop begin
+        if((self.M-1>= 0)):
+            for c1 in range ((self.M-1)+1):
+                for c2 in range (c1 , (self.M-1)+1):
+                    cov[self.M*(c1) + c2] = 0.0
+            for c1 in range ((self.M-1)+1):
+                mean[c1] = 0.0
+            if((self.N-1>= 0)):
+                for c1 in range ((self.M-1)+1):
+                    for c2 in range ((self.N-1)+1):
+                        mean[c1] += data[self.M*(c2) + c1]
+            for c1 in range ((self.M-1)+1):
+                mean[c1] /= float_n
+            for c1 in range ((self.N-1)+1):
+                for c2 in range ((self.M-1)+1):
+                    data[self.M*(c1) + c2] -= mean[c2]
+            if((self.N-1>= 0)):
+                for c1 in range ((self.M-1)+1):
+                    for c2 in range (c1 , (self.M-1)+1):
+                        for c3 in range ((self.N-1)+1):
+                            cov[self.M*(c1) + c2] += data[self.M*(c3) + c1] * data[self.M*(c3) + c2]
+            for c1 in range ((self.M-1)+1):
+                for c2 in range (c1 , (self.M-1)+1):
+                    cov[self.M*(c1) + c2] /= (float_n - 1.0)
+                    cov[self.M*(c2) + c1] = cov[self.M*(c1) + c2]
+# scop end
+
+    def kernel_maxfuse(self, float_n: float, data: list, cov: list, mean: list):
 # --pluto-fuse maxfuse
-#        if (self.M >= 1):
-#          if (self.N >= 1):
-#            for c0 in range( self.M ):
-#                for c3 in range( self.M ):
-#                    cov[(c0)*self.M + c3] = 0.0;
-#                mean[c0] = 0.0;
-#                for c3 in range( self.N ):
-#                    mean[c0] += data[(c3)*self.M + c0];
-#                mean[c0] /= float_n;
-#                for c3 in range( self.N ):
-#                    data[(c3)*self.M + c0] -= mean[c0];
-#                for c3 in range( c0+1 ):
-#                    for c4 in range( self.N ):
-#                        cov[(c3)*self.M + c0] += data[(c4)*self.M + c3] * data[(c4)*self.M + c0];
-#                for c3 in range( c0+1 ):
-#                    cov[(c3)*self.M + c0] /= (float_n - 1.0);
-#                    cov[(c0)*self.M + c3] = cov[(c3)*self.M + c0];
-#
-#          if (self.N <= 0):
-#            for c0 in range( self.M ):
-#                for c3 in range( self.M ):
-#                    cov[(c0)*self.M + c3] = 0.0;
-#                mean[c0] = 0.0;
-#                mean[c0] /= float_n;
-#                for c3 in range( c0+1 ):
-#                    cov[(c3)*self.M + c0] /= (float_n - 1.0);
-#                    cov[(c0)*self.M + c3] = cov[(c3)*self.M + c0];
-#
-# --pluto --pluto-scalpriv --vectorizer --pragmatizer
+# scop begin
+        if (self.M >= 1):
+          if (self.N >= 1):
+            for c0 in range( self.M ):
+                for c3 in range( self.M ):
+                    cov[(c0)*self.M + c3] = 0.0;
+                mean[c0] = 0.0;
+                for c3 in range( self.N ):
+                    mean[c0] += data[(c3)*self.M + c0];
+                mean[c0] /= float_n;
+                for c3 in range( self.N ):
+                    data[(c3)*self.M + c0] -= mean[c0];
+                for c3 in range( c0+1 ):
+                    for c4 in range( self.N ):
+                        cov[(c3)*self.M + c0] += data[(c4)*self.M + c3] * data[(c4)*self.M + c0];
+                for c3 in range( c0+1 ):
+                    cov[(c3)*self.M + c0] /= (float_n - 1.0);
+                    cov[(c0)*self.M + c3] = cov[(c3)*self.M + c0];
+
+          if (self.N <= 0):
+            for c0 in range( self.M ):
+                for c3 in range( self.M ):
+                    cov[(c0)*self.M + c3] = 0.0;
+                mean[c0] = 0.0;
+                mean[c0] /= float_n;
+                for c3 in range( c0+1 ):
+                    cov[(c3)*self.M + c0] /= (float_n - 1.0);
+                    cov[(c0)*self.M + c3] = cov[(c3)*self.M + c0];
+# scop end
+
+    def kernel_vectorizer(self, float_n: float, data: list, cov: list, mean: list):
+# --pluto --pluto-prevector --vectorizer --pragmatizer
+# scop begin
         if (self.M >= 1):
           ub1 = (self.M + -1);
           for c1 in range(ub1+1):

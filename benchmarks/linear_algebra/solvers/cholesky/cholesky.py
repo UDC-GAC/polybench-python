@@ -279,7 +279,14 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, A: list):
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+        self.kernel_vectorizer = self.kernel_pluto
+        self.kernel = getattr( self, "kernel_%s" % (options.POCC) )
+
+    def kernel_pluto(self, A: list):
+# --pluto
 # scop begin
         if((self.N-1>= 0)):
             A[self.N*(0) + 0] = math.sqrt(A[self.N*(0) + 0])
@@ -299,23 +306,24 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
                     A[self.N*(c0) + c0] -= A[self.N*(c0) + c1] * A[self.N*(c0) + c1]
                 A[self.N*(c0) + c0] = math.sqrt(A[self.N*(c0) + c0])
 
+    def kernel_maxfuse(self, A: list):
 # --pluto --pluto-fuse maxfuse
-#        if((self.N-1>= 0)):
-#            A[(0)*self.N + 0] = math.sqrt(A[(0)*self.N + 0])
-#            if((self.N-2>= 0)):
-#                A[(1)*self.N + 0] /= A[(0)*self.N + 0]
-#            if((self.N-2>= 0)):
-#                A[(1)*self.N + 1] -= A[(1)*self.N + 0] * A[(1)*self.N + 0]
-#            if((self.N-2>= 0)):
-#                A[(1)*self.N + 1] = math.sqrt(A[(1)*self.N + 1])
-#            for c0 in range (2 , (self.N-1)+1):
-#                A[(c0)*self.N + 0] /= A[(0)*self.N + 0]
-#                A[(c0)*self.N + c0] -= A[(c0)*self.N + 0] * A[(c0)*self.N + 0]
-#                for c1 in range (1 , (c0-1)+1):
-#                    for c2 in range ((c1-1)+1):
-#                        A[(c0)*self.N + c1] -= A[(c0)*self.N + c2] * A[(c1)*self.N + c2]
-#                    A[(c0)*self.N + c1] /= A[(c1)*self.N + c1]
-#                    A[(c0)*self.N + c0] -= A[(c0)*self.N + c1] * A[(c0)*self.N + c1]
-#                A[(c0)*self.N + c0] = math.sqrt(A[(c0)*self.N + c0])
-#
+# scop begin
+        if((self.N-1>= 0)):
+            A[(0)*self.N + 0] = math.sqrt(A[(0)*self.N + 0])
+            if((self.N-2>= 0)):
+                A[(1)*self.N + 0] /= A[(0)*self.N + 0]
+            if((self.N-2>= 0)):
+                A[(1)*self.N + 1] -= A[(1)*self.N + 0] * A[(1)*self.N + 0]
+            if((self.N-2>= 0)):
+                A[(1)*self.N + 1] = math.sqrt(A[(1)*self.N + 1])
+            for c0 in range (2 , (self.N-1)+1):
+                A[(c0)*self.N + 0] /= A[(0)*self.N + 0]
+                A[(c0)*self.N + c0] -= A[(c0)*self.N + 0] * A[(c0)*self.N + 0]
+                for c1 in range (1 , (c0-1)+1):
+                    for c2 in range ((c1-1)+1):
+                        A[(c0)*self.N + c1] -= A[(c0)*self.N + c2] * A[(c1)*self.N + c2]
+                    A[(c0)*self.N + c1] /= A[(c1)*self.N + c1]
+                    A[(c0)*self.N + c0] -= A[(c0)*self.N + c1] * A[(c0)*self.N + c1]
+                A[(c0)*self.N + c0] = math.sqrt(A[(c0)*self.N + c0])
 # scop end

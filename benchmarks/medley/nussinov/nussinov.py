@@ -266,6 +266,7 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
+    # No difference for --pluto / vectorizer / maxfuse
     def kernel(self, seq: list, table: list):
         def match(b1,b2):
             return b1+b2 == 3

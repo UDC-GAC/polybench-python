@@ -230,32 +230,43 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, alpha, beta, A: list, u1: list, v1: list, u2: list, v2: list, w: list, x: list, y: list, z: list):
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+        self.kernel = getattr( self, "kernel_%s" % (options.POCC) )
+
+    def kernel_pluto(self, alpha, beta, A: list, u1: list, v1: list, u2: list, v2: list, w: list, x: list, y: list, z: list):
 # scop begin
-#        if((self.N-1>= 0)):
-#            for c1 in range ((self.N-1)+1):
-#                for c2 in range ((self.N-1)+1):
-#                    A[self.N*(c2) + c1] = A[self.N*(c2) + c1] + u1[c2] * v1[c1] + u2[c2] * v2[c1]
-#                    x[c1] = x[c1] + beta * A[self.N*(c2) + c1] * y[c2]
-#            for c1 in range ((self.N-1)+1):
-#                x[c1] = x[c1] + z[c1]
-#            for c1 in range ((self.N-1)+1):
-#                for c2 in range ((self.N-1)+1):
-#                    w[c1] = w[c1] + alpha * A[self.N*(c1) + c2] * x[c2]
+        if((self.N-1>= 0)):
+            for c1 in range ((self.N-1)+1):
+                for c2 in range ((self.N-1)+1):
+                    A[self.N*(c2) + c1] = A[self.N*(c2) + c1] + u1[c2] * v1[c1] + u2[c2] * v2[c1]
+                    x[c1] = x[c1] + beta * A[self.N*(c2) + c1] * y[c2]
+            for c1 in range ((self.N-1)+1):
+                x[c1] = x[c1] + z[c1]
+            for c1 in range ((self.N-1)+1):
+                for c2 in range ((self.N-1)+1):
+                    w[c1] = w[c1] + alpha * A[self.N*(c1) + c2] * x[c2]
+# scop end
 
+    def kernel_vectorizer(self, alpha, beta, A: list, u1: list, v1: list, u2: list, v2: list, w: list, x: list, y: list, z: list):
 # --pluto --pluto-prevector --vectorizer --pragmatizer
-#        if((self.N-1>= 0)):
-#            for c2 in range ((self.N-1)+1):
-#                for c1 in range ((self.N-1)+1):
-#                    A[self.N*(c2) + c1] = A[self.N*(c2) + c1] + u1[c2] * v1[c1] + u2[c2] * v2[c1]
-#                    x[c1] = x[c1] + beta * A[self.N*(c2) + c1] * y[c2]
-#            for c1 in range ((self.N-1)+1):
-#                x[c1] = x[c1] + z[c1]
-#            for c1 in range ((self.N-1)+1):
-#                for c2 in range ((self.N-1)+1):
-#                    w[c1] = w[c1] + alpha * A[self.N*(c1) + c2] * x[c2]
+# scop begin
+        if((self.N-1>= 0)):
+            for c2 in range ((self.N-1)+1):
+                for c1 in range ((self.N-1)+1):
+                    A[self.N*(c2) + c1] = A[self.N*(c2) + c1] + u1[c2] * v1[c1] + u2[c2] * v2[c1]
+                    x[c1] = x[c1] + beta * A[self.N*(c2) + c1] * y[c2]
+            for c1 in range ((self.N-1)+1):
+                x[c1] = x[c1] + z[c1]
+            for c1 in range ((self.N-1)+1):
+                for c2 in range ((self.N-1)+1):
+                    w[c1] = w[c1] + alpha * A[self.N*(c1) + c2] * x[c2]
+# scop end
 
+    def kernel_maxfuse(self, alpha, beta, A: list, u1: list, v1: list, u2: list, v2: list, w: list, x: list, y: list, z: list):
 # --pluto --pluto-fuse maxfuse
+# scop begin
         if((self.N-1>= 0)):
             for c0 in range ((self.N-1)+1):
                 for c3 in range ((self.N-1)+1):
