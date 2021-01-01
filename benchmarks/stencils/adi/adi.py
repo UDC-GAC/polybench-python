@@ -388,7 +388,14 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, u: list, v: list, p: list, q: list):
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+        self.kernel_vectorizer = self.kernel_pluto
+        self.kernel = getattr( self, "kernel_%s" % (options.POCC) )
+
+    def kernel_pluto(self, u: list, v: list, p: list, q: list):
+# --pluto / maxfuse
 #scop begin
         DY = 1.0/self.DATA_TYPE(self.N)
         DT = 1.0/self.DATA_TYPE(self.TSTEPS)
@@ -437,51 +444,54 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
                 for c17 in range (1 , (self.N-2)+1):
                     for c18 in range (1 , (self.N-2)+1):
                         u[self.N*(c17) + self.N-1-c18] = p[self.N*(c17) + self.N-1-c18] * u[self.N*(c17) + self.N-c18] + q[self.N*(c17) + self.N-1-c18]
+# scop end
 
+    def kernel_maxfuse(self, u: list, v: list, p: list, q: list):
 # --pluto-fuse maxfuse
-#        DY = 1.0/self.N
-#        DT = 1.0/self.TSTEPS
-#        B1 = 2.0
-#        B2 = 1.0
-#        mul2 = B2 * DT / (DY * DY)
-#        e = 1.0+mul2
-#        d = -mul2 / 2.0
-#        f = d
-#        DX = 1.0/self.N
-#        mul1 = B1 * DT / (DX * DX)
-#        b = 1.0+mul1
-#        a = -mul1 / 2.0
-#        c = a
-#        if((self.N-3>= 0)):
-#            for c0 in range (1 , (self.TSTEPS)+1):
-#                for c7 in range (1 , (self.N-2)+1):
-#                    v[(self.N-1)*self.N + c7] = 1.0
-#                for c7 in range (1 , (self.N-2)+1):
-#                    p[(c7)*self.N + 0] = 0.0
-#                for c7 in range (1 , (self.N-2)+1):
-#                    for c12 in range (1 , (self.N-2)+1):
-#                        p[(c7)*self.N + c12] = -c / (a*p[(c7)*self.N + c12-1]+b)
-#                for c7 in range (1 , (self.N-2)+1):
-#                    v[(0)*self.N + c7] = 1.0
-#                    q[(c7)*self.N + 0] = v[(0)*self.N + c7]
-#                for c7 in range (1 , (self.N-2)+1):
-#                    for c12 in range (1 , (self.N-2)+1):
-#                        q[(c7)*self.N + c12] = (-d*u[(c12)*self.N + c7-1]+(1.0+2.0)*d)*u[(c12)*self.N + c7] - f*u[(c12)*self.N + c7+1]-a*q[(c7)*self.N + c12-1]/(a*p[(c7)*self.N + c12-1]+b)
-#                for c7 in range (1 , (self.N-2)+1):
-#                    u[(c7)*self.N + self.N-1] = 1.0
-#                    u[(c7)*self.N + 0] = 1.0
-#                    p[(c7)*self.N + 0] = 0.0
-#                for c7 in range (1 , (self.N-2)+1):
-#                    q[(c7)*self.N + 0] = u[(c7)*self.N + 0]
-#                for c7 in range (1 , (self.N-2)+1):
-#                    for c12 in range (1 , (self.N-2)+1):
-#                        v[(self.N-1-c12)*self.N + c7] = p[(c7)*self.N + self.N-1-c12] * v[(self.N-c12)*self.N + c7] + q[(c7)*self.N + self.N-1-c12]
-#                    for c12 in range (1 , (self.N-2)+1):
-#                        p[(c7)*self.N + c12] = -f / (d*p[(c7)*self.N + c12-1]+e)
-#                for c7 in range (1 , (self.N-2)+1):
-#                    for c12 in range (1 , (self.N-2)+1):
-#                        q[(c7)*self.N + c12] = (-a*v[(c7-1)*self.N + c12]+(1.0+2.0)*a)*v[(c7)*self.N + c12] - c*v[(c7+1)*self.N + c12]-d*q[(c7)*self.N + c12-1]/(d*p[(c7)*self.N + c12-1]+e)
-#                    for c12 in range (1 , (self.N-2)+1):
-#                        u[(c7)*self.N + self.N-1-c12] = p[(c7)*self.N + self.N-1-c12] * u[(c7)*self.N + self.N-c12] + q[(c7)*self.N + self.N-1-c12]
-#
+# scop begin
+        DY = 1.0/self.N
+        DT = 1.0/self.TSTEPS
+        B1 = 2.0
+        B2 = 1.0
+        mul2 = B2 * DT / (DY * DY)
+        e = 1.0+mul2
+        d = -mul2 / 2.0
+        f = d
+        DX = 1.0/self.N
+        mul1 = B1 * DT / (DX * DX)
+        b = 1.0+mul1
+        a = -mul1 / 2.0
+        c = a
+        if((self.N-3>= 0)):
+            for c0 in range (1 , (self.TSTEPS)+1):
+                for c7 in range (1 , (self.N-2)+1):
+                    v[(self.N-1)*self.N + c7] = 1.0
+                for c7 in range (1 , (self.N-2)+1):
+                    p[(c7)*self.N + 0] = 0.0
+                for c7 in range (1 , (self.N-2)+1):
+                    for c12 in range (1 , (self.N-2)+1):
+                        p[(c7)*self.N + c12] = -c / (a*p[(c7)*self.N + c12-1]+b)
+                for c7 in range (1 , (self.N-2)+1):
+                    v[(0)*self.N + c7] = 1.0
+                    q[(c7)*self.N + 0] = v[(0)*self.N + c7]
+                for c7 in range (1 , (self.N-2)+1):
+                    for c12 in range (1 , (self.N-2)+1):
+                        q[(c7)*self.N + c12] = (-d*u[(c12)*self.N + c7-1]+(1.0+2.0)*d)*u[(c12)*self.N + c7] - f*u[(c12)*self.N + c7+1]-a*q[(c7)*self.N + c12-1]/(a*p[(c7)*self.N + c12-1]+b)
+                for c7 in range (1 , (self.N-2)+1):
+                    u[(c7)*self.N + self.N-1] = 1.0
+                    u[(c7)*self.N + 0] = 1.0
+                    p[(c7)*self.N + 0] = 0.0
+                for c7 in range (1 , (self.N-2)+1):
+                    q[(c7)*self.N + 0] = u[(c7)*self.N + 0]
+                for c7 in range (1 , (self.N-2)+1):
+                    for c12 in range (1 , (self.N-2)+1):
+                        v[(self.N-1-c12)*self.N + c7] = p[(c7)*self.N + self.N-1-c12] * v[(self.N-c12)*self.N + c7] + q[(c7)*self.N + self.N-1-c12]
+                    for c12 in range (1 , (self.N-2)+1):
+                        p[(c7)*self.N + c12] = -f / (d*p[(c7)*self.N + c12-1]+e)
+                for c7 in range (1 , (self.N-2)+1):
+                    for c12 in range (1 , (self.N-2)+1):
+                        q[(c7)*self.N + c12] = (-a*v[(c7-1)*self.N + c12]+(1.0+2.0)*a)*v[(c7)*self.N + c12] - c*v[(c7+1)*self.N + c12]-d*q[(c7)*self.N + c12-1]/(d*p[(c7)*self.N + c12-1]+e)
+                    for c12 in range (1 , (self.N-2)+1):
+                        u[(c7)*self.N + self.N-1-c12] = p[(c7)*self.N + self.N-1-c12] * u[(c7)*self.N + self.N-c12] + q[(c7)*self.N + self.N-1-c12]
+
 #scop end

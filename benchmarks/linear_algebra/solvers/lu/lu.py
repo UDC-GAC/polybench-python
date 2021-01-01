@@ -261,7 +261,15 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, A: list):
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+        if options.POCC == "maxfuse": f_str = "pluto"
+        else: f_str = options.POCC
+        self.kernel = getattr( self, "kernel_%s" % (f_str) )
+
+    def kernel_pluto(self, A: list):
+# --pluto
 # scop begin
         if((self.N-2>= 0)):
             A[self.N*(1) + 0] /= A[self.N*(0) + 0]
@@ -276,21 +284,22 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
                 for c1 in range (c0 , (self.N-1)+1):
                     for c2 in range ((c0-1)+1):
                         A[self.N*(c0) + c1] -= A[self.N*(c0) + c2] * A[self.N*(c2) + c1]
+# scop end
 
-# --pluto maxfuse: No difference
-# --pluto scalpriv: No difference
+    def kernel_vectorizer(self, A: list):
 # --pluto --pluto-prevector --vectorizer --pragmatizer
-#        if((self.N-2>= 0)):
-#            A[self.N*(1) + 0] /= A[self.N*(0) + 0]
-#            for c1 in range (1 , (self.N-1)+1):
-#                A[self.N*(1) + c1] -= A[self.N*(1) + 0] * A[self.N*(0) + c1]
-#            for c0 in range (2 , (self.N-1)+1):
-#                A[self.N*(c0) + 0] /= A[self.N*(0) + 0]
-#                for c1 in range (1 , (c0-1)+1):
-#                    for c2 in range ((c1-1)+1):
-#                        A[self.N*(c0) + c1] -= A[self.N*(c0) + c2] * A[self.N*(c2) + c1]
-#                    A[self.N*(c0) + c1] /= A[self.N*(c1) + c1]
-#                for c2 in range ((c0-1)+1):
-#                    for c1 in range (c0 , (self.N-1)+1):
-#                        A[self.N*(c0) + c1] -= A[self.N*(c0) + c2] * A[self.N*(c2) + c1]
+# scop begin
+        if((self.N-2>= 0)):
+            A[self.N*(1) + 0] /= A[self.N*(0) + 0]
+            for c1 in range (1 , (self.N-1)+1):
+                A[self.N*(1) + c1] -= A[self.N*(1) + 0] * A[self.N*(0) + c1]
+            for c0 in range (2 , (self.N-1)+1):
+                A[self.N*(c0) + 0] /= A[self.N*(0) + 0]
+                for c1 in range (1 , (c0-1)+1):
+                    for c2 in range ((c1-1)+1):
+                        A[self.N*(c0) + c1] -= A[self.N*(c0) + c2] * A[self.N*(c2) + c1]
+                    A[self.N*(c0) + c1] /= A[self.N*(c1) + c1]
+                for c2 in range ((c0-1)+1):
+                    for c1 in range (c0 , (self.N-1)+1):
+                        A[self.N*(c0) + c1] -= A[self.N*(c0) + c2] * A[self.N*(c2) + c1]
 # scop end

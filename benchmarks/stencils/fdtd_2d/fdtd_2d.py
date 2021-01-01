@@ -325,6 +325,7 @@ class _StrategyNumPy(Fdtd_2d):
                     self.print_message('\n')
                 self.print_value(array[i, j])
 
+    # Same code for --pluto / maxfuse / vectorizer
     def kernel(self, ex: ndarray, ey: ndarray, hz: ndarray, _fict_: ndarray):
 # scop begin
         for t in range(0, self.TMAX):

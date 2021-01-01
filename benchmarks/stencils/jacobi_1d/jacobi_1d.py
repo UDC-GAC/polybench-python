@@ -121,6 +121,7 @@ class _StrategyListPluto(Jacobi_1d):
                 self.print_message('\n')
             self.print_value(A[i])
 
+    # No variations between --pluto / maxfuse / vectorizer
     def kernel(self, A: list, B: list):
 # scop begin
         if((self.N-3>= 0) and (self.TSTEPS-1>= 0)):

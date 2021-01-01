@@ -290,82 +290,94 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, alpha, beta, tmp: list, A: list, B: list, C: list, D: list):
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+        self.kernel = getattr( self, "kernel_%s" % (options.POCC) )
+
+    def kernel_pluto(self, alpha, beta, tmp: list, A: list, B: list, C: list, D: list):
+# --pluto
 # scop begin
-#        if((self.NI-1>= 0)):
-#            if((self.NJ-1>= 0) and (self.NL-1>= 0)):
-#                for c1 in range ((self.NI-1)+1):
-#                    for c2 in range (min((self.NJ-1)+1 , (self.NL-1)+1)):
-#                        D[self.NL*(c1) + c2] *= beta
-#                        tmp[self.NJ*(c1) + c2] = 0.0
-#                    for c2 in range (self.NL , (self.NJ-1)+1):
-#                        tmp[self.NJ*(c1) + c2] = 0.0
-#                    for c2 in range (self.NJ , (self.NL-1)+1):
-#                        D[self.NL*(c1) + c2] *= beta
-#            if((self.NJ-1>= 0) and (self.NL*-1>= 0)):
-#                for c1 in range ((self.NI-1)+1):
-#                    for c2 in range ((self.NJ-1)+1):
-#                        tmp[self.NJ*(c1) + c2] = 0.0
-#            if((self.NJ*-1>= 0) and (self.NL-1>= 0)):
-#                for c1 in range ((self.NI-1)+1):
-#                    for c2 in range ((self.NL-1)+1):
-#                        D[self.NL*(c1) + c2] *= beta
-#            if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL-1>= 0)):
-#                for c1 in range ((self.NI-1)+1):
-#                    for c2 in range ((self.NJ-1)+1):
-#                        for c5 in range ((self.NK-1)+1):
-#                            tmp[self.NJ*(c1) + c2] += alpha * A[self.NK*(c1) + c5] * B[self.NJ*(c5) + c2]
-#                        for c5 in range ((self.NL-1)+1):
-#                            D[self.NL*(c1) + c5] += tmp[self.NJ*(c1) + c2] * C[self.NL*(c2) + c5]
-#            if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL*-1>= 0)):
-#                for c1 in range ((self.NI-1)+1):
-#                    for c2 in range ((self.NJ-1)+1):
-#                        for c5 in range ((self.NK-1)+1):
-#                            tmp[self.NJ*(c1) + c2] += alpha * A[self.NK*(c1) + c5] * B[self.NJ*(c5) + c2]
-#            if((self.NJ-1>= 0) and (self.NK*-1>= 0) and (self.NL-1>= 0)):
-#                for c1 in range ((self.NI-1)+1):
-#                    for c2 in range ((self.NJ-1)+1):
-#                        for c5 in range ((self.NL-1)+1):
-#                            D[self.NL*(c1) + c5] += tmp[self.NJ*(c1) + c2] * C[self.NL*(c2) + c5]
+        if((self.NI-1>= 0)):
+            if((self.NJ-1>= 0) and (self.NL-1>= 0)):
+                for c1 in range ((self.NI-1)+1):
+                    for c2 in range (min((self.NJ-1)+1 , (self.NL-1)+1)):
+                        D[self.NL*(c1) + c2] *= beta
+                        tmp[self.NJ*(c1) + c2] = 0.0
+                    for c2 in range (self.NL , (self.NJ-1)+1):
+                        tmp[self.NJ*(c1) + c2] = 0.0
+                    for c2 in range (self.NJ , (self.NL-1)+1):
+                        D[self.NL*(c1) + c2] *= beta
+            if((self.NJ-1>= 0) and (self.NL*-1>= 0)):
+                for c1 in range ((self.NI-1)+1):
+                    for c2 in range ((self.NJ-1)+1):
+                        tmp[self.NJ*(c1) + c2] = 0.0
+            if((self.NJ*-1>= 0) and (self.NL-1>= 0)):
+                for c1 in range ((self.NI-1)+1):
+                    for c2 in range ((self.NL-1)+1):
+                        D[self.NL*(c1) + c2] *= beta
+            if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL-1>= 0)):
+                for c1 in range ((self.NI-1)+1):
+                    for c2 in range ((self.NJ-1)+1):
+                        for c5 in range ((self.NK-1)+1):
+                            tmp[self.NJ*(c1) + c2] += alpha * A[self.NK*(c1) + c5] * B[self.NJ*(c5) + c2]
+                        for c5 in range ((self.NL-1)+1):
+                            D[self.NL*(c1) + c5] += tmp[self.NJ*(c1) + c2] * C[self.NL*(c2) + c5]
+            if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL*-1>= 0)):
+                for c1 in range ((self.NI-1)+1):
+                    for c2 in range ((self.NJ-1)+1):
+                        for c5 in range ((self.NK-1)+1):
+                            tmp[self.NJ*(c1) + c2] += alpha * A[self.NK*(c1) + c5] * B[self.NJ*(c5) + c2]
+            if((self.NJ-1>= 0) and (self.NK*-1>= 0) and (self.NL-1>= 0)):
+                for c1 in range ((self.NI-1)+1):
+                    for c2 in range ((self.NJ-1)+1):
+                        for c5 in range ((self.NL-1)+1):
+                            D[self.NL*(c1) + c5] += tmp[self.NJ*(c1) + c2] * C[self.NL*(c2) + c5]
+# scop end
 
+    def kernel_vectorizer(self, alpha, beta, tmp: list, A: list, B: list, C: list, D: list):
 # --pluto --pluto-prevector --vectorizer --pragmatizer
-#        if((self.NI-1>= 0)):
-#            if((self.NJ-1>= 0) and (self.NL-1>= 0)):
-#                for c1 in range ((self.NI-1)+1):
-#                    for c2 in range (min((self.NJ-1)+1 , (self.NL-1)+1)):
-#                        D[self.NL*(c1) + c2] *= beta
-#                        tmp[self.NJ*(c1) + c2] = 0.0
-#                    for c2 in range (self.NL , (self.NJ-1)+1):
-#                        tmp[self.NJ*(c1) + c2] = 0.0
-#                    for c2 in range (self.NJ , (self.NL-1)+1):
-#                        D[self.NL*(c1) + c2] *= beta
-#            if((self.NJ-1>= 0) and (self.NL*-1>= 0)):
-#                for c1 in range ((self.NI-1)+1):
-#                    for c2 in range ((self.NJ-1)+1):
-#                        tmp[self.NJ*(c1) + c2] = 0.0
-#            if((self.NJ*-1>= 0) and (self.NL-1>= 0)):
-#                for c1 in range ((self.NI-1)+1):
-#                    for c2 in range ((self.NL-1)+1):
-#                        D[self.NL*(c1) + c2] *= beta
-#            if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL-1>= 0)):
-#                for c1 in range ((self.NI-1)+1):
-#                    for c2 in range ((self.NJ-1)+1):
-#                        for c5 in range ((self.NK-1)+1):
-#                            tmp[self.NJ*(c1) + c2] += alpha * A[self.NK*(c1) + c5] * B[self.NJ*(c5) + c2]
-#                        for c5 in range ((self.NL-1)+1):
-#                            D[self.NL*(c1) + c5] += tmp[self.NJ*(c1) + c2] * C[self.NL*(c2) + c5]
-#            if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL*-1>= 0)):
-#                for c1 in range ((self.NI-1)+1):
-#                    for c5 in range ((self.NK-1)+1):
-#                        for c2 in range ((self.NJ-1)+1):
-#                            tmp[self.NJ*(c1) + c2] += alpha * A[self.NK*(c1) + c5] * B[self.NJ*(c5) + c2]
-#            if((self.NJ-1>= 0) and (self.NK*-1>= 0) and (self.NL-1>= 0)):
-#                for c1 in range ((self.NI-1)+1):
-#                    for c2 in range ((self.NJ-1)+1):
-#                        for c5 in range ((self.NL-1)+1):
-#                            D[self.NL*(c1) + c5] += tmp[self.NJ*(c1) + c2] * C[self.NL*(c2) + c5]
+# scop begin
+        if((self.NI-1>= 0)):
+            if((self.NJ-1>= 0) and (self.NL-1>= 0)):
+                for c1 in range ((self.NI-1)+1):
+                    for c2 in range (min((self.NJ-1)+1 , (self.NL-1)+1)):
+                        D[self.NL*(c1) + c2] *= beta
+                        tmp[self.NJ*(c1) + c2] = 0.0
+                    for c2 in range (self.NL , (self.NJ-1)+1):
+                        tmp[self.NJ*(c1) + c2] = 0.0
+                    for c2 in range (self.NJ , (self.NL-1)+1):
+                        D[self.NL*(c1) + c2] *= beta
+            if((self.NJ-1>= 0) and (self.NL*-1>= 0)):
+                for c1 in range ((self.NI-1)+1):
+                    for c2 in range ((self.NJ-1)+1):
+                        tmp[self.NJ*(c1) + c2] = 0.0
+            if((self.NJ*-1>= 0) and (self.NL-1>= 0)):
+                for c1 in range ((self.NI-1)+1):
+                    for c2 in range ((self.NL-1)+1):
+                        D[self.NL*(c1) + c2] *= beta
+            if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL-1>= 0)):
+                for c1 in range ((self.NI-1)+1):
+                    for c2 in range ((self.NJ-1)+1):
+                        for c5 in range ((self.NK-1)+1):
+                            tmp[self.NJ*(c1) + c2] += alpha * A[self.NK*(c1) + c5] * B[self.NJ*(c5) + c2]
+                        for c5 in range ((self.NL-1)+1):
+                            D[self.NL*(c1) + c5] += tmp[self.NJ*(c1) + c2] * C[self.NL*(c2) + c5]
+            if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL*-1>= 0)):
+                for c1 in range ((self.NI-1)+1):
+                    for c5 in range ((self.NK-1)+1):
+                        for c2 in range ((self.NJ-1)+1):
+                            tmp[self.NJ*(c1) + c2] += alpha * A[self.NK*(c1) + c5] * B[self.NJ*(c5) + c2]
+            if((self.NJ-1>= 0) and (self.NK*-1>= 0) and (self.NL-1>= 0)):
+                for c1 in range ((self.NI-1)+1):
+                    for c2 in range ((self.NJ-1)+1):
+                        for c5 in range ((self.NL-1)+1):
+                            D[self.NL*(c1) + c5] += tmp[self.NJ*(c1) + c2] * C[self.NL*(c2) + c5]
+# scop end
 
+    def kernel_maxfuse(self, alpha, beta, tmp: list, A: list, B: list, C: list, D: list):
 # --pluto --pluto-fuse maxfuse
+# scop begin
         if((self.NI-1>= 0)):
             if((self.NJ-1>= 0) and (self.NK-1>= 0) and (self.NL-1>= 0)):
                 for c0 in range ((self.NI-1)+1):

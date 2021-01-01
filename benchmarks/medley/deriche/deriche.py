@@ -407,7 +407,14 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, alpha, imgIn: list, imgOut: list, y1: list, y2: list):
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+        self.kernel_vectorizer = self.kernel_pluto
+        self.kernel = getattr( self, "kernel_%s" % (options.POCC) )
+
+    def kernel_pluto(self, alpha, imgIn: list, imgOut: list, y1: list, y2: list):
+# --pluto / vectorizer
 # scop begin
         k = (1.0-math.exp(-alpha))*(1.0-math.exp(-alpha))/(1.0+2.0*alpha*math.exp(-alpha)-math.exp(2.0*alpha))
         b1 = math.pow(2.0,-alpha)
@@ -492,86 +499,89 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
             for c8 in range ((self.W-1)+1):
                 for c9 in range ((self.H-1)+1):
                     imgOut[self.H*(c8) + c9] = c2*(y1[self.H*(c8) + c9] + y2[self.H*(c8) + c9])
+# scop end
 
+    def kernel_maxfuse(self, alpha, imgIn: list, imgOut: list, y1: list, y2: list):
 # --pluto-fuse maxfuse
-#        k = (1.0-math.exp(-alpha))*(1.0-math.exp(-alpha))/(1.0+2.0*alpha*math.exp(-alpha)-math.exp(2.0*alpha))
-#        b1 = math.pow(2.0,-alpha)
-#        b2 = -math.exp(-2.0*alpha)
-#        c1 = c2 = 1
-#        a4 = a8 = -k*math.exp(-2.0*alpha)
-#        a3 = a7 = k*math.exp(-alpha)*(alpha+1.0)
-#        if((self.H-1>= 0)):
-#            for c8 in range ((self.W-1)+1):
-#                yp1 = 0.0
-#                yp2 = 0.0
-#                xp1 = 0.0
-#                xp2 = 0.0
-#                for c13 in range ((self.H-1)+1):
-#                    y2[(c8)*self.H + self.H-1-c13] = a3*xp1 + a4*xp2 + b1*yp1 + b2*yp2
-#                    yp2 = yp1
-#                    xp2 = xp1
-#                    yp1 = y2[(c8)*self.H + self.H-1-c13]
-#                    xp1 = imgIn[(c8)*self.H + self.H-1-c13]
-#        if((self.H*-1>= 0)):
-#            for c8 in range ((self.W-1)+1):
-#                yp1 = 0.0
-#                yp2 = 0.0
-#                xp1 = 0.0
-#                xp2 = 0.0
-#        a1 = a5 = k
-#        a2 = a6 = k*math.exp(-alpha)*(alpha-1.0)
-#        if((self.H-1>= 0)):
-#            for c8 in range ((self.W-1)+1):
-#                ym1 = 0.0
-#                ym2 = 0.0
-#                xm1 = 0.0
-#                for c13 in range ((self.H-1)+1):
-#                    y1[(c8)*self.H + c13] = a1*imgIn[(c8)*self.H + c13] + a2*xm1 + b1*ym1 + b2*ym2
-#                    ym2 = ym1
-#                    ym1 = y1[(c8)*self.H + c13]
-#                    xm1 = imgIn[(c8)*self.H + c13]
-#        if((self.H*-1>= 0)):
-#            for c8 in range ((self.W-1)+1):
-#                ym1 = 0.0
-#                ym2 = 0.0
-#                xm1 = 0.0
-#        if((self.W-1>= 0)):
-#            for c8 in range ((self.H-1)+1):
-#                tp1 = 0.0
-#                tp2 = 0.0
-#                yp1 = 0.0
-#                yp2 = 0.0
-#                for c13 in range ((self.W-1)+1):
-#                    imgOut[(c13)*self.H + c8] = c1 * (y1[(c13)*self.H + c8] + y2[(c13)*self.H + c8])
-#                for c13 in range ((self.W-1)+1):
-#                    y2[(self.W-1-c13)*self.H + c8] = a7*tp1 + a8*tp2 + b1*yp1 + b2*yp2
-#                    yp2 = yp1
-#                    yp1 = y2[(self.W-1-c13)*self.H + c8]
-#                    tp2 = tp1
-#                    tp1 = imgOut[(self.W-1-c13)*self.H + c8]
-#        if((self.W*-1>= 0)):
-#            for c8 in range ((self.H-1)+1):
-#                tp1 = 0.0
-#                tp2 = 0.0
-#                yp1 = 0.0
-#                yp2 = 0.0
-#        if((self.W-1>= 0)):
-#            for c8 in range ((self.H-1)+1):
-#                tm1 = 0.0
-#                ym1 = 0.0
-#                ym2 = 0.0
-#                for c13 in range ((self.W-1)+1):
-#                    y1[(c13)*self.H + c8] = a5*imgOut[(c13)*self.H + c8] + a6*tm1 + b1*ym1 + b2*ym2
-#                    ym2 = ym1
-#                    ym1 = y1 [(c13)*self.H + c8]
-#                    tm1 = imgOut[(c13)*self.H + c8]
-#        if((self.W*-1>= 0)):
-#            for c8 in range ((self.H-1)+1):
-#                tm1 = 0.0
-#                ym1 = 0.0
-#                ym2 = 0.0
-#        if((self.H-1>= 0)):
-#            for c8 in range ((self.W-1)+1):
-#                for c13 in range ((self.H-1)+1):
-#                    imgOut[(c8)*self.H + c13] = c2*(y1[(c8)*self.H + c13] + y2[(c8)*self.H + c13])
+# scop begin
+        k = (1.0-math.exp(-alpha))*(1.0-math.exp(-alpha))/(1.0+2.0*alpha*math.exp(-alpha)-math.exp(2.0*alpha))
+        b1 = math.pow(2.0,-alpha)
+        b2 = -math.exp(-2.0*alpha)
+        c1 = c2 = 1
+        a4 = a8 = -k*math.exp(-2.0*alpha)
+        a3 = a7 = k*math.exp(-alpha)*(alpha+1.0)
+        if((self.H-1>= 0)):
+            for c8 in range ((self.W-1)+1):
+                yp1 = 0.0
+                yp2 = 0.0
+                xp1 = 0.0
+                xp2 = 0.0
+                for c13 in range ((self.H-1)+1):
+                    y2[(c8)*self.H + self.H-1-c13] = a3*xp1 + a4*xp2 + b1*yp1 + b2*yp2
+                    yp2 = yp1
+                    xp2 = xp1
+                    yp1 = y2[(c8)*self.H + self.H-1-c13]
+                    xp1 = imgIn[(c8)*self.H + self.H-1-c13]
+        if((self.H*-1>= 0)):
+            for c8 in range ((self.W-1)+1):
+                yp1 = 0.0
+                yp2 = 0.0
+                xp1 = 0.0
+                xp2 = 0.0
+        a1 = a5 = k
+        a2 = a6 = k*math.exp(-alpha)*(alpha-1.0)
+        if((self.H-1>= 0)):
+            for c8 in range ((self.W-1)+1):
+                ym1 = 0.0
+                ym2 = 0.0
+                xm1 = 0.0
+                for c13 in range ((self.H-1)+1):
+                    y1[(c8)*self.H + c13] = a1*imgIn[(c8)*self.H + c13] + a2*xm1 + b1*ym1 + b2*ym2
+                    ym2 = ym1
+                    ym1 = y1[(c8)*self.H + c13]
+                    xm1 = imgIn[(c8)*self.H + c13]
+        if((self.H*-1>= 0)):
+            for c8 in range ((self.W-1)+1):
+                ym1 = 0.0
+                ym2 = 0.0
+                xm1 = 0.0
+        if((self.W-1>= 0)):
+            for c8 in range ((self.H-1)+1):
+                tp1 = 0.0
+                tp2 = 0.0
+                yp1 = 0.0
+                yp2 = 0.0
+                for c13 in range ((self.W-1)+1):
+                    imgOut[(c13)*self.H + c8] = c1 * (y1[(c13)*self.H + c8] + y2[(c13)*self.H + c8])
+                for c13 in range ((self.W-1)+1):
+                    y2[(self.W-1-c13)*self.H + c8] = a7*tp1 + a8*tp2 + b1*yp1 + b2*yp2
+                    yp2 = yp1
+                    yp1 = y2[(self.W-1-c13)*self.H + c8]
+                    tp2 = tp1
+                    tp1 = imgOut[(self.W-1-c13)*self.H + c8]
+        if((self.W*-1>= 0)):
+            for c8 in range ((self.H-1)+1):
+                tp1 = 0.0
+                tp2 = 0.0
+                yp1 = 0.0
+                yp2 = 0.0
+        if((self.W-1>= 0)):
+            for c8 in range ((self.H-1)+1):
+                tm1 = 0.0
+                ym1 = 0.0
+                ym2 = 0.0
+                for c13 in range ((self.W-1)+1):
+                    y1[(c13)*self.H + c8] = a5*imgOut[(c13)*self.H + c8] + a6*tm1 + b1*ym1 + b2*ym2
+                    ym2 = ym1
+                    ym1 = y1 [(c13)*self.H + c8]
+                    tm1 = imgOut[(c13)*self.H + c8]
+        if((self.W*-1>= 0)):
+            for c8 in range ((self.H-1)+1):
+                tm1 = 0.0
+                ym1 = 0.0
+                ym2 = 0.0
+        if((self.H-1>= 0)):
+            for c8 in range ((self.W-1)+1):
+                for c13 in range ((self.H-1)+1):
+                    imgOut[(c8)*self.H + c13] = c2*(y1[(c8)*self.H + c13] + y2[(c8)*self.H + c13])
 # scop end

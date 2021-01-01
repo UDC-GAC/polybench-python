@@ -196,36 +196,48 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, A: list, s: list, q: list, p: list, r: list):
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+        self.kernel = getattr( self, "kernel_%s" % (options.POCC) )
+
+    def kernel_pluto(self, A: list, s: list, q: list, p: list, r: list):
+# --pluto
 # scop begin
-#        for c1 in range ((self.N-1)+1):
-#            q[c1] = 0.0
-#        if((self.M-1>= 0)):
-#            for c1 in range ((self.N-1)+1):
-#                for c2 in range ((self.M-1)+1):
-#                    q[c1] = q[c1] + A[self.M*(c1) + c2] * p[c2]
-#        for c1 in range ((self.M-1)+1):
-#            s[c1] = 0
-#        if((self.N-1>= 0)):
-#            for c1 in range ((self.M-1)+1):
-#                for c2 in range ((self.N-1)+1):
-#                    s[c1] = s[c1] + r[c2] * A[self.M*(c2) + c1]
+        for c1 in range ((self.N-1)+1):
+            q[c1] = 0.0
+        if((self.M-1>= 0)):
+            for c1 in range ((self.N-1)+1):
+                for c2 in range ((self.M-1)+1):
+                    q[c1] = q[c1] + A[self.M*(c1) + c2] * p[c2]
+        for c1 in range ((self.M-1)+1):
+            s[c1] = 0
+        if((self.N-1>= 0)):
+            for c1 in range ((self.M-1)+1):
+                for c2 in range ((self.N-1)+1):
+                    s[c1] = s[c1] + r[c2] * A[self.M*(c2) + c1]
+# scop end
 
+    def kernel_vectorizer(self, A: list, s: list, q: list, p: list, r: list):
 # --pluto --pluto-prevector --pragmatizer --vectorizer
-#        for c1 in range ((self.N-1)+1):
-#            q[c1] = 0.0
-#        if((self.M-1>= 0)):
-#            for c1 in range ((self.N-1)+1):
-#                for c2 in range ((self.M-1)+1):
-#                    q[c1] = q[c1] + A[self.M*(c1) + c2] * p[c2]
-#        for c1 in range ((self.M-1)+1):
-#            s[c1] = 0
-#        if((self.N-1>= 0)):
-#            for c2 in range ((self.N-1)+1):
-#                for c1 in range ((self.M-1)+1):
-#                    s[c1] = s[c1] + r[c2] * A[self.M*(c2) + c1]
+# scop begin
+        for c1 in range ((self.N-1)+1):
+            q[c1] = 0.0
+        if((self.M-1>= 0)):
+            for c1 in range ((self.N-1)+1):
+                for c2 in range ((self.M-1)+1):
+                    q[c1] = q[c1] + A[self.M*(c1) + c2] * p[c2]
+        for c1 in range ((self.M-1)+1):
+            s[c1] = 0
+        if((self.N-1>= 0)):
+            for c2 in range ((self.N-1)+1):
+                for c1 in range ((self.M-1)+1):
+                    s[c1] = s[c1] + r[c2] * A[self.M*(c2) + c1]
+# scop end
 
+    def kernel_maxfuse(self, A: list, s: list, q: list, p: list, r: list):
 # --pluto --pluto-fuse maxfuse
+# scop begin
         for c0 in range (min((self.M-1)+1 , (self.N-1)+1)):
             q[c0] = 0.0
             q[c0] = q[c0] + A[(c0)*self.M + 0] * p[0]

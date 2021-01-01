@@ -232,7 +232,14 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, alpha, beta, C: list, A: list, B: list):
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+        self.kernel_vectorizer = self.kernel_pluto
+        self.kernel = getattr( self, "kernel_%s" % (options.POCC) )
+
+    def kernel_pluto(self, alpha, beta, C: list, A: list, B: list):
+# --pluto / --pluto-prevector --vectorizer --pragmatizer
 # scop begin
         if((self.M-1>= 0) and (self.N-1>= 0)):
             for c2 in range ((self.N-1)+1):
@@ -247,19 +254,21 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
                         C[self.N*(c3) + c2] += alpha*B[self.N*(c1) + c2] * A[self.M*(c1) + c3]
                         temp2 += B[self.N*(c3) + c2] * A[self.M*(c1) + c3]
                     C[self.N*(c1) + c2] = beta * C[self.N*(c1) + c2] + alpha*B[self.N*(c1) + c2] * A[self.M*(c1) + c1] + alpha * temp2
+# scop end
 
+    def kernel_maxfuse(self, alpha, beta, C: list, A: list, B: list):
 # --pluto --pluto-fuse maxfuse
-#        if((self.M-1>= 0) and (self.N-1>= 0)):
-#            for c1 in range ((self.N-1)+1):
-#                temp2 = 0
-#                C[(0)*self.N + c1] = beta * C[(0)*self.N + c1] + alpha*B[(0)*self.N + c1] * A[(0)*self.M + 0] + alpha * temp2
-#            for c0 in range (1 , (self.M-1)+1):
-#                for c1 in range ((self.N-1)+1):
-#                    C[(0)*self.N + c1] += alpha*B[(c0)*self.N + c1] * A[(c0)*self.M + 0]
-#                    temp2 = 0
-#                    temp2 += B[(0)*self.N + c1] * A[(c0)*self.M + 0]
-#                    for c2 in range (1 , (c0-1)+1):
-#                        C[(c2)*self.N + c1] += alpha*B[(c0)*self.N + c1] * A[(c0)*self.M + c2]
-#                        temp2 += B[(c2)*self.N + c1] * A[(c0)*self.M + c2]
-#                    C[(c0)*self.N + c1] = beta * C[(c0)*self.N + c1] + alpha*B[(c0)*self.N + c1] * A[(c0)*self.M + c0] + alpha * temp2
+        if((self.M-1>= 0) and (self.N-1>= 0)):
+            for c1 in range ((self.N-1)+1):
+                temp2 = 0
+                C[(0)*self.N + c1] = beta * C[(0)*self.N + c1] + alpha*B[(0)*self.N + c1] * A[(0)*self.M + 0] + alpha * temp2
+            for c0 in range (1 , (self.M-1)+1):
+                for c1 in range ((self.N-1)+1):
+                    C[(0)*self.N + c1] += alpha*B[(c0)*self.N + c1] * A[(c0)*self.M + 0]
+                    temp2 = 0
+                    temp2 += B[(0)*self.N + c1] * A[(c0)*self.M + 0]
+                    for c2 in range (1 , (c0-1)+1):
+                        C[(c2)*self.N + c1] += alpha*B[(c0)*self.N + c1] * A[(c0)*self.M + c2]
+                        temp2 += B[(c2)*self.N + c1] * A[(c0)*self.M + c2]
+                    C[(c0)*self.N + c1] = beta * C[(c0)*self.N + c1] + alpha*B[(c0)*self.N + c1] * A[(c0)*self.M + c0] + alpha * temp2
 # scop end

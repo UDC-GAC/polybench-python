@@ -117,26 +117,14 @@ class _StrategyListPluto(_StrategyList):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListPluto)
 
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+    # No difference between --pluto / maxfuse / vectorizer
     def kernel(self, r: list, y: list):
         z = self.create_array(1, [self.N], self.DATA_TYPE(0))
+# --pluto --pluto-noskew (there's a bug without noskew, results are incorrect)
 # scop begin
-# --pluto: some kind of bug, results incorrect
-#        y[0] = -r[0]
-#        beta = 1.0
-#        alpha = -r[0]
-#        for c1 in range (1 , (self.N-1)+1):
-#            summ = 0.0
-#            summ += r[c1-0 -1]*y[0]
-#            beta = (1-alpha*alpha)*beta
-#            for c2 in range (1 , (c1-1)+1):
-#                summ += r[c1-c2-1]*y[c2]
-#            alpha = - (r[c1] + summ)/beta
-#            y[c1] = alpha
-#            for c2 in range (c1 , (c1 * 2-1)+1):
-#                z[(-1 * c1) + c2] = y[(-1 * c1) + c2] + alpha*y[c2-((-1*c1)+c2)-1]
-#            for c2 in range (c1 * 2 , (c1 * 3-1)+1):
-#                y[(-2 * c1) + c2] = z[(-2 * c1) + c2]
-# --pluto --pluto-noskew
         y[0] = -r[0]
         beta = 1.0
         alpha = -r[0]
@@ -184,22 +172,4 @@ class _StrategyNumPy(Durbin):
             z[0:k] = y[0:k] + alpha * y[k-1::-1]
             y[0:k] = z[0:k]
             y[k] = alpha
-
-# --pluto --pluto-fuse maxfuse
-#        y[0] = -r[0]
-#        beta = 1.0
-#        alpha = -r[0]
-#        for c0 in range (1 , (self.N-1)+1):
-#            sum = 0.0
-#            sum += r[c0-0 -1]*y[0]
-#            beta = (1-alpha*alpha)*beta
-#            for c1 in range (1 , (c0-1)+1):
-#                sum += r[c0-c1-1]*y[c1]
-#            alpha = - (r[c0] + sum)/beta
-#            y[c0] = alpha
-#            for c1 in range (c0 , (c0 * 2-1)+1):
-#                z[(-1 * c0) + c1] = y[(-1 * c0) + c1] + alpha*y[c0-(-1 * c0) + c1-1]
-#            for c1 in range (c0 * 2 , (c0 * 3-1)+1):
-#                y[(-2 * c0) + c1] = z[(-2 * c0) + c1]
-#
 # scop end

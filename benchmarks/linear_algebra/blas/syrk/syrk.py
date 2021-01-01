@@ -221,7 +221,14 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, alpha, beta, C: list, A: list):
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+        self.kernel_vectorizer = self.kernel_pluto
+        self.kernel = getattr( self, "kernel_%s" % (options.POCC) )
+
+    def kernel_pluto(self, alpha, beta, C: list, A: list):
+# --pluto
 # scop begin
         if((self.N-1>= 0)):
             for c1 in range ((self.N-1)+1):
@@ -232,17 +239,20 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
                     for c2 in range ((c1)+1):
                         for c3 in range ((self.M-1)+1):
                             C[self.N*(c1) + c2] += alpha * A[self.M*(c1) + c3] * A[self.M*(c2) + c3]
+# scop end
 
+    def kernel_maxfuse(self, alpha, beta, C: list, A: list):
 # --pluto --pluto-fuse maxfuse
-#        if((self.N-1>= 0)):
-#            if((self.M-1>= 0)):
-#                for c0 in range ((self.N-1)+1):
-#                    for c1 in range ((c0)+1):
-#                        C[(c0)*self.N + c1] *= beta
-#                        for c2 in range (c0 , (self.M + c0-1)+1):
-#                            C[(c0)*self.N + c1] += alpha * A[(c0)*self.M + (-1 * c0) + c2] * A[(c1)*self.M + (-1 * c0) + c2]
-#            if((self.M*-1>= 0)):
-#                for c0 in range ((self.N-1)+1):
-#                    for c1 in range ((c0)+1):
-#                        C[(c0)*self.N + c1] *= beta
+# scop begin
+        if((self.N-1>= 0)):
+            if((self.M-1>= 0)):
+                for c0 in range ((self.N-1)+1):
+                    for c1 in range ((c0)+1):
+                        C[(c0)*self.N + c1] *= beta
+                        for c2 in range (c0 , (self.M + c0-1)+1):
+                            C[(c0)*self.N + c1] += alpha * A[(c0)*self.M + (-1 * c0) + c2] * A[(c1)*self.M + (-1 * c0) + c2]
+            if((self.M*-1>= 0)):
+                for c0 in range ((self.N-1)+1):
+                    for c1 in range ((c0)+1):
+                        C[(c0)*self.N + c1] *= beta
 # scop end

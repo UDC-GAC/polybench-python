@@ -242,6 +242,7 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
+    # No variations between --pluto / maxfuse / vectorizer
     def kernel(self, A: list, B: list):
 # scop begin
         if((self.N-3>= 0) and (self.TSTEPS-1>= 0)):

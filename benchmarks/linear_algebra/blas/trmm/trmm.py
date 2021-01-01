@@ -230,7 +230,14 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, alpha, A: list, B: list):
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+        self.kernel_vectorizer = self.kernel_pluto
+        self.kernel = getattr( self, "kernel_%s" % (options.POCC) )
+
+    def kernel_pluto(self, alpha, A: list, B: list):
+# --pluto
 # scop begin
         if((self.M-1>= 0) and (self.N-1>= 0)):
             if((self.M-2>= 0)):
@@ -241,17 +248,20 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
             for c1 in range ((self.M-1)+1):
                 for c2 in range ((self.N-1)+1):
                     B[self.N*(c1) + c2] = alpha * B[self.N*(c1) + c2]
+# scop end
 
+    def kernel_maxfuse(self, alpha, A: list, B: list):
 # --pluto --pluto-fuse maxfuse
-#        if((self.M-1>= 0) and (self.N-1>= 0)):
-#            if((self.M-2>= 0)):
-#                for c0 in range ((self.N-1)+1):
-#                    for c1 in range ((self.M-2)+1):
-#                        for c4 in range (c1 + 1 , (self.M-1)+1):
-#                            B[(c1)*self.N + c0] += A[(c4)*self.M + c1] * B[(c4)*self.N + c0]
-#                        B[(c1)*self.N + c0] = alpha * B[(c1)*self.N + c0]
-#                    B[(self.M + -1)*self.N + c0] = alpha * B[(self.M + -1)*self.N + c0]
-#            if self.M == 1:
-#                for c0 in range ((self.N-1)+1):
-#                    B[(0)*self.N + c0] = alpha * B[(0)*self.N + c0]
+# scop begin
+        if((self.M-1>= 0) and (self.N-1>= 0)):
+            if((self.M-2>= 0)):
+                for c0 in range ((self.N-1)+1):
+                    for c1 in range ((self.M-2)+1):
+                        for c4 in range (c1 + 1 , (self.M-1)+1):
+                            B[(c1)*self.N + c0] += A[(c4)*self.M + c1] * B[(c4)*self.N + c0]
+                        B[(c1)*self.N + c0] = alpha * B[(c1)*self.N + c0]
+                    B[(self.M + -1)*self.N + c0] = alpha * B[(self.M + -1)*self.N + c0]
+            if self.M == 1:
+                for c0 in range ((self.N-1)+1):
+                    B[(0)*self.N + c0] = alpha * B[(0)*self.N + c0]
 # scop end

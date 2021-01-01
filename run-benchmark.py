@@ -112,6 +112,8 @@ if __name__ == '__main__':
                                  'List with flattened indexes; 2: NumPy array. Default: 0.')
         parser.add_argument('--load-elimination', action="store_true", default=False,
                             help="Enables load elimination (where applicable). Default: False." )
+        parser.add_argument('--pocc', dest="pocc_option", default="pluto",
+                            help="Selects the PoCC optimization applied. Valid values are 'pluto', 'vectorizer', and 'maxfuse'" )
         # Parse the commandline arguments. This process will fail on error
         args = parser.parse_args()
 
@@ -266,6 +268,9 @@ if __name__ == '__main__':
                 result['polybench_options'].POLYBENCH_ARRAY_IMPLEMENTATION = ArrayImplementation.LIST_PLUTO
             elif n == 4:
                 result['polybench_options'].POLYBENCH_ARRAY_IMPLEMENTATION = ArrayImplementation.LIST_FLATTENED_PLUTO
+                # Process PoCC options
+                if args.pocc_option in ["pluto","vectorizer","maxfuse"]: result['polybench_options'].POCC = args.pocc_option
+                else: raise AssertionError( 'Argument "pocc=%s" not valid.' %(args.pocc_option) )
             else:
                 raise AssertionError( 'Argument "array-implementation=%d" not valid.' % (n) )
         else:

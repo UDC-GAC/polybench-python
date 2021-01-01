@@ -215,32 +215,44 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
     def __new__(cls, options: PolyBenchOptions, parameters: PolyBenchSpec):
         return object.__new__(_StrategyListFlattenedPluto)
 
-    def kernel(self, alpha: float, beta: float, C: list, A: list, B: list):
+    def __init__(self, options: PolyBenchOptions, parameters: PolyBenchSpec):
+        super().__init__(options, parameters)
+
+        self.kernel = getattr( self, "kernel_%s" % (options.POCC) )
+
+    def kernel_pluto(self, alpha: float, beta: float, C: list, A: list, B: list):
+# --pluto
 # scop begin
-#        if((self.NI-1>= 0) and (self.NJ-1>= 0)):
-#            for c1 in range ((self.NI-1)+1):
-#                for c2 in range ((self.NJ-1)+1):
-#                    C[self.NJ*(c1) + c2] *= beta
-#            if((self.NK-1>= 0)):
-#                for c1 in range ((self.NI-1)+1):
-#                    for c2 in range ((self.NJ-1)+1):
-#                        for c3 in range ((self.NK-1)+1):
-#                            C[self.NJ*(c1) + c2] += alpha * A[self.NK*(c1) + c3] * B[self.NJ*(c3) + c2]
+        if((self.NI-1>= 0) and (self.NJ-1>= 0)):
+            for c1 in range ((self.NI-1)+1):
+                for c2 in range ((self.NJ-1)+1):
+                    C[self.NJ*(c1) + c2] *= beta
+            if((self.NK-1>= 0)):
+                for c1 in range ((self.NI-1)+1):
+                    for c2 in range ((self.NJ-1)+1):
+                        for c3 in range ((self.NK-1)+1):
+                            C[self.NJ*(c1) + c2] += alpha * A[self.NK*(c1) + c3] * B[self.NJ*(c3) + c2]
+#scop end
 
+    def kernel_maxfuse(self, alpha: float, beta: float, C: list, A: list, B: list):
 # --pluto --pluto-fuse maxfuse
-#        if ((self.NI >= 1) and (self.NJ >= 1)):
-#          if (self.NK >= 1):
-#            for c0 in range( self.NI ):
-#                for c1 in range( self.NJ ):
-#                    C[(c0)*self.NJ + c1] *= beta;
-#                    for c2 in range( c0, c0+self.NK ):
-#                        C[(c0)*self.NJ + c1] += alpha * A[(c0)*self.NK + (-1 * c0) + c2] * B[((-1 * c0) + c2)*self.NJ + c1];
-#          if (self.NK <= 0):
-#            for c0 in range( self.NI ):
-#                for c1 in range( self.NJ ):
-#                    C[(c0)*self.NJ + c1] *= beta;
+# scop begin
+        if ((self.NI >= 1) and (self.NJ >= 1)):
+          if (self.NK >= 1):
+            for c0 in range( self.NI ):
+                for c1 in range( self.NJ ):
+                    C[(c0)*self.NJ + c1] *= beta;
+                    for c2 in range( c0, c0+self.NK ):
+                        C[(c0)*self.NJ + c1] += alpha * A[(c0)*self.NK + (-1 * c0) + c2] * B[((-1 * c0) + c2)*self.NJ + c1];
+          if (self.NK <= 0):
+            for c0 in range( self.NI ):
+                for c1 in range( self.NJ ):
+                    C[(c0)*self.NJ + c1] *= beta;
+#scop end
 
+    def kernel_vectorizer(self, alpha: float, beta: float, C: list, A: list, B: list):
 # --pluto --pluto-scalpriv --vectorizer --pragmatizer
+# scop begin
         if ((self.NI >= 1) and (self.NJ >= 1)):
           ub1 = (self.NI + -1);
           for c1 in range( ub1+1 ):
@@ -253,4 +265,3 @@ class _StrategyListFlattenedPluto(_StrategyListFlattened):
                     for c2 in range( self.NJ ):
                         C[(c1)*self.NJ + c2] += alpha * A[(c1)*self.NK + c3] * B[(c3)*self.NJ + c2];
 # scop end
-
