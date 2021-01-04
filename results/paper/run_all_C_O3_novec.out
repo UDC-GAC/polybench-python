@@ -1,0 +1,3390 @@
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.blas.symm
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+9673458963 6613805792 5773395357 1801422718 505436756 881500673 82256772 601801837 1120669 3004198800 0 0 3000574091 600600032 
+9373186168 6613805768 5519728857 1797459306 509071801 839236814 81272180 601801813 1121976 3004198800 0 0 3000575638 600600032 
+9738414349 6613805795 5771846233 1812481730 486881647 889627416 82601208 601801843 1117859 3004198800 0 0 3000597540 600600032 
+9552321356 6613805779 5606321759 1806039176 492504703 854599263 84786067 601801824 1122771 3004198800 0 0 3000598301 600600032 
+9860397803 6613805804 5873173507 1814635214 485328362 921166323 82615947 601801848 1121467 3004198800 0 0 3000597741 600600032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+9840633326 6613805808 5921031208 1810252962 492671463 896970645 83551449 601801853 1120048 3004198800 0 0 3000599700 600600032 
+9897212883 6613805806 5897766725 1812757263 487523091 880384185 84819112 601801853 1119695 3004198800 0 0 3000599910 600600032 
+9782333946 6613805799 5833766456 1809744571 486301090 898849515 82238329 601801843 1119711 3004198800 0 0 3000599673 600600032 
+9618161287 6613805787 5683549579 1808687818 492594030 886820318 81773879 601801832 1120378 3004198800 0 0 3000599534 600600032 
+9813999142 6613805803 5853990515 1812704359 484413174 910386848 85530977 601801848 1120276 3004198800 0 0 3000600064 600600032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.blas.syr2k
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+14860550346 7216820016 8833266542 2219420036 1358976323 836533123 85829186 722523062 1138613 4324320600 0 0 3603677886 721320632 
+13896694206 7216819937 8077464547 2216410509 1359482610 802250020 90262921 722522982 1139590 4324320600 0 0 3603679252 721320632 
+13916338677 7216819941 8064130374 2218076270 1358704020 764142833 83493724 722522987 1138886 4324320600 0 0 3603678253 721320632 
+13777351829 7216819926 7932265213 2217651845 1358671830 755437697 85856983 722522974 1140423 4324320600 0 0 3603678483 721320632 
+14739527718 7216820006 8748247872 2217762925 1359488773 792251601 89117614 722523051 1139097 4324320600 0 0 3603677499 721320632 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+14567878813 7216819992 8662375248 2217542981 1359700931 786527348 89949975 722523038 1138738 4324320600 0 0 3603720304 721320632 
+14345372127 7216819972 8404751821 2218017890 1359156393 799554522 87497472 722523019 1138390 4324320600 0 0 3603719996 721320632 
+14892638824 7216820017 8858265591 2218765527 1359263529 817066438 91386638 722523063 1138850 4324320600 0 0 3603719839 721320632 
+14963753358 7216820021 8910539096 2218406795 1359542598 810159609 92604212 722523068 1139141 4324320600 0 0 3603720052 721320632 
+13792525361 7216819927 7955915792 2217063718 1359068319 785350254 89290260 722522974 1139698 4324320600 0 0 3603719946 721320632 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.blas.gemm
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+3076185267 9251509468 305830307 3793629442 8084093 220686171 15613516 1322301315 1203090 3961100000 0 0 3961099998 1321100032 
+3181393788 9251509462 335058467 3799611589 8149778 220718458 16993441 1322301302 1203012 3961100000 0 0 3961100065 1321100032 
+3157996162 9251509460 313098157 3800717786 8147032 220746492 15653449 1322301301 1202961 3961100000 0 0 3961100065 1321100032 
+3182846567 9251509462 339461104 3800832459 8144328 220670085 16887591 1322301302 1203194 3961100000 0 0 3961100065 1321100032 
+3158208602 9251509461 313708187 3800357443 8153119 220684862 16148527 1322301300 1203002 3961100000 0 0 3961100044 1321100032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+3178369388 9251509463 333975383 3799830811 8151340 220743729 16612703 1322301302 1203173 3961100000 0 0 3961100065 1321100032 
+3187702534 9251509463 336864090 3799674028 8151536 220662599 16618177 1322301303 1203026 3961100000 0 0 3961100065 1321100032 
+3186587183 9251509463 335629267 3799696202 8153199 220653195 16827559 1322301302 1204278 3961100000 0 0 3961100065 1321100032 
+3172962769 9251509461 325781378 3800100196 8156510 220669603 16302150 1322301301 1203089 3961100000 0 0 3961100065 1321100032 
+3183950872 9251509462 336236721 3799740417 8159518 220655772 16705943 1322301302 1203326 3961100000 0 0 3961100065 1321100032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.blas.gesummv
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+16274885 18607103 4888709 9997902 34238 578065 618760 1691351 1303 6763900 0 0 10142665 3383932 
+16303487 18607103 4883502 9998845 33629 582620 617419 1691351 1302 6763900 0 0 10142665 3383932 
+16290213 18607103 4879273 9996201 35099 578185 616967 1691351 1306 6763900 0 0 10142665 3383932 
+16316308 18607103 4875017 9996941 35075 578740 616699 1691351 1302 6763900 0 0 10142665 3383932 
+16295199 18607103 4884534 9996846 34615 578764 617369 1691351 1306 6763900 0 0 10142665 3383932 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+16294974 18607104 4888706 10000829 32820 577063 616130 1691352 1308 6763900 0 0 10142665 3383932 
+16297699 18607104 4890669 9997474 34737 577259 620177 1691352 1318 6763900 0 0 10142665 3383932 
+16274721 18607104 4880711 10000194 34360 577872 616290 1691351 1305 6763900 0 0 10142665 3383932 
+16300013 18607103 4890090 9995654 35605 578005 616394 1691351 1309 6763900 0 0 10142665 3383932 
+16304115 18607103 4895585 9998569 33543 580869 615985 1691351 1301 6763900 0 0 10142665 3383932 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.blas.trmm
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+8926522909 4211409326 6368325615 100353839 1088240867 447075379 2524210 601801778 1114925 1200000000 0 0 1199999039 600600032 
+9057892392 4211409336 6515587648 109898169 1078642546 465755346 2778791 601801787 1115323 1200000000 0 0 1200000063 600600032 
+9008664577 4211409330 6447103231 101873993 1086860471 450239361 2485307 601801785 1115282 1200000000 0 0 1199999825 600600032 
+8716280386 4211409308 6180240219 100808973 1087689974 415105802 2756666 601801758 1114999 1200000000 0 0 1199973015 600600032 
+8388957419 4211409282 5884086332 107078137 1081129160 423223993 2724024 601801732 1115161 1200000000 0 0 1199996930 600600032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+8910659109 4211409327 6357629825 103772205 1084860776 457991636 3131179 601801776 1113350 1200000000 0 0 1199974327 600600032 
+9368817726 4211409361 6785481885 102655161 1085885537 536441028 2216114 601801812 1114996 1200000000 0 0 1199974793 600600032 
+8850891620 4211409319 6313432925 103686473 1084955057 427369752 2592345 601801770 1115000 1200000000 0 0 1199975782 600600032 
+8698109335 4211409307 6142480053 106629826 1081767657 445070478 2570413 601801759 1113757 1200000000 0 0 1199977002 600600032 
+8972643350 4211409329 6420776733 102496159 1086184886 466296333 3019699 601801781 1115119 1200000000 0 0 1199973525 600600032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.blas.syrk
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+3031572231 5775614266 792403601 1468289821 620273057 132566889 2485697 722522110 1141728 2162520600 0 0 2162520664 721320632 
+2962863298 5775614241 702833584 1465700623 620504978 134669148 2238357 722522088 1140423 2162520600 0 0 2162520664 721320632 
+2962273193 5775614242 711006334 1466153267 620643743 135342532 2095820 722522089 1141178 2162520600 0 0 2162519832 721320632 
+3209845323 5775614261 891536359 1470965939 619856731 142464052 2099210 722522108 1141419 2162520600 0 0 2162519369 721320632 
+3221375559 5775614262 903344544 1470430921 619758651 150231402 2270042 722522109 1140337 2162520600 0 0 2162520664 721320632 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+2924757964 5775614240 702005824 1466019301 620614685 140080938 2229016 722522088 1140297 2162520600 0 0 2162506238 721320632 
+2943792963 5775614242 716329178 1467322262 620543838 130357937 2501875 722522089 1139989 2162520600 0 0 2162506900 721320632 
+3208717771 5775614276 912812408 1465586257 621284265 137014873 2077476 722522120 1139820 2162520600 0 0 2162498609 721320632 
+2951515521 5775614242 693062711 1466413503 620489107 142554970 1882504 722522088 1141713 2162520600 0 0 2162518116 721320632 
+3258159989 5775614265 930044793 1471343994 620285130 134595842 2533538 722522112 1140267 2162520600 0 0 2162519658 721320632 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.blas.gemver
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+96681360 88056219 48837367 30938848 4183909 7143385 1751403 12008058 6008 40002000 0 0 36008071 12002032 
+96798645 88056220 48945511 31183416 4079452 7082210 1753527 12008058 6009 40002000 0 0 36008071 12002032 
+98122182 88056220 50209143 31201262 4086896 7453381 1762245 12008058 6008 40002000 0 0 36008071 12002032 
+96610510 88056219 48875834 30946025 4184121 7088117 1745474 12008058 6015 40002000 0 0 36008071 12002032 
+96933334 88056220 49152642 31218617 4053355 7049301 1784695 12008057 6012 40002000 0 0 36008071 12002032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+97875120 88056220 50384783 24694446 6373943 7306453 1768698 12008058 6007 40002000 0 0 36008071 12002032 
+96552370 88056220 48753726 31178020 4078127 7243244 1743472 12008058 6011 40002000 0 0 36008071 12002032 
+97603450 88056220 49735816 31219555 4079700 7352501 1745055 12008058 6010 40002000 0 0 36008071 12002032 
+97979341 88056219 50049595 30932623 4186905 7417402 1754917 12008058 6009 40002000 0 0 36008071 12002032 
+97250776 88056220 49347694 31179584 4082196 7107215 1756428 12008058 6008 40002000 0 0 36008071 12002032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.solvers.durbin
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+14565299 30101968 3148536 7998196 10492 1106 4 4024314 4073 8005995 0 0 8020460 2017472 
+14566774 30101968 3167040 7988323 12800 3548 0 4024314 4255 8005995 0 0 8020460 2017472 
+14560395 30101968 3133850 7995371 10113 2804 0 4024314 4052 8005995 0 0 8020460 2017472 
+14559572 30101969 3137572 7994931 9846 1197 0 4024314 4050 8005995 0 0 8020460 2017472 
+14949426 30101968 3206563 7990041 11293 2739 0 4024315 4050 8005995 0 0 8020460 2017472 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+14560242 30101968 3158846 7757020 107077 2192 0 4024314 4046 8005995 0 0 8020460 2017472 
+14566163 30101968 3140775 7997233 9813 2392 1 4024314 4057 8005995 0 0 8020460 2017472 
+14564751 30101968 3141108 7995519 11666 1323 0 4024314 4062 8005995 0 0 8020460 2017472 
+15055223 30101968 3252652 7990068 11020 3517 0 4024314 4046 8005995 0 0 8020460 2017472 
+14560413 30101968 3145358 7997334 8764 1206 13 4024314 4071 8005995 0 0 8020460 2017472 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.solvers.ludcmp
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+19299390473 16058050860 10891805029 2667838939 2585086311 1352972308 110869555 2676676710 3834397 5339331000 0 0 5343332843 4004034 
+19214222506 16058050857 10776750921 2671067078 2585177952 1270803139 101639025 2676676707 3833699 5339331000 0 0 5343334123 4004034 
+17995858853 16058050668 9649223287 2666527011 2585971702 1253569720 105682357 2676676520 3841511 5339331000 0 0 5343333871 4004034 
+19066612133 16058050759 10672425587 2661517022 2586109358 1333045700 122519840 2676676606 3841302 5339331000 0 0 5343333988 4004034 
+18342905591 16058050695 9970716839 2670068967 2585033224 1319163543 102719818 2676676544 3840911 5339331000 0 0 5343333689 4004034 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+18367865872 16058050705 10078813721 2666416854 2585809378 1318148773 116073476 2676676551 3840645 5339331000 0 0 5343334549 4004034 
+18297661111 16058050703 9981510870 2666779600 2585881729 1339383884 108619390 2676676548 3840753 5339331000 0 0 5343334492 4004034 
+18576340799 16058050716 10240310526 2667429526 2585045732 1403987839 114971008 2676676566 3836117 5339331000 0 0 5343333586 4004034 
+18854124414 16058050739 10484201627 2671489947 2584861440 1284208191 105588579 2676676590 3840860 5339331000 0 0 5343333975 4004034 
+18831374828 16058050734 10430605534 2669301204 2585481402 1381996223 112653922 2676676584 3842033 5339331000 0 0 5343263836 4004034 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.solvers.cholesky
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+5684581417 8024019265 2197213490 2561746528 8602593 242082907 54808620 1337335521 1959601 2668667000 0 0 2668666565 1335334032 
+5681275661 8024019265 2192479458 2562063778 8638859 242214055 53108700 1337335515 1952830 2668667000 0 0 2668666569 1335334032 
+5693709189 8024019267 2205881002 2561508912 8630692 242231376 55462018 1337335516 1958488 2668667000 0 0 2668666554 1335334032 
+5684925670 8024019264 2196078873 2561996597 8612995 242289644 53172555 1337335515 1960148 2668667000 0 0 2668666593 1335334032 
+5693151956 8024019289 2211323694 2558954663 8582811 242159043 58093888 1337335531 1958926 2668667000 0 0 2668666513 1335334032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+5699575457 8024019265 2207482965 2557014441 8561770 242208389 53984775 1337335517 1958853 2668667000 0 0 2668665979 1335334032 
+5698395782 8024019266 2209215842 2557622623 8564463 242287934 54087838 1337335518 1957831 2668667000 0 0 2668666093 1335334032 
+5702717913 8024019268 2204723497 2557736185 8552654 242114760 54102523 1337335519 1954965 2668667000 0 0 2668667039 1335334032 
+5697989616 8024019264 2207014908 2557109095 8580418 242303924 54593034 1337335515 1959657 2668667000 0 0 2668667022 1335334032 
+5710107246 8024019269 2211886058 2557359369 8527079 242068953 54283971 1337335516 1958052 2668667000 0 0 2668667050 1335334032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.solvers.gramschmidt
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+41752997827 10811187594 35123517089 754481007 2636857450 3040650682 6641291 2160609451 1443999 2881201200 0 0 3599873923 1440720633 
+41679174579 10811187590 35084828100 753883107 2637274520 2931550638 5799808 2160609451 1444187 2881201200 0 0 3599875570 1440720633 
+41493666791 10811187571 34881080773 756733818 2633574681 3070481129 6834722 2160609431 1443643 2881201200 0 0 3599875716 1440720633 
+42025294262 10811187617 35412604945 755352917 2635641782 3102325478 8210963 2160609474 1444360 2881201200 0 0 3599748321 1440720633 
+41850716839 10811187606 35233520209 753636658 2638673100 2965318348 6518873 2160609461 1444428 2881201200 0 0 3599750762 1440720633 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+41214117214 10811187550 34584194584 754710882 2635716967 3063183145 8011410 2160609411 1444206 2881201200 0 0 3599815139 1440720633 
+40816719686 10811187517 34220730097 760467730 2629154887 2956625286 5221355 2160609375 1443994 2881201200 0 0 3599876549 1440720633 
+40560854869 10811187496 33982405790 764909766 2621284014 2995454708 6873767 2160609356 1443659 2881201200 0 0 3599814984 1440720633 
+41789202202 10811187597 35167080290 753456273 2637409705 2992612259 6417498 2160609453 1444226 2881201200 0 0 3599815258 1440720633 
+42237473008 10811187633 35606219340 753110478 2638590467 3004229424 7358322 2160609491 1444320 2881201200 0 0 3599814218 1440720633 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.solvers.trisolv
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+9420932 12022194 4156004 3797843 11125 355533 393405 2003050 1998 4000000 0 0 4002061 2003032 
+9437495 12022195 4159121 3796717 11364 355215 387489 2003050 1995 4000000 0 0 4002061 2003032 
+9431016 12022194 4166012 3800009 11287 354985 384490 2003050 1999 4000000 0 0 4002061 2003032 
+9428596 12022195 4153358 3798142 11248 354926 402058 2003049 2005 4000000 0 0 4002061 2003032 
+9391026 12022195 4144108 3792947 11326 355155 398659 2003049 1991 4000000 0 0 4002061 2003032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+9441759 12022194 4147936 3798294 11352 355124 388513 2003050 1996 4000000 0 0 4002061 2003032 
+9412043 12022195 4147569 3799936 11490 355506 391437 2003050 1998 4000000 0 0 4002061 2003032 
+9425374 12022194 4156040 3797140 11394 354928 390003 2003050 2027 4000000 0 0 4002061 2003032 
+9391816 12022195 4151475 3797429 11305 355258 386330 2003050 1993 4000000 0 0 4002061 2003032 
+9415133 12022195 4134055 3797764 11225 355206 393855 2003050 1998 4000000 0 0 4002061 2003032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.solvers.lu
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+18950691819 18696672741 10216418041 2695095540 2504146725 1271121830 121624388 2670665598 3820200 5331333000 0 0 5335256423 2666666033 
+19208456147 18696672762 10431337437 2702244911 2503412665 1302781034 101073311 2670665624 3819218 5331333000 0 0 5335261027 2666666033 
+19456197905 18696672782 10637817695 2701590358 2503725971 1355607641 114319042 2670665639 3815993 5331333000 0 0 5335261857 2666666033 
+19312979731 18696672770 10524609892 2700872802 2503901399 1268118451 103524196 2670665626 3815725 5331333000 0 0 5335261629 2666666033 
+19697765667 18696672814 10871064024 2701066935 2504112187 1305752067 121126282 2670665703 3816493 5331333000 0 0 5335269088 2666666033 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+19146159791 18696672756 10350000818 2703043130 2503301365 1296319443 108759250 2670665613 3812479 5331333000 0 0 5335263317 2666666033 
+19743638949 18696672862 10947122197 2699549791 2504059582 1395089789 113038607 2670665738 3816729 5331333000 0 0 5335260548 2666666033 
+19192777957 18696672837 10412240653 2697501987 2504329024 1314629541 113877378 2670665717 3818522 5331333000 0 0 5335247814 2666666033 
+18531240917 18696672815 9827144265 2696286229 2503708980 1283492820 116126999 2670665654 3815818 5331333000 0 0 5335129868 2666666033 
+19722129969 18696672889 10913264171 2701819063 2503768473 1311860675 108127629 2670665758 3816813 5331333000 0 0 5335130343 2666666033 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.kernels.atax
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+29694587 51887321 8356528 19504769 61423 675941 708457 7983859 3802 15960000 0 0 19948166 7981934 
+29637812 51887322 8316351 19504338 61285 674779 706049 7983858 3806 15960000 0 0 19948166 7981934 
+29698201 51887321 8312804 19502667 60359 686398 682319 7983858 3806 15960000 0 0 19948166 7981934 
+29696278 51887322 8329330 19505614 61311 673832 702714 7983858 3804 15960000 0 0 19948166 7981934 
+29708171 51887322 8304325 19505013 61316 675752 699536 7983858 3805 15960000 0 0 19948166 7981934 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+29704543 51887321 8300973 19509231 60857 674034 760575 7983859 3803 15960000 0 0 19948166 7981934 
+29727149 51887322 8325664 19505156 60918 676476 699081 7983858 3802 15960000 0 0 19948166 7981934 
+29734118 51887321 8349709 19506349 61205 674890 702272 7983858 3804 15960000 0 0 19948166 7981934 
+29689937 51887321 8342726 19501295 61452 679493 699607 7983859 3804 15960000 0 0 19948166 7981934 
+29715996 51887321 8317224 19502739 60714 692630 695886 7983859 3805 15960000 0 0 19948166 7981934 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.kernels.doitgen
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+2081588194 3810367272 381295722 540810046 490809878 98816917 514584 544341371 3410444 1075200000 0 0 1078507629 544320032 
+2088778771 3810367271 376962598 540968127 492380741 49033628 523407 544341373 3415017 1075200000 0 0 1078554948 544320032 
+2084781152 3810367273 385305511 539428901 491007365 59401541 509365 544341372 3410321 1075200000 0 0 1078560062 544320032 
+2076275731 3810367270 382483284 541032028 491017709 76853394 551247 544341372 3413514 1075200000 0 0 1078539608 544320032 
+2079714871 3810367272 381116273 541021687 490673464 74210962 543553 544341373 3410450 1075200000 0 0 1078513856 544320032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+2082414856 3810367275 383050939 540780608 491172179 51256107 555305 544341374 3410357 1075200000 0 0 1078520964 544320032 
+2084786795 3810367272 383949812 539745557 490923109 113284658 573216 544341374 3410139 1075200000 0 0 1078519487 544320032 
+2083280428 3810367272 373081709 541236007 491953024 58766448 584552 544341373 3410129 1075200000 0 0 1078557970 544320032 
+2084683307 3810367270 386649257 540859534 490902405 63907566 538126 544341369 3410599 1075200000 0 0 1078504593 544320032 
+2083358875 3810367271 385195732 540569678 491387228 37183071 568456 544341372 3410088 1075200000 0 0 1078555468 544320032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.kernels.2mm
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+7302933594 11605452813 1432114712 1613615184 1633849838 396653313 8989947 1657682255 1682022 4104960000 0 0 3312908683 1657680032 
+7244974334 11605452808 1380972109 1613205651 1633912157 379306963 7991852 1657682293 1681670 4104960000 0 0 3312921262 1657680032 
+7298717774 11605452812 1437487936 1613824050 1633766706 392785748 9354735 1657682246 1681696 4104960000 0 0 3312943598 1657680032 
+7287049546 11605452820 1474894928 1614061324 1633702857 379381593 9884409 1657682309 1681699 4104960000 0 0 3312919489 1657680032 
+7266740595 11605452853 1401638572 1612609048 1633995795 390214179 8385865 1657682253 1681646 4104960000 0 0 3312909345 1657680032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+7295446313 11605452806 1416362770 1615035475 1633509841 405432764 8828690 1657682244 1681647 4104960000 0 0 3312954464 1657680032 
+7249558121 11605452801 1367191377 1614844474 1633485858 381735322 9124515 1657682241 1681620 4104960000 0 0 3312959249 1657680032 
+7283873323 11605452808 1415615467 1613126007 1633962726 378503030 8986414 1657682251 1681731 4104960000 0 0 3312950056 1657680032 
+7360317898 11605452854 1476814529 1613739215 1633810420 380392767 10402806 1657682256 1681722 4104960000 0 0 3312940511 1657680032 
+7338890232 11605452814 1493942938 1613759414 1633815854 397554366 9977180 1657682260 1681675 4104960000 0 0 3312941316 1657680032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.kernels.mvt
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+78679046 52030205 52665903 11514507 3954381 6450308 1206058 8004057 4007 16000000 0 0 16004063 8000032 
+78104133 52030205 52075429 11541280 3945834 6352224 1219830 8004056 4004 16000000 0 0 16004063 8000032 
+79320346 52030205 53220770 11542469 3949815 6620773 1207390 8004057 4910 16000000 0 0 16004037 8000032 
+78891726 52030206 52824586 11545587 3947536 6339486 1211471 8004056 4911 16000000 0 0 16004063 8000032 
+80032858 52030206 53867010 11539764 3949586 6500674 1212040 8004057 4006 16000000 0 0 16004063 8000032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+79354670 52030206 53229070 11563604 3949581 6507891 1212310 8004057 4009 16000000 0 0 16004063 8000032 
+78976581 52030205 52940751 11542429 3950474 6470307 1212949 8004057 4006 16000000 0 0 16004063 8000032 
+79165535 52030206 53090440 11536987 3954094 6379933 1213663 8004056 4005 16000000 0 0 16004036 8000032 
+78470081 52030205 52528165 11559305 3949994 6393378 1211186 8004057 4005 16000000 0 0 16004063 8000032 
+78835224 52030205 52883309 11531930 3948046 6498352 1213646 8004056 4006 16000000 0 0 16004063 8000032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.kernels.3mm
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+12307500946 18920738724 3791570946 2625877495 2692970509 633687700 28939579 2702593553 2592578 5400000000 0 0 5399969032 2702590032 
+12347056025 18920738737 3867560913 2624652643 2693229698 702917112 28255127 2702593577 2592633 5400000000 0 0 5399931312 2702590032 
+12713487681 18920738776 4118622718 2627885780 2693023486 673916077 24227196 2702593602 2592615 5400000000 0 0 5399940697 2702590032 
+12284616637 18920738725 3757572327 2623883945 2693445120 680095298 26884034 2702593555 2592624 5400000000 0 0 5399927614 2702590032 
+12163199949 18920738738 3669689822 2625535874 2692916390 676426116 25441312 2702593554 2592603 5400000000 0 0 5399920858 2702590032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+12351440246 18920738717 3841811017 2625833500 2692787346 713670855 29186982 2702593553 2592538 5400000000 0 0 5399998385 2702590032 
+12426856913 18920738724 3865847379 2624418262 2693097987 695042838 28727979 2702593595 2592613 5400000000 0 0 5399902302 2702590032 
+12262202393 18920738718 3741999319 2626107881 2692937488 665643828 28767942 2702593557 2592564 5400000000 0 0 5399862858 2702590032 
+12735982777 18920738792 4162692593 2625849239 2693128226 740886915 25065893 2702593599 2592578 5400000000 0 0 5399979319 2702590032 
+12697704970 18920738758 4103633191 2626058555 2693430662 684984624 26164546 2702593592 2592652 5400000000 0 0 5399984641 2702590032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  linear-algebra.kernels.bicg
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+37505585 43907023 10689794 23539427 22891 697755 754015 3992159 2105 15960000 0 0 23940067 7982134 
+48131932 43907024 20171746 23672284 22481 687695 754167 3992160 2102 15960000 0 0 23940067 7982134 
+37519843 43907023 10714122 23536861 22951 695297 755037 3992159 2104 15960000 0 0 23940067 7982134 
+37531930 43907023 10750068 23658096 23066 687311 754893 3992159 2104 15960000 0 0 23940067 7982134 
+37541994 43907023 10760996 23659223 23153 687988 750524 3992159 2103 15960000 0 0 23940056 7982134 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+37595582 43907023 10517797 22427173 524099 687324 564345 3992159 2102 15960000 0 0 23940067 7982134 
+37523775 43907023 10753214 23660595 22995 698054 755423 3992159 2105 15960000 0 0 23940067 7982134 
+37524220 43907023 10758956 23658889 23369 691550 756057 3992159 2104 15960000 0 0 23940067 7982134 
+37604440 43907023 10517424 22424826 524618 688834 582563 3992159 2104 15960000 0 0 23940067 7982134 
+37513060 43907023 10746524 23663281 22696 687511 753523 3992160 2104 15960000 0 0 23940067 7982134 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  stencils.seidel-2d
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+75851923599 29959019479 51547671647 5971122563 11711616 335108032 292684107 1000005913 1329262 17964018000 0 0 6005987245 1996002032 
+75844349267 29959019479 51601171959 5971921094 11709274 334994536 284228506 1000005920 1091769 17964018000 0 0 6005986617 1996002032 
+75844330220 29959019506 51536477798 5970102139 11710778 335008963 290871630 1000005851 1205383 17964018000 0 0 6005986744 1996002032 
+75845604476 29959019444 51602598608 5972023518 11705267 335132359 284132028 1000005828 1491896 17964018000 0 0 6005986996 1996002032 
+75849773526 29959019465 51539283636 5972027953 11709867 334994664 283492718 1000005857 1492041 17964018000 0 0 6005986715 1996002032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+75850281823 29959019532 51555693353 5972135786 11708416 334972629 288797465 1000005857 1091473 17964018000 0 0 6005986629 1996002032 
+75841684603 29959019535 51590449098 5972186239 11708037 334996406 285012105 1000005852 1398837 17964018000 0 0 6005987710 1996002032 
+75844118153 29959019509 51560614489 5971426056 11706742 334935905 285314101 1000005881 1272163 17964018000 0 0 6005986684 1996002032 
+75844175957 29959019524 51539933211 5972138887 11710298 334884725 283765033 1000005839 1309102 17964018000 0 0 6005987546 1996002032 
+75846000586 29959019442 51571398144 5972196018 11709947 334971192 285426822 1000005817 1490156 17964018000 0 0 6005987638 1996002032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  stencils.jacobi-2d
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+8448374301 16857130907 1414852999 8308289284 15058863 570218164 391664445 1686103241 1300030 8424020000 0 0 8424019536 1684804032 
+8331725913 16857130898 1332321239 8306418224 15156477 571458251 393804939 1686103239 1300013 8424020000 0 0 8424019867 1684804032 
+8365659624 16857130889 1359971739 8308202794 15061269 570833410 393102513 1686103250 1300100 8424020000 0 0 8424019393 1684804032 
+8317990842 16857130887 1318939032 8306917072 15216984 571057049 394288202 1686103238 1300043 8424020000 0 0 8424019344 1684804032 
+8301607426 16857130897 1310767965 8307696601 15023589 571671373 393418283 1686103238 1300091 8424020000 0 0 8424019386 1684804032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+8226300701 16857130878 1236897942 8308199294 15079203 570661079 391484022 1686103238 1300000 8424020000 0 0 8424019435 1684804032 
+8346378834 16857130902 1342928667 8307638113 15045430 572551254 394288153 1686103242 1300052 8424020000 0 0 8424019583 1684804032 
+8347338147 16857130901 1345467819 8307402564 15085944 572188339 392755117 1686103238 1299955 8424020000 0 0 8424019274 1684804032 
+8292859146 16857130899 1293991357 8307210103 15103703 571885585 393193675 1686103250 1300028 8424020000 0 0 8424019478 1684804032 
+8405563095 16857130897 1391019923 8307909775 15044048 572432108 393901627 1686103257 1300021 8424020000 0 0 8424019267 1684804032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  stencils.jacobi-1d
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+5021660 15987199 3016 5993548 31 764 2 1998551 1007 5994000 0 0 5994062 1998032 
+17514215 15987201 9663759 5993827 36 909 0 1998551 1003 5994000 0 0 5994062 1998032 
+5022937 15987199 3224 5993561 24 695 4 1998551 1003 5994000 0 0 5994062 1998032 
+5023521 15987199 2998 5993731 29 740 7 1998550 1003 5994000 0 0 5994062 1998032 
+5023979 15987200 1973 5990747 492 748 0 1998550 1003 5994000 0 0 5994062 1998032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+5022144 15987199 4167 5993700 24 766 6 1998551 1005 5994000 0 0 5994062 1998032 
+5039093 15987199 2893 5993652 29 884 0 1998551 1002 5994000 0 0 5994062 1998032 
+5022701 15987199 3190 5993597 34 890 0 1998550 1003 5994000 0 0 5994062 1998032 
+5021338 15987200 3796 5993788 26 782 2 1998551 1003 5994000 0 0 5994062 1998032 
+5023795 15987199 3253 5993581 93 704 4 1998550 1006 5994000 0 0 5994062 1998032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  stencils.heat-3d
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+12548957299 29673110232 1224765195 16344602687 15966067 1071864185 594094337 1657075568 14044585 24645480000 0 0 16430321866 1643032036 
+12529095732 29673110251 1212225378 16343810594 15993503 1068726072 594714079 1657075599 14044733 24645480000 0 0 16430321243 1643032036 
+12574540783 29673110252 1235441148 16343599923 16009075 1070707625 594654279 1657075601 14044684 24645480000 0 0 16430321065 1643032036 
+12461403601 29673110237 1175098350 16343835217 16021253 1069047510 594734461 1657075573 14044689 24645480000 0 0 16430321684 1643032036 
+12532095655 29673110241 1200299495 16343763557 16021566 1068821555 595707051 1657075572 14044761 24645480000 0 0 16430321293 1643032036 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+12622911394 29673110254 1267553384 16343952993 15990779 1071167695 594237134 1657075599 14044743 24645480000 0 0 16430320861 1643032036 
+12489997504 29673110240 1194263152 16343523832 16017189 1073411921 594390521 1657075602 14044691 24645480000 0 0 16430321088 1643032036 
+12501281018 29673110254 1196367660 16343687052 16005418 1072756079 594650218 1657075581 14051844 24645480000 0 0 16430320950 1643032036 
+12516716664 29673110227 1203782721 16344753998 15923790 1070767388 594997092 1657075566 14044704 24645480000 0 0 16430322027 1643032036 
+12563811077 29673110257 1232451814 16344034078 15968002 1070270435 594263373 1657075593 14044802 24645480000 0 0 16430319763 1643032036 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  stencils.adi
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+33353540184 18945044441 17031205845 5467797066 635169398 2421258926 714840740 1993009268 1999009 12948052000 0 0 6972968813 2992004538 
+33339183441 18945044509 17020932263 5454784932 635201649 2443878558 716964264 1993009353 1999182 12948052000 0 0 6973004151 2992004538 
+33285781042 18945044498 16970007870 5453733840 635534894 2460662727 716927034 1993009307 1999146 12948052000 0 0 6973001436 2992004538 
+33408748207 18945044470 17086887884 5451724532 634843827 2461809428 717472926 1993009309 1999214 12948052000 0 0 6973003022 2992004538 
+33381305118 18945044515 17068006570 5464723723 635168880 2398032695 718348894 1993009321 1999125 12948052000 0 0 6973003558 2992004538 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+33419311886 18945044452 17101557088 5472228603 634643268 2408572036 714623645 1993009274 1998992 12948052000 0 0 6973027631 2992004538 
+33379673761 18945044513 17057654459 5447681044 635308329 2470979912 713899083 1993009358 1999795 12948052000 0 0 6972900416 2992004538 
+33499967753 18945044527 17179850858 5459727154 635079349 2445557878 714719471 1993009383 1999265 12948052000 0 0 6972869834 2992004538 
+33307821134 18945044536 16999531978 5457690749 635681610 2445849182 713430113 1993009377 1999585 12948052000 0 0 6972895105 2992004538 
+33320085335 18945044479 17003240184 5449837501 635268010 2445519153 714866440 1993009405 1999214 12948052000 0 0 6973005753 2992004538 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  stencils.fdtd-2d
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+7041316992 13794406276 2078173706 5552241173 77322125 771233765 410790715 1799900622 1502648 6591202500 0 0 6591802107 1798400532 
+7311142152 13794406277 2081469033 5589744657 72848327 771413934 410577164 1799900623 1502359 6591202500 0 0 6591802105 1798400532 
+7057210575 13794406278 2093068195 5556490627 80114477 771083877 410281601 1799900625 1502556 6591202500 0 0 6591802208 1798400532 
+7039763668 13794406273 2062111692 5606190044 74932970 771798968 411391824 1799900621 1502567 6591202500 0 0 6591802278 1798400532 
+7034238105 13794406279 2076715318 5571498506 76631970 770810755 409400227 1799900622 1502550 6591202500 0 0 6591802285 1798400532 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+6999697648 13794406273 2048718718 5559881315 77273475 771742314 410695109 1799900620 1502505 6591202500 0 0 6591802223 1798400532 
+7021803048 13794406276 2071396764 5588494946 74180536 771725317 410401638 1799900623 1502577 6591202500 0 0 6591802254 1798400532 
+7033941474 13794406277 2080677665 5553067400 80132952 771753854 412492484 1799900623 1502495 6591202500 0 0 6591802093 1798400532 
+7135645781 13794406278 2072217906 5597828008 74060376 771640314 410432406 1799900623 1502409 6591202500 0 0 6591802191 1798400532 
+7011444313 13794406276 2049980883 5553120312 80850895 771938938 411815714 1799900621 1502342 6591202500 0 0 6591802276 1798400532 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  datamining.covariance
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+22397408332 6080199033 18705701429 9115326 1981681386 2867533188 36848373 1012926275 724710 2021761800 0 0 2022716653 1014364232 
+22444013798 6080199036 18752226872 9165015 1981743614 2878675426 33560311 1012926281 724610 2021761800 0 0 2022720496 1014364232 
+22484046721 6080199038 18796385283 9193909 1981697656 2877763651 34675205 1012926283 724536 2021761800 0 0 2022720765 1014364232 
+22508974448 6080199041 18826680464 9057175 1981792841 2864839133 36466773 1012926291 724592 2021761800 0 0 2022720022 1014364232 
+22390611055 6080199034 18700203517 9022063 1981671553 2863700859 33879147 1012926276 724566 2021761800 0 0 2022720298 1014364232 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+22430385535 6080199031 18737039126 9363936 1981586310 2858577030 34162298 1012926278 724706 2021761800 0 0 2022719291 1014364232 
+22428372294 6080199035 18739419744 9264748 1981721868 2892185705 38065222 1012926278 724593 2021761800 0 0 2022719811 1014364232 
+22403985484 6080199033 18716415997 9226057 1981771679 2870065425 35491295 1012926276 724574 2021761800 0 0 2022717647 1014364232 
+22362097942 6080199028 18671993370 9419242 1981694924 2846872662 34351600 1012926276 724638 2021761800 0 0 2022718397 1014364232 
+22454686049 6080199036 18761816119 9215293 1981785495 2883156773 37182193 1012926279 724567 2021761800 0 0 2022719052 1014364232 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  datamining.correlation
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+22347711130 6085488620 18648420251 13065590 1981519556 2844980176 36991505 1012928669 724529 2026083600 0 0 2024299412 1015326032 
+22381787127 6085488621 18689583040 12789088 1981691832 2848006185 35937164 1012928672 724544 2026083600 0 0 2024398363 1015326032 
+22437493625 6085488628 18743509024 12887900 1981616527 2873955510 34368501 1012928683 724665 2026083600 0 0 2024400846 1015326032 
+22387681521 6085488624 18694060795 13057075 1981598979 2864046528 36226544 1012928676 724618 2026083600 0 0 2024400212 1015326032 
+22421041410 6085488628 18726559776 12906917 1981820212 2871632377 34680857 1012928675 724468 2026083600 0 0 2024399548 1015326032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+22455956884 6085488628 18755939585 13041759 1981531359 2877916460 35272142 1012928679 724574 2026083600 0 0 2024399695 1015326032 
+22464676798 6085488630 18769915131 12759402 1981859660 2858435939 35607052 1012928682 724528 2026083600 0 0 2024399888 1015326032 
+22371710337 6085488623 18675152830 12667199 1981793241 2901473833 35238729 1012928675 724555 2026083600 0 0 2024399967 1015326032 
+22401196945 6085488628 18709720853 12870716 1981673198 2879031703 35363179 1012928675 724587 2026083600 0 0 2024400714 1015326032 
+22412528644 6085488624 18718679777 12639493 1981735702 2875908191 35030591 1012928674 724586 2026083600 0 0 2024400226 1015326032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  medley.deriche
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+809642267 566390480 515940397 52651645 7393443 96127896 13550751 53117495 20740 0 0 0 88473669 53084192 
+815001084 566390478 514678255 52641089 8947837 96079675 13566404 53117495 20734 0 0 0 88473669 53084192 
+809372548 566390477 515614185 52684346 7381126 96098615 13588732 53117495 20752 0 0 0 88473669 53084192 
+815434494 566390477 518396835 52632049 7391929 96103731 13571289 53117494 20748 0 0 0 88473669 53084192 
+815019457 566390476 515318128 52678817 7394489 96044486 13623170 53117493 20754 0 0 0 88472481 53084192 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+810371819 566390476 514878016 52615166 7380975 96058062 13544084 53117494 20755 0 0 0 88472395 53084192 
+810151480 566390477 516120372 52690423 7402094 96043864 13588848 53117496 20744 0 0 0 88472377 53084192 
+810287451 566390476 515848252 52658329 7383945 96054599 13547172 53117493 20735 0 0 0 88472294 53084192 
+810727539 566390479 516821324 52683095 7349846 96062583 13567319 53117495 20746 0 0 0 88471861 53084192 
+810289657 566390478 514841982 52691457 7386430 96114044 13548993 53117494 20743 0 0 0 88472478 53084192 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  medley.floyd-warshall
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+63063765551 219559227746 7180103278 64837452414 47367414 1831405796 1429720667 21959848002 7842891 0 0 0 65855990243 21952000032 
+62967770180 219559227741 7206206675 64862848732 47411017 1830683302 1421359701 21959847992 7842879 0 0 0 65855990136 21952000032 
+63027539366 219559227737 7118121460 64827391114 47206469 1827257781 1430230018 21959847990 7842858 0 0 0 65855990471 21952000032 
+63049923982 219559227732 7219096439 64855756618 47303065 1836649330 1429656568 21959847992 7842858 0 0 0 65855990400 21952000032 
+63184824895 219559227735 7147026079 64860885787 47184667 1825315835 1429698310 21959847987 7842862 0 0 0 65855990748 21952000032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+63052436678 219559227798 7042945654 64841569016 47595373 1828749930 1408554359 21959848115 7843086 0 0 0 65855994241 21952000032 
+63000816300 219559227855 7045308849 64854500391 47422164 1831018004 1412036946 21959848034 7842886 0 0 0 65855994507 21952000032 
+62927908174 219559227855 7083068805 64853388156 47471177 1823881793 1407719010 21959848066 7842922 0 0 0 65855994539 21952000032 
+62986927134 219559227846 7049285396 64844386707 47440509 1834164006 1413432808 21959848181 7843001 0 0 0 65855995345 21952000032 
+62927476820 219559227858 7126721378 64841751142 47517364 1830142836 1401349521 21959848077 7844245 0 0 0 65855975093 21952000032 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Running  medley.nussinov
+Interpreter: C
+Options:
+(iterations,5)
+('POLYBENCH_PAPI',True)
+Version=baseline
+18216136060 26110406769 7398297313 2846983629 2343697721 1060560511 19105936 2610425368 3072529 0 0 0 5220822041 2610413782 
+17918335966 26110406663 7229903570 2847332965 2343659104 1003371969 18728131 2610425260 3069397 0 0 0 5220816337 2610413782 
+18047606741 26110406672 7242387800 2847327644 2343741238 983839198 19431422 2610425269 3075690 0 0 0 5220816970 2610413782 
+17865276969 26110406659 7149190703 2847040294 2343685035 1067174772 19263428 2610425256 3070792 0 0 0 5220817708 2610413782 
+18117986712 26110406678 7301182548 2847093950 2343699304 1054207843 18658089 2610425278 3071213 0 0 0 5220817023 2610413782 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Version=pluto
+17465105232 26110406620 6825537527 2847017783 2343617927 1039612072 18227837 2610425221 3070417 0 0 0 5220820414 2610413782 
+18567691500 26110406708 7613880047 2848104923 2343710303 1020640406 18200799 2610425311 3071411 0 0 0 5220819438 2610413782 
+17430485283 26110406617 6835546910 2847055602 2343545268 1027488523 18338318 2610425219 3072291 0 0 0 5220817320 2610413782 
+18253865815 26110406691 7405864693 2847704810 2343586288 1060199211 19003222 2610425288 3069721 0 0 0 5220817431 2610413782 
+18559405511 26110406717 7618427601 2848073870 2343615880 1024369928 19405152 2610425313 3074922 0 0 0 5220815734 2610413782 
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
+Setting cpu: 0
+Setting cpu: 1
+Setting cpu: 2
+Setting cpu: 3
+Setting cpu: 4
+Setting cpu: 5
+Setting cpu: 6
+Setting cpu: 7
+Setting cpu: 8
+Setting cpu: 9
+Setting cpu: 10
+Setting cpu: 11
