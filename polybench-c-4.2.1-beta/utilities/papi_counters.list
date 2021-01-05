@@ -1,0 +1,17 @@
+// Counters must be delimited with ',' including the last one.
+// C/C++ comments are allowed.
+// Both native and standard PAPI events are supported.
+"PAPI_TOT_CYC",               // total cycles
+"PAPI_TOT_INS", // total instructions
+"UOPS_EXECUTED:STALL_CYCLES", // stalls
+"MEM_LOAD_UOPS_RETIRED:L1_HIT", // L1 hits
+"MEM_LOAD_UOPS_RETIRED:L1_MISS", // L1 misses
+"L2_RQSTS:MISS", // L2 misses
+"LONGEST_LAT_CACHE:MISS", // L3 misses
+"PAPI_BR_INS", // total branches
+"PAPI_BR_MSP", // mispredicted branches
+"FP_ARITH:SCALAR_DOUBLE",
+"FP_ARITH:128B_PACKED_DOUBLE",
+"FP_ARITH:256B_PACKED_DOUBLE",
+"MEM_INST_RETIRED:ALL_LOADS",
+"MEM_INST_RETIRED:ALL_STORES",
