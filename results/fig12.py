@@ -96,7 +96,8 @@ if __name__ == "__main__":
 
     df_O3=parse(c_o3_path,cols=c_cols)
     df_O3novec=parse(c_o3_novec_path,cols=c_cols)
-    df_pypy=parse(pypy_path,cols=py_cols)
+    try: df_pypy=parse(pypy_path,cols=py_cols)
+    except ValueError: df_pypy=parse(pypy_path,cols=py_fp_cols2)
     df_numpy=parse(numpy_path,cols=py_fp_cols2)
 
     df=pd.concat( [df_O3novec,df_O3,df_pypy,df_numpy], keys=["-O3 -fno-tree-vectorize","-O3","Python","Python"], names=["gcc opts"] )
@@ -146,4 +147,5 @@ if __name__ == "__main__":
     df_tex = df3.stack().unstack([1,2,3])
     df_tex.columns = pd.Index( df_tex.columns )
     df_tex.rename( columns={ ('C', '-O1', 'baseline'): "gcc -O1", ('C', '-O3 -fno-tree-vectorize', 'baseline'): "gcc -O3 -fno-tree-vectorize", ('C', '-O3', 'baseline'):"gcc -O3", ('PyPy', 'Python', 'list'):"PyPy nested lists", ('PyPy', 'Python', 'list_flattened'): "PyPy", ('PyPy','Python','load_elimination'): "PyPy with manual load elimination", ('CPython','Python','numpy'):'CPython/NumPy' }, inplace=True )
-    df_tex['CPython/NumPy'].unstack().drop( ["p128d","p256d","scalard","l1h","scalars","vecs","vecd"], axis=1 ).to_latex( "tab-numpy.tex", float_format="%.3g", na_rep="n/a" )
+    try: df_tex['CPython/NumPy'].unstack().drop( ["p128d","p256d","scalard","l1h","scalars","vecs","vecd"], axis=1 ).to_latex( "tab-numpy.tex", float_format="%.3g", na_rep="n/a" )
+    except KeyError: df_tex['CPython/NumPy'].unstack().drop( ["p128d","p256d","scalard","l1h"], axis=1 ).to_latex( "tab-numpy.tex", float_format="%.3g", na_rep="n/a" )

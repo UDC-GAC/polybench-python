@@ -6,6 +6,7 @@ import seaborn as sns
 c_cols = ["cycles","inst","stalls","l1h","l1m","l2m","l3m","br","brmissp","scalard","p128d","p256d","loads","stores"]
 py_cols= ["inst","cycles","stalls","l1m","l2m","l3m","br","brmissp","scalars","scalard","vecs","vecd","loads","stores"]
 py_fp_cols= ["inst","cycles","stalls","l1m","l2m","l3m","br","brmissp","scalars_trash","scalard_trash","scalard","p128d","p256d","loads","stores"]
+py_fp_cols2= ["inst","cycles","stalls","l1m","l2m","l3m","br","brmissp","scalard","p128d","p256d","loads","stores"]
 
 def parse( path, cols=c_cols ):
     f = open( path, "r" )
@@ -96,9 +97,12 @@ if __name__ == "__main__":
 
     df_O3=parse(c_o3_path,cols=c_cols)
     df_O3novec=parse(c_o3_novec_path,cols=c_cols)
-    df_pypy=parse(pypy_path,cols=py_cols)
-    df_maxfuse=parse(pypy_maxfuse, cols=py_fp_cols )
-    df_vector=parse(pypy_vector, cols=py_fp_cols )
+    try: df_pypy=parse(pypy_path,cols=py_cols)
+    except ValueError: df_pypy=parse(pypy_path,cols=py_fp_cols2)
+    try: df_maxfuse=parse(pypy_maxfuse, cols=py_fp_cols )
+    except ValueError: df_maxfuse=parse(pypy_maxfuse, cols=py_fp_cols2 )
+    try: df_vector=parse(pypy_vector, cols=py_fp_cols )
+    except ValueError: df_vector=parse(pypy_vector, cols=py_fp_cols2 )
 
     df=pd.concat( [df_O3novec,df_O3,df_pypy,df_maxfuse,df_vector], keys=["-O3 -fno-tree-vectorize","-O3","Python","Python","Python","Python"], names=["gcc opts"] )
     df.reset_index().set_index( ["interpreter","benchmark","gcc opts","version"] ).sort_index(level=1).to_excel("/tmp/polybench_python.xls")
@@ -148,6 +152,9 @@ if __name__ == "__main__":
     df_tex = df2.stack().unstack([1,2,3])
     df_tex.columns = pd.Index( df_tex.columns )
     df_tex.rename( columns={ ('C', '-O1', 'baseline'): "gcc -O1", ('C', '-O3 -fno-tree-vectorize', 'baseline'): "gcc -O3 -fno-tree-vectorize", ('C', '-O3', 'baseline'):"gcc -O3", ('PyPy', 'Python', 'list'):"PyPy nested lists", ('PyPy', 'Python', 'list_flattened'): "PyPy", ('PyPy','Python','load_elimination'): "PyPy with manual load elimination", ('CPython','Python','numpy'):'CPython/NumPy', ("PyPy","Python","list_flattened_pluto"): "fusion", ("PyPy","Python","pluto_vectorizer"): "vectorizer", ("PyPy","Python","pluto_maxfuse"): "maxfuse" }, inplace=True )
-    df_tex["maxfuse"].unstack().drop( ["p128d","p256d","scalard","scalars","vecs","vecd","scalars_trash","scalard_trash"], axis=1 ).to_latex( "tab-pocc-maxfuse.tex", float_format="%.3g", na_rep="n/a" )
-    df_tex["fusion"].unstack().drop( ["p128d","p256d","scalard","scalars","vecs","vecd","scalars_trash","scalard_trash"], axis=1 ).to_latex( "tab-pocc-fusion.tex", float_format="%.3g", na_rep="n/a" )
-    df_tex["vectorizer"].unstack().drop( ["p128d","p256d","scalard","scalars","vecs","vecd","scalars_trash","scalard_trash"], axis=1 ).to_latex( "tab-pocc-vectorizer.tex", float_format="%.3g", na_rep="n/a" )
+    try: df_tex["maxfuse"].unstack().drop( ["p128d","p256d","scalard","scalars","vecs","vecd","scalars_trash","scalard_trash"], axis=1 ).to_latex( "tab-pocc-maxfuse.tex", float_format="%.3g", na_rep="n/a" )
+    except KeyError: df_tex["maxfuse"].unstack().drop( ["p128d","p256d","scalard"], axis=1 ).to_latex( "tab-pocc-maxfuse.tex", float_format="%.3g", na_rep="n/a" )
+    try: df_tex["fusion"].unstack().drop( ["p128d","p256d","scalard","scalars","vecs","vecd","scalars_trash","scalard_trash"], axis=1 ).to_latex( "tab-pocc-fusion.tex", float_format="%.3g", na_rep="n/a" )
+    except KeyError: df_tex["fusion"].unstack().drop( ["p128d","p256d","scalard"], axis=1 ).to_latex( "tab-pocc-fusion.tex", float_format="%.3g", na_rep="n/a" )
+    try: df_tex["vectorizer"].unstack().drop( ["p128d","p256d","scalard","scalars","vecs","vecd","scalars_trash","scalard_trash"], axis=1 ).to_latex( "tab-pocc-vectorizer.tex", float_format="%.3g", na_rep="n/a" )
+    except KeyError: df_tex["vectorizer"].unstack().drop( ["p128d","p256d","scalard"], axis=1 ).to_latex( "tab-pocc-vectorizer.tex", float_format="%.3g", na_rep="n/a" )

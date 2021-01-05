@@ -97,7 +97,8 @@ if __name__ == "__main__":
     df_O1=parse(c_o1_path,cols=c_cols)
     df_O3=parse(c_o3_path,cols=c_cols)
     df_O3novec=parse(c_o3_novec_path,cols=c_cols)
-    df_pypy=parse(pypy_path,cols=py_cols)
+    try: df_pypy=parse(pypy_path,cols=py_cols)
+    except ValueError: df_pypy=parse(pypy_path, cols=py_fp_cols2)
 
     df=pd.concat( [df_O1,df_O3novec,df_O3,df_pypy], keys=["-O1","-O3 -fno-tree-vectorize","-O3","Python"], names=["gcc opts"] )
     df.reset_index().set_index( ["interpreter","benchmark","gcc opts","version"] ).sort_index(level=1).to_excel("/tmp/polybench_python.xls")

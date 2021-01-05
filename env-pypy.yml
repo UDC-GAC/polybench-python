@@ -1,0 +1,17 @@
+name: polybench-pypy
+channels:
+  - conda-forge
+dependencies:
+  - pypy
+  - numpy
+  - nasm
+  - tqdm
+  - pip
+  - pandas
+  - matplotlib
+  - seaborn
+  - xlwt
+  - pip:
+    - python_papi
+    - inlineasm
+    - inline

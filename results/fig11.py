@@ -7,6 +7,7 @@ import scipy.stats
 c_cols = ["cycles","inst","stalls","l1h","l1m","l2m","l3m","br","brmissp","scalard","p128d","p256d","loads","stores"]
 abbrv_c_cols = ["cycles","inst","stalls","l1h","l1m","l2m","l3m","br","brmissp","loads","stores"]
 py_cols= ["inst","cycles","stalls","l1m","l2m","l3m","br","brmissp","scalars","scalard","vecs","vecd","loads","stores"]
+py_fp_cols2= ["inst","cycles","stalls","l1m","l2m","l3m","br","brmissp","scalard","p128d","p256d","loads","stores"]
 
 def parse( path, cols=c_cols ):
     f = open( path, "r" )
@@ -95,11 +96,13 @@ if __name__ == "__main__":
     pypy_path = results_folder + "/pypy-run-all.out"
     map( nofile_error, [c_o0_path,c_o1_path,c_o3_path,c_o3_novec_path,pypy_path] )
 
-    df_O0=parse(c_o0_path,cols=abbrv_c_cols)
+    try: df_O0=parse(c_o0_path,cols=abbrv_c_cols)
+    except ValueError: df_O0=parse(c_o0_path,cols=c_cols)
     df_O1=parse(c_o1_path,cols=c_cols)
     df_O3=parse(c_o3_path,cols=c_cols)
     df_O3novec=parse(c_o3_novec_path,cols=c_cols)
-    df_pypy=parse(pypy_path,cols=py_cols)
+    try: df_pypy=parse(pypy_path,cols=py_cols)
+    except ValueError: df_pypy=parse(pypy_path,cols=py_fp_cols2)
 
     df=pd.concat( [df_O0,df_O1,df_O3novec,df_O3,df_pypy], keys=["-O0","-O1","-O3 -fno-tree-vectorize","-O3","-O3","Python"], names=["gcc opts"] )
     df.reset_index().set_index( ["interpreter","benchmark","gcc opts","version"] ).sort_index(level=1).to_excel("/tmp/polybench_python.xls")

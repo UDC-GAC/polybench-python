@@ -6,6 +6,7 @@ import seaborn as sns
 c_cols = ["cycles","inst","stalls","l1h","l1m","l2m","l3m","br","brmissp","scalard","p128d","p256d","loads","stores"]
 abbrv_c_cols = ["cycles","inst","stalls","l1h","l1m","l2m","l3m","br","brmissp","loads","stores"]
 py_cols= ["inst","cycles","stalls","l1m","l2m","l3m","br","brmissp","scalars","scalard","vecs","vecd","loads","stores"]
+py_fp_cols2= ["inst","cycles","stalls","l1m","l2m","l3m","br","brmissp","scalard","p128d","p256d","loads","stores"]
 
 def parse( path, cols=c_cols ):
     f = open( path, "r" )
@@ -94,11 +95,13 @@ if __name__ == "__main__":
     pypy_path = results_folder + "/pypy-run-all.out"
     map( nofile_error, [c_o0_path,c_o1_path,c_o3_path,c_o3_novec_path,pypy_path] )
 
-    df_O0=parse(c_o0_path,cols=abbrv_c_cols)
+    try: df_O0=parse(c_o0_path,cols=abbrv_c_cols)
+    except ValueError: df_O0=parse(c_o0_path,cols=c_cols)
     df_O1=parse(c_o1_path,cols=c_cols)
     df_O3=parse(c_o3_path,cols=c_cols)
     df_O3novec=parse(c_o3_novec_path,cols=c_cols)
-    df_pypy=parse(pypy_path,cols=py_cols)
+    try: df_pypy=parse(pypy_path,cols=py_cols)
+    except ValueError: df_pypy=parse(pypy_path,cols=py_fp_cols2)
 
     df=pd.concat( [df_O0,df_O1,df_O3novec,df_O3,df_pypy], keys=["-O0","-O1","-O3 -fno-tree-vectorize","-O3","Python"], names=["gcc opts"] )
     df.reset_index().set_index( ["interpreter","benchmark","gcc opts","version"] ).sort_index(level=1).to_excel("/tmp/polybench_python.xls")
@@ -139,4 +142,5 @@ if __name__ == "__main__":
     df_tex = df2.stack().unstack([1,2,3])
     df_tex.columns = pd.Index( df_tex.columns )
     df_tex.rename( columns={ ('C', '-O1', 'baseline'): "gcc -O1", ('C', '-O3 -fno-tree-vectorize', 'baseline'): "gcc -O3 -novec", ('C', '-O3', 'baseline'):"gcc -O3", ('PyPy', 'Python', 'list'):"PyPy nested lists", ('PyPy', 'Python', 'list_flattened'): "PyPy", ('PyPy','Python','load_elimination'): "PyPy w/LE", ("C","-O0","baseline"): "gcc -O0" }, inplace=True )
-    df_tex.stack().unstack(1).drop( ["p128d","p256d","scalard","l1h","scalars","vecs","vecd"], axis=1 ).unstack().loc[shape_3].T.to_latex( "tab-shape3.tex", float_format="%.3g", na_rep="n/a" )
+    try: df_tex.stack().unstack(1).drop( ["p128d","p256d","scalard","l1h","scalars","vecs","vecd"], axis=1 ).unstack().loc[shape_3].T.to_latex( "tab-shape3.tex", float_format="%.3g", na_rep="n/a" )
+    except KeyError: df_tex.stack().unstack(1).drop( ["p128d","p256d","scalard","l1h"], axis=1 ).unstack().loc[shape_3].T.to_latex( "tab-shape3.tex", float_format="%.3g", na_rep="n/a" )

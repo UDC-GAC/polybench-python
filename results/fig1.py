@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 c_cols = ["cycles","inst","stalls","l1h","l1m","l2m","l3m","br","brmissp","scalard","p128d","p256d","loads","stores"]
+abbrv_c_cols = ["cycles","inst","stalls","l1h","l1m","l2m","l3m","br","brmissp","loads","stores"]
 py_cols= ["inst","cycles","stalls","l1m","l2m","l3m","br","brmissp","scalars","scalard","vecs","vecd","loads","stores"]
 py_fp_cols= ["inst","cycles","stalls","l1m","l2m","l3m","br","brmissp","scalars_trash","scalard_trash","scalard","p128d","p256d","loads","stores"]
 py_fp_cols2= ["inst","cycles","stalls","l1m","l2m","l3m","br","brmissp","scalard","p128d","p256d","loads","stores"]
@@ -99,7 +100,8 @@ if __name__ == "__main__":
     df_O3=parse(c_o3_path,cols=c_cols)
     df_O3_prevector=parse(c_o3_prevector_path,cols=c_cols)
     df_O3novec=parse(c_o3_novec_path,cols=c_cols)
-    df_pypy=parse(pypy_path,cols=py_cols)
+    try: df_pypy=parse(pypy_path,cols=py_cols)
+    except ValueError: df_pypy = parse( pypy_path, cols=py_fp_cols2 )
     df_numpy=parse(numpy_path,cols=py_fp_cols2)
 
     df=pd.concat( [df_O3novec,df_O3,df_O3_prevector,df_pypy,df_numpy], keys=["-O3 -fno-tree-vectorize","-O3","-O3","Python","Python"], names=["gcc opts"] )
