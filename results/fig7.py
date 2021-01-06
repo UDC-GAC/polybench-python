@@ -79,8 +79,8 @@ def nofile_error( path ):
 
 if __name__ == "__main__":
     if len( sys.argv ) < 2:
-        print( "Usage: <whatever-fig.py> <results_folder> [output_image]" )
-        print( "\tGenerates the requested file into [output_image], or opens it on the screen" )
+        print( "Usage: <whatever-fig.py> <results_folder>" )
+        print( "\tGenerates the appropriate image and tables into <results_folder>" )
         sys.exit(0)
 
     results_folder = sys.argv[1]
@@ -100,7 +100,8 @@ if __name__ == "__main__":
     df_O1=parse(c_o1_path,cols=c_cols)
     df_O3=parse(c_o3_path,cols=c_cols)
     df_O3novec=parse(c_o3_novec_path,cols=c_cols)
-    df_pypy=parse(pypy_path,cols=py_fp_cols2)
+    try: df_pypy=parse(pypy_path,cols=py_cols)
+    except ValueError: df_pypy=parse(pypy_path,cols=py_fp_cols2)
 
     df=pd.concat( [df_O0,df_O1,df_O3novec,df_O3,df_pypy], keys=["-O0","-O1","-O3 -fno-tree-vectorize","-O3","Python"], names=["gcc opts"] )
     df.reset_index().set_index( ["interpreter","benchmark","gcc opts","version"] ).sort_index(level=1).to_excel("/tmp/polybench_python.xls")
@@ -139,14 +140,11 @@ if __name__ == "__main__":
     plt.ylabel( "Normalized axis" )
     plt.axhline( 1.0, linestyle="--", color="k", linewidth=.5, label="gcc -O3 -fno-tree-vectorize" )
     plt.legend()
-    if len(sys.argv) > 2:
-        plt.savefig( sys.argv[2], bbox_inches='tight' )
-    else:
-        plt.show()
+    plt.savefig( results_folder+"/fig7.pdf", bbox_inches='tight' )
 
     # Sanitize df5 to generate the table for the appendix
     df_tex = df2.stack().unstack([1,2,3])
     df_tex.columns = pd.Index( df_tex.columns )
     df_tex.rename( columns={ ('C', '-O1', 'baseline'): "gcc -O1", ('C', '-O3 -fno-tree-vectorize', 'baseline'): "gcc -O3 -novec", ('C', '-O3', 'baseline'):"gcc -O3", ('PyPy', 'Python', 'list'):"PyPy nested lists", ('PyPy', 'Python', 'list_flattened'): "PyPy", ('PyPy','Python','load_elimination'): "PyPy w/LE", ("C","-O0","baseline"): "gcc -O0" }, inplace=True )
-    try: df_tex.stack().unstack(1).drop( ["p128d","p256d","scalard","l1h","scalars","vecs","vecd"], axis=1 ).unstack().loc[shape_2].T.to_latex( "tab-shape2.tex", float_format="%.3g", na_rep="n/a" )
-    except KeyError: df_tex.stack().unstack(1).drop( ["p128d","p256d","scalard","l1h"], axis=1 ).unstack().loc[shape_2].T.to_latex( "tab-shape2.tex", float_format="%.3g", na_rep="n/a" )
+    try: df_tex.stack().unstack(1).drop( ["p128d","p256d","scalard","l1h","scalars","vecs","vecd"], axis=1 ).unstack().loc[shape_2].T.to_latex( results_folder+"/tab-shape2.tex", float_format="%.3g", na_rep="n/a" )
+    except KeyError: df_tex.stack().unstack(1).drop( ["p128d","p256d","scalard","l1h"], axis=1 ).unstack().loc[shape_2].T.to_latex( results_folder+"/tab-shape2.tex", float_format="%.3g", na_rep="n/a" )

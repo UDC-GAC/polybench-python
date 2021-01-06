@@ -1,0 +1,92 @@
+\documentclass{article}
+
+\usepackage[pdftex]{graphicx}
+\usepackage{booktabs}
+\usepackage{geometry}
+
+   \geometry{twoside=true, head=13pt,
+     paperwidth=8.5in, paperheight=11in,
+     includeheadfoot=false, columnsep=2pc,
+     top=1in, bottom=1in, inner=0.75in, outer=0.75in,
+     marginparwidth=2pc,heightrounded
+     }%
+
+\begin{document}
+
+\begin{figure}[h!tb]
+	\includegraphics[width=\columnwidth]{fig1.pdf}
+	\caption{Figure 1 in the paper}
+\end{figure}
+
+\begin{figure}[h!tb]
+	\includegraphics[width=\columnwidth]{fig4.pdf}
+	\caption{Figure 4 in the paper}
+\end{figure}
+
+\begin{figure}[h!tb]
+	\includegraphics[width=\columnwidth]{fig5.pdf}
+	\caption{Figure 5 in the paper}
+\end{figure}
+
+\begin{figure}[h!tb]
+	\includegraphics[width=\columnwidth]{fig7.pdf}
+	\caption{Figure 7 in the paper}
+\end{figure}
+
+\begin{figure}[h!tb]
+	\includegraphics[width=\columnwidth]{fig9.pdf}
+	\caption{Figure 9 in the paper}
+\end{figure}
+
+\begin{figure}[h!tb]
+	\includegraphics[width=\columnwidth]{fig10.pdf}
+	\caption{Figure 10 in the paper}
+\end{figure}
+
+\begin{figure}[h!tb]
+	\includegraphics[width=\columnwidth]{fig11.pdf}
+	\caption{Figure 11 in the paper}
+\end{figure}
+
+\begin{figure}[h!tb]
+	\includegraphics[width=\columnwidth]{fig12.pdf}
+	\caption{Figure 12 in the paper}
+\end{figure}
+
+\clearpage
+\begin{table*}
+\caption{Table 2 in the paper}
+\scriptsize\input{tab-shape1.tex}
+\end{table*}
+
+\begin{table*}
+	\caption{Table 3 in the paper}
+\scriptsize\input{tab-shape2.tex}
+\end{table*}
+
+\begin{table*}
+	\caption{Table 4 in the paper}
+	\scriptsize\input{tab-shape3.tex}
+\end{table*}
+
+\begin{table*}
+	\caption{Table 5 in the paper}
+	\scriptsize\input{tab-numpy.tex}
+\end{table*}
+
+\begin{table*}
+	\caption{Table 6 in the paper}
+	\scriptsize\input{tab-pocc-maxfuse.tex}
+\end{table*}
+
+\begin{table*}
+	\caption{Table 7 in the paper}
+	\scriptsize\input{tab-pocc-fusion.tex}
+\end{table*}
+
+\begin{table*}
+	\caption{Table 8 in the paper}
+	\scriptsize\input{tab-pocc-vectorizer.tex}
+\end{table*}
+
+\end{document}

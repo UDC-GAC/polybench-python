@@ -79,8 +79,8 @@ def nofile_error( path ):
 
 if __name__ == "__main__":
     if len( sys.argv ) < 2:
-        print( "Usage: <whatever-fig.py> <results_folder> [output_image]" )
-        print( "\tGenerates the requested file into [output_image], or opens it on the screen" )
+        print( "Usage: <whatever-fig.py> <results_folder>" )
+        print( "\tGenerates the appropriate images and tables into <results_folder>" )
         sys.exit(0)
 
     results_folder = sys.argv[1]
@@ -138,14 +138,11 @@ if __name__ == "__main__":
     plt.ylabel( "Normalized axis" )
     plt.axhline( 1.0, linestyle="--", color="k", linewidth=.5, label="gcc -O3 -fno-tree-vectorize" )
     plt.legend()
-    if len(sys.argv) > 2:
-        plt.savefig( sys.argv[2], bbox_inches='tight' )
-    else:
-        plt.show()
+    plt.savefig( results_folder + "/fig12.pdf", bbox_inches='tight' )
 
     # Sanitize df2 to generate the table for the appendix
     df_tex = df3.stack().unstack([1,2,3])
     df_tex.columns = pd.Index( df_tex.columns )
     df_tex.rename( columns={ ('C', '-O1', 'baseline'): "gcc -O1", ('C', '-O3 -fno-tree-vectorize', 'baseline'): "gcc -O3 -fno-tree-vectorize", ('C', '-O3', 'baseline'):"gcc -O3", ('PyPy', 'Python', 'list'):"PyPy nested lists", ('PyPy', 'Python', 'list_flattened'): "PyPy", ('PyPy','Python','load_elimination'): "PyPy with manual load elimination", ('CPython','Python','numpy'):'CPython/NumPy' }, inplace=True )
-    try: df_tex['CPython/NumPy'].unstack().drop( ["p128d","p256d","scalard","l1h","scalars","vecs","vecd"], axis=1 ).to_latex( "tab-numpy.tex", float_format="%.3g", na_rep="n/a" )
-    except KeyError: df_tex['CPython/NumPy'].unstack().drop( ["p128d","p256d","scalard","l1h"], axis=1 ).to_latex( "tab-numpy.tex", float_format="%.3g", na_rep="n/a" )
+    try: df_tex['CPython/NumPy'].unstack().drop( ["p128d","p256d","scalard","l1h","scalars","vecs","vecd"], axis=1 ).to_latex( results_folder+"/tab-numpy.tex", float_format="%.3g", na_rep="n/a" )
+    except KeyError: df_tex['CPython/NumPy'].unstack().drop( ["p128d","p256d","scalard","l1h"], axis=1 ).to_latex( results_folder+"/tab-numpy.tex", float_format="%.3g", na_rep="n/a" )

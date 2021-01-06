@@ -79,8 +79,8 @@ def nofile_error( path ):
 
 if __name__ == "__main__":
     if len( sys.argv ) < 2:
-        print( "Usage: <whatever-fig.py> <results_folder> [output_image]" )
-        print( "\tGenerates the requested file into [output_image], or opens it on the screen" )
+        print( "Usage: <whatever-fig.py> <results_folder>" )
+        print( "\tGenerates the appropriate image and tables into <results_folder>" )
         sys.exit(0)
 
     results_folder = sys.argv[1]
@@ -137,9 +137,4 @@ if __name__ == "__main__":
     df5[sel_columns].T.plot(kind="bar",logy=False, colormap=sns.light_palette( "crimson", as_cmap=True ), edgecolor="k", rot=0 )
     plt.axhline(1.0, linestyle="--", color="k", linewidth=.5 )
     plt.ylabel( "Normalized axis" )
-
-    if len(sys.argv) > 2:
-        plt.savefig( sys.argv[2], bbox_inches='tight' )
-    else:
-        plt.show()
-
+    plt.savefig( results_folder+"/fig4.pdf", bbox_inches='tight' )

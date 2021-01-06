@@ -3,7 +3,7 @@
 
 ########################### Edit as needed
 iterations = 5
-dataset_size = "MINI" # This is the standard PolyBench size, used in the experiments in the paper
+dataset_size = "LARGE" # This is the standard PolyBench size, used in the experiments in the paper
 c_compiler = "/usr/bin/gcc"
 O0_options = "-O0"
 O1_options = "-O1"

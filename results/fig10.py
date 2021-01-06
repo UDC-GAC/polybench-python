@@ -79,8 +79,8 @@ def nofile_error( path ):
 
 if __name__ == "__main__":
     if len( sys.argv ) < 2:
-        print( "Usage: <whatever-fig.py> <results_folder> [output_image]" )
-        print( "\tGenerates the requested file into [output_image], or opens it on the screen" )
+        print( "Usage: <whatever-fig.py> <results_folder>" )
+        print( "\tGenerates the appropriate images and tables into <results_folder>" )
         sys.exit(0)
 
     results_folder = sys.argv[1]
@@ -143,18 +143,15 @@ if __name__ == "__main__":
     plt.ylabel( "Normalized axis" )
     plt.axhline( 1.0, linestyle="--", color="k", linewidth=.5, label="gcc -O3 -fno-tree-vectorize" )
     plt.legend()
-    if len(sys.argv) > 2:
-        plt.savefig( sys.argv[2], bbox_inches='tight' )
-    else:
-        plt.show()
+    plt.savefig( results_folder + "/fig10.pdf", bbox_inches='tight' )
 
     # Sanitize df5 to generate the table for the appendix
     df_tex = df2.stack().unstack([1,2,3])
     df_tex.columns = pd.Index( df_tex.columns )
     df_tex.rename( columns={ ('C', '-O1', 'baseline'): "gcc -O1", ('C', '-O3 -fno-tree-vectorize', 'baseline'): "gcc -O3 -fno-tree-vectorize", ('C', '-O3', 'baseline'):"gcc -O3", ('PyPy', 'Python', 'list'):"PyPy nested lists", ('PyPy', 'Python', 'list_flattened'): "PyPy", ('PyPy','Python','load_elimination'): "PyPy with manual load elimination", ('CPython','Python','numpy'):'CPython/NumPy', ("PyPy","Python","list_flattened_pluto"): "fusion", ("PyPy","Python","pluto_vectorizer"): "vectorizer", ("PyPy","Python","pluto_maxfuse"): "maxfuse" }, inplace=True )
-    try: df_tex["maxfuse"].unstack().drop( ["p128d","p256d","scalard","scalars","vecs","vecd","scalars_trash","scalard_trash"], axis=1 ).to_latex( "tab-pocc-maxfuse.tex", float_format="%.3g", na_rep="n/a" )
-    except KeyError: df_tex["maxfuse"].unstack().drop( ["p128d","p256d","scalard"], axis=1 ).to_latex( "tab-pocc-maxfuse.tex", float_format="%.3g", na_rep="n/a" )
-    try: df_tex["fusion"].unstack().drop( ["p128d","p256d","scalard","scalars","vecs","vecd","scalars_trash","scalard_trash"], axis=1 ).to_latex( "tab-pocc-fusion.tex", float_format="%.3g", na_rep="n/a" )
-    except KeyError: df_tex["fusion"].unstack().drop( ["p128d","p256d","scalard"], axis=1 ).to_latex( "tab-pocc-fusion.tex", float_format="%.3g", na_rep="n/a" )
-    try: df_tex["vectorizer"].unstack().drop( ["p128d","p256d","scalard","scalars","vecs","vecd","scalars_trash","scalard_trash"], axis=1 ).to_latex( "tab-pocc-vectorizer.tex", float_format="%.3g", na_rep="n/a" )
-    except KeyError: df_tex["vectorizer"].unstack().drop( ["p128d","p256d","scalard"], axis=1 ).to_latex( "tab-pocc-vectorizer.tex", float_format="%.3g", na_rep="n/a" )
+    try: df_tex["maxfuse"].unstack().drop( ["p128d","p256d","scalard","scalars","vecs","vecd","scalars_trash","scalard_trash"], axis=1 ).to_latex( results_folder+"/tab-pocc-maxfuse.tex", float_format="%.3g", na_rep="n/a" )
+    except KeyError: df_tex["maxfuse"].unstack().drop( ["p128d","p256d","scalard"], axis=1 ).to_latex( results_folder + "/tab-pocc-maxfuse.tex", float_format="%.3g", na_rep="n/a" )
+    try: df_tex["fusion"].unstack().drop( ["p128d","p256d","scalard","scalars","vecs","vecd","scalars_trash","scalard_trash"], axis=1 ).to_latex( results_folder+"/tab-pocc-fusion.tex", float_format="%.3g", na_rep="n/a" )
+    except KeyError: df_tex["fusion"].unstack().drop( ["p128d","p256d","scalard"], axis=1 ).to_latex( results_folder+"/tab-pocc-fusion.tex", float_format="%.3g", na_rep="n/a" )
+    try: df_tex["vectorizer"].unstack().drop( ["p128d","p256d","scalard","scalars","vecs","vecd","scalars_trash","scalard_trash"], axis=1 ).to_latex( results_folder+"/tab-pocc-vectorizer.tex", float_format="%.3g", na_rep="n/a" )
+    except KeyError: df_tex["vectorizer"].unstack().drop( ["p128d","p256d","scalard"], axis=1 ).to_latex( results_folder+"/tab-pocc-vectorizer.tex", float_format="%.3g", na_rep="n/a" )
