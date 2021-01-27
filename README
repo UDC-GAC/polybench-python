@@ -33,8 +33,8 @@ fair side-by-side comparison of Python-based implementations.
 Available benchmarks (PolyBench/Python v1.0)
 
 Benchmark       Description
-2mm             2 Matrix Multiplications (alpha * A * B * C + beta * D)
-3mm             3 Matrix Multiplications ((A*B)*(C*D))
+_2mm            2 Matrix Multiplications (alpha * A * B * C + beta * D)
+_3mm            3 Matrix Multiplications ((A*B)*(C*D))
 adi             Alternating Direction Implicit solver
 atax            Matrix Transpose and Vector Multiplication
 bicg            BiCG Sub Kernel of BiCGStab Linear Solver
@@ -63,6 +63,10 @@ syr2k           Symmetric rank-2k update
 syrk            Symmetric rank-k update
 trisolv         Triangular solver
 trmm            Triangular matrix-multiply
+
+
+Note that, due to Python's restrictions in package naming, the "2mm" and "3mm"
+kernels from PoylBench/C have been renamed to "_2mm" and "_3mm", respectively.
 
 
 Installation
@@ -105,7 +109,8 @@ configure the benchmark runs:
 
 
     --polybench-options OPTIONS
-        A comma separated list of options passed to PolyBench. Available options are:
+        A comma separated list of options passed to PolyBench. Available options
+	are:
 
         * POLYBENCH_TIME: (default off) prints the time elapsed during the
           execution of the kernel's code in seconds.
@@ -114,12 +119,13 @@ configure the benchmark runs:
         * POLYBENCH_PADDING_FACTOR: (default 0) adds N elements at the end of
           every array's dimension.
         * POLYBENCH_PAPI: (default off) enables PAPI counters. This will not
-          work when POLYBENCH_TIME is enabled. Edit "papi_counters.list", and add 1
-          line per event to monitor. Each line (including the last one) must finish
-          with a ',' and both native and standard events are supported.
+          work when POLYBENCH_TIME is enabled. Edit "papi_counters.list", and
+	  add 1 line per event to monitor. Each line (including the last one)
+	  must finish with a ',' and both native and standard events are
+	  supported.
 
-          The whole kernel is run one time per counter (no multiplexing) and there is
-          no sampling being used for the counter value.
+          The whole kernel is run one time per counter (no multiplexing) and
+	  there is no sampling being used for the counter value.
         * POLYBENCH_PAPI_VERBOSE: (default false) print the PAPI counter name
           next to its value.
         * POLYBENCH_CACHE_SIZE_KB: (default 32770) the size, in KiloBytes, of
@@ -139,24 +145,25 @@ configure the benchmark runs:
         benchmark implementation.
 
     --output-array OUTPUT_ARRAY
-        Alias for POLYBENCH_DUMP_TARGET. Also enables POLYBENCH_DUMP_ARRAYS. Prints
-        the benchmarks result into a file. In order to print into the console use
-        either "stdout" or "stderr".
+        Alias for POLYBENCH_DUMP_TARGET. Also enables POLYBENCH_DUMP_ARRAYS.
+	Prints the benchmarks result into a file. In order to print into the
+	console use either "stdout" or "stderr".
 
     --verify-file VERIFY_FILE_NAME
         Verify the results of the benchmark against the results stored in a file.
         This option enables --output-array and makes the output file to target a
-        file name whose name matches the one passed by this argument, appending the
-        .verify suffix. When the benchmark terminates, its result is compared and a
-        message indicating the comparison result will be printed on "stdout".
+        file name whose name matches the one passed by this argument, appending
+	the .verify suffix. When the benchmark terminates, its result is
+	compare and a message indicating the comparison result will be printed
+	on "stdout".
 
     --verify-polybench-path VERIFY_POLYBENCH_PATH
-        Combined with --verify-file, this parameter allows to specify the path where
-        PolyBench/C is present to allow for automatic discovery of the appropriate
-        output file. Please note that the files containing the results of
-        PolyBench/C must already exist and must be next to where the actual
-        implementation resides. This is the default behavior when PolyBench/C is run
-        from Perl scripts.
+        Combined with --verify-file, this parameter allows to specify the path
+	where PolyBench/C is present to allow for automatic discovery of the
+	appropriate output file. Please note that the files containing the
+	results of PolyBench/C must already exist and must be next to where the
+	actual implementation resides. This is the default behavior when
+	PolyBench/C is run from Perl scripts.
 
     --iterations ITERATIONS
         Performs N runs of the benchmark.
