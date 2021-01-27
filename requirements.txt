@@ -1,4 +1,4 @@
-inline~=0.0.1
-inlineasm~=0.0.3
-numpy~=1.18.4
-python_papi~=5.5.1
+inline
+inlineasm
+numpy
+python_papi
