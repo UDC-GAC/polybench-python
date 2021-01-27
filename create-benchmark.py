@@ -11,6 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Author:
+#    Miguel Ángel Abella González <miguel.abella@udc.es>
+#
+# Contact:
+#    Gabriel Rodríguez <gabriel.rodriguez@udc.es>
+
 
 """This utility simplifies the task of creating a new benchmark.
 
