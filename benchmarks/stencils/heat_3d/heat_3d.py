@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Author:
+# Authors:
 #    Miguel Ángel Abella González <miguel.abella@udc.es>
+#    Gabriel Rodríguez <gabriel.rodriguez@udc.es>
 #
 # Contact:
 #    Gabriel Rodríguez <gabriel.rodriguez@udc.es>
