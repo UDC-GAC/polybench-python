@@ -1,132 +1,182 @@
-PolyBench/Python v0.0
+PolyBench/Python v1.0
 
 Copyright (c) 2020 Universidade da Coruña.
 
-Contact:
+Author:
     Miguel Ángel Abella González <miguel.abella@udc.es>
 
-PolyBench/Python is the reimplementation of PolyBench in the Python
-programming language. It is a benchmark suite of 30 numerical computations
-with static control flow, extracted from operations in various application
-domains (linear algebra computations, image processing, physics simulation,
-dynamic programming, statistics, etc.).
+Contact:
+    Gabriel Rodríguez <gabriel.rodriguez@udc.es>
+
+Citing:
+    To cite PolyBench/Python in your work, please cite:
+
+    M.Á. Abella-González, P. Carollo-Fernández, L.-N. Pouchet, F. Rastello,
+    G. Rodríguez. "PolyBench/Python: Benchmarking Python Environments with
+    Polyhedral Optimizations". ACM SIGPLAN 2021 International Conference on
+    Compiler Construction, CC 2021. doi https://doi.org/10.1145/3446804.3446842.
 
 
-System requirements:
-------------------------------------------------------------------------------
-Runtime:
-    - Linux operating system running on x86 or AMD64 (the later recommended)
-    - Python 3.6 or newer (CPython 3.8 and PyPy 7.3.1 (Python 3.6.9) tested)
 
-Dependencies:
-    - Python development packages for the selected interpreter(s)
-    - GNU C compiler
-    - NASM
+PolyBench/Python is the reimplementation of PolyBench in the Python programming
+language. It is a benchmark suite of 30 numerical computations with static 
+control flow, extracted from operations in various application domains (linear
+algebra computations, image processing, physics simulation, dynamic programming,
+statistics, etc.).
 
-Optional:
-    - Python virtualenv
+PolyBench/Python v1.0 is an exact mirror of the 30 kernel in PolyBench/C 4.2 by
+L.-N. Pouchet and T. Yuki 
+(https://sourceforge.net/projects/polybench/files/polybench-c-4.2.1-beta.tar.gz/download)
+in terms of computation performed, problem sizes, and data types. This enables
+fair side-by-side comparison of Python-based implementations.
+
+Available benchmarks (PolyBench/Python v1.0)
+
+Benchmark       Description
+2mm             2 Matrix Multiplications (alpha * A * B * C + beta * D)
+3mm             3 Matrix Multiplications ((A*B)*(C*D))
+adi             Alternating Direction Implicit solver
+atax            Matrix Transpose and Vector Multiplication
+bicg            BiCG Sub Kernel of BiCGStab Linear Solver
+cholesky        Cholesky Decomposition
+correlation     Correlation Computation
+covariance      Covariance Computation
+deriche         Edge detection filter
+doitgen         Multi-resolution analysis kernel (MADNESS)
+durbin          Toeplitz system solver
+fdtd-2d         2-D Finite Different Time Domain Kernel
+floyd-warshall  Graph shortest path length
+gemm            Matrix-multiply C=alpha.A.B+beta.C
+gemver          Vector Multiplication and Matrix Addition
+gesummv         Scalar, Vector and Matrix Multiplication
+gramschmidt     Gram-Schmidt decomposition
+head-3d         Heat equation over 3D data domain
+jacobi-1D       1-D Jacobi stencil computation
+jacobi-2D       2-D Jacobi stencil computation
+lu              LU decomposition
+ludcmp          LU decomposition followed by Forward Substitution
+mvt             Matrix Vector Product and Transpose
+nussinov        Dynamic programming algorithm for sequence alignment
+seidel          2-D Seidel stencil computation
+symm            Symmetric matrix-multiply
+syr2k           Symmetric rank-2k update
+syrk            Symmetric rank-k update
+trisolv         Triangular solver
+trmm            Triangular matrix-multiply
 
 
 Installation
-------------------------------------------------------------------------------
-This section asumes a Linux distribution. Other Unix-like operating systems
-may work up to some extent, but PolyBench/Python relies on some Linux-specific
-system calls for some of its options which probably will not be available in
-other platforms.
+--------------------------------------------------------------------------------
 
-Installing system dependencies using package managers
+PolyBench/Python requires a function Python 3 installation. Refer to your system
+documentation to install it. After Python is available, the distribution 
+includes a "requirements.txt" file which can be used by pip to
+install the required dependences:
 
-    On Debian and derivatives (Ubuntu, etc.)
-        $ sudo apt install python3 python3-dev
-        $ sudo apt install pypy3 pypy3-dev
-        $ sudo apt install libpapi-dev
-        $ sudo apt install gcc nasm
-        $ sudo apt install python3-virtualenv
+    $ python -m pip install -r requirements.txt
 
-    On Red-Hat based systems (Fedora, CentOS, etc.)
-        $ sudo dnf install python3 python3-devel
-        $ sudo dnf install pypy3 pypy3-devel
-        $ sudo dnf install papi-devel
-        $ sudo dnf install gcc nasm
-        $ sudo dnf install python3-virtualenv
+In order to test that the basic functionalities are working, a test run can be
+launched:
 
+    $ python run-benchmark.py benchmarks/datamining/correlation/correlation.py --dataset-size MINI
+Running benchmarks.datamining.correlation.correlation
+  Start time: 2021-01-27 09:58:18
+  Interpreter: CPython
+  Options: 
+    (iterations, 1)
+    ('POLYBENCH_TIME', False)
+    ('POLYBENCH_CYCLE_ACCURATE_TIMER', False)
+    ('POLYBENCH_PAPI', False)
+    ('POLYBENCH_ARRAY_IMPLEMENTATION', <ArrayImplementation.LIST: 1>)
 
-Installing PolyBench/Python dependencies
-    At the root level of PolyBench/Python (where this README file is):
-        $ pip install -r requirements.txt --user
-
-    This will install all required packages for the active user. It may take
-    some time for compiling dependencies.
-
-    Alternatively, it is recommended to issue the previous command on a
-    Python virtual environment. At the root level of PolyBench/Python issue
-    the following set of commands for creating a virtual environment for a
-    given interpreter...
-        For CPython3:
-            $ virtualenv -p `which python3` venv-cpython
-        For PyPy3:
-            $ virtualenv -p `which pypy3` venv-pypy
-    Once the virtual environment is created, activate it and issue the
-    instalation commands on it. For instance, using the previously created
-    virtual environment for PyPy3:
-        $ source venv-pypy/bin/activate
-        (venv-pypy) $ pip install -r requirements.txt
-
-    Note: once inside a virtual environment, the command "python" is aliased
-        to the selected interpreted of the virtual environment.
+If this command runs without error, everything should be in working order.
 
 
 Usage:
-------------------------------------------------------------------------------
-There are two main tools in PolyBench/Python, both implemented in Python. Both
-are command line tools accepting the help option (both -h and --help) which
-prints some useful usage information and available options.
+--------------------------------------------------------------------------------
 
-create-benchmark.py
-    Allows to create a new benchmark given a benchmark name and a category
-    where to locate it. For instance, for creating the "correlation" benchmark
-    on the "datamining" category:
-        $ python create-benchmark.py -C datamining/correlation -N Correlation
+The "run-benchmark.py" scripts provides a set of options that can be used to
+configure the benchmark runs:
 
-run-benchmark.py
-    Allows to run one or all benchmarks by issuing a single command, accepting
-    a set of options which may alter the execution behavior.
+    $ python run-benchmark.py <benchmark> [options]
 
-    Some usage examples of this tool:
-    - List existing benchmarks:
-        $ python run-benchmark.py
+<benchmark> needs to be one of the ".py" files in the subfolders of the 
+"benchmark/" folder. Options are as follows:
 
-    - Running an existing benchmark:
-        $ python run-benchmark.py benchmarks/datamining/correlation/correlation.py
 
-    - Running an existing benchmark and printing the execution time:
-        $ python run-benchmark.py benchmarks/datamining/correlation/correlation.py --polybench-options POLYBENCH_TIME
+    --polybench-options OPTIONS
+        A comma separated list of options passed to PolyBench. Available options are:
 
-    - Verifying a benchmark's implementation against a compatible output file
-      named "bench.out":
-        $ python run-benchmark.py benchmarks/datamining/correlation/correlation.py --verify-file bench.out
+        * POLYBENCH_TIME: (default off) prints the time elapsed during the
+          execution of the kernel's code in seconds.
+        * POLYBENCH_DUMP_ARRAYS: (default false) outputs the returning arrays of
+          the benchmark into stderr.
+        * POLYBENCH_PADDING_FACTOR: (default 0) adds N elements at the end of
+          every array's dimension.
+        * POLYBENCH_PAPI: (default off) enables PAPI counters. This will not
+          work when POLYBENCH_TIME is enabled. Edit "papi_counters.list", and add 1
+          line per event to monitor. Each line (including the last one) must finish
+          with a ',' and both native and standard events are supported.
 
-    Available PolyBench options (--polybench-options):
-        POLYBENCH_TIME: (default off) prints the time elapsed during the
-            execution of the kernel's code in seconds.
-        POLYBENCH_DUMP_ARRAYS: (default false) outputs the returning arrays of
-            the benchmark into stderr.
-        POLYBENCH_PADDING_FACTOR: (default 0) adds N elements at the end of
-            every array's dimension.
-        POLYBENCH_PAPI: (default off) enables PAPI counters. This will not
-            work when POLYBENCH_TIME is enabled
-        POLYBENCH_PAPI_VERBOSE: (default false) print the PAPI counter name
-            next to its value.
-        POLYBENCH_CACHE_SIZE_KB: (default 32770) the size, in KiloBytes, of
-            the data structure used for flushing the cache.
-        POLYBENCH_NO_FLUSH_CACHE: (default flush) disable cache flushing.
-        POLYBENCH_CYCLE_ACCURATE_TIMER: (default false) use the processor's
-            timestamp counter (TSC) on compatible systems.
-        POLYBENCH_LINUX_FIFO_SCHEDULER: (default false) use the FIFO scheduler
-            for this process. This requires superuser privilege.
+          The whole kernel is run one time per counter (no multiplexing) and there is
+          no sampling being used for the counter value.
+        * POLYBENCH_PAPI_VERBOSE: (default false) print the PAPI counter name
+          next to its value.
+        * POLYBENCH_CACHE_SIZE_KB: (default 32770) the size, in KiloBytes, of
+          the data structure used for flushing the cache.
+        * POLYBENCH_NO_FLUSH_CACHE: (default flush) disable cache flushing.
+        * POLYBENCH_CYCLE_ACCURATE_TIMER: (default false) use the processor's
+          timestamp counter (TSC) on compatible systems.
+        * POLYBENCH_LINUX_FIFO_SCHEDULER: (default false) use the FIFO scheduler
+          for this process. This requires superuser privilege.
 
-    Examples using multiple polybench options:
-    - Printing verbose PAPI counters:
-        $ python run-benchmark.py benchmarks/datamining/correlation/correlation.py --polybench-options POLYBENCH_PAPI,POLYBENCH_PAPI_VERBOSE
-    - Print the execution time and use a larger cache flush size:
-        $ python run-benchmark.py benchmarks/datamining/correlation/correlation.py --polybench-options POLYBENCH_TIME,POLYBENCH_CACHE_SIZE_KB=65538
+    --dataset-size DATASET_SIZE
+        Specify a working dataset size to use from "polybench.spec" file. Valid
+        values are:"MINI", "SMALL", "MEDIUM", "LARGE", "EXTRALARGE".
+
+    --save-results
+        Saves execution results into an automatically named file next to the
+        benchmark implementation.
+
+    --output-array OUTPUT_ARRAY
+        Alias for POLYBENCH_DUMP_TARGET. Also enables POLYBENCH_DUMP_ARRAYS. Prints
+        the benchmarks result into a file. In order to print into the console use
+        either "stdout" or "stderr".
+
+    --verify-file VERIFY_FILE_NAME
+        Verify the results of the benchmark against the results stored in a file.
+        This option enables --output-array and makes the output file to target a
+        file name whose name matches the one passed by this argument, appending the
+        .verify suffix. When the benchmark terminates, its result is compared and a
+        message indicating the comparison result will be printed on "stdout".
+
+    --verify-polybench-path VERIFY_POLYBENCH_PATH
+        Combined with --verify-file, this parameter allows to specify the path where
+        PolyBench/C is present to allow for automatic discovery of the appropriate
+        output file. Please note that the files containing the results of
+        PolyBench/C must already exist and must be next to where the actual
+        implementation resides. This is the default behavior when PolyBench/C is run
+        from Perl scripts.
+
+    --iterations ITERATIONS
+        Performs N runs of the benchmark.
+
+    --array-implementation ARRAY_IMPLEMENTATION
+        Allows to select the internal array implementation in use.
+        * 0: Python nested Lists; (default)
+        * 1: Python List with flattened indexes; 
+        * 2: NumPy array.
+
+
+Funding:
+--------------------------------------------------------------------------------
+
+The development of PolyBench/Python was supported in part by the Ministry of 
+Science and Innovation of Spain (PID2019-104184RB-I00 / AEI / 10.13039/501100011033), 
+and by the U.S. National Science Foundation (award CCF-1750399). 
+
+Licensing:
+--------------------------------------------------------------------------------
+
+PolyBench/Python and all the files it contains are provided under an Apache 2.0
+License. A copy of the license is provided in the LICENSE file.
