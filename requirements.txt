@@ -2,3 +2,4 @@ inline
 inlineasm
 numpy
 python_papi
+nasm

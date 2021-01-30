@@ -79,6 +79,10 @@ install the required dependences:
 
     $ python -m pip install -r requirements.txt
 
+In addition to the basic Python system, timing functionalities require "nasm" to
+be installed. Please refer to your operating system documentation on how to
+install "nasm".
+
 In order to test that the basic functionalities are working, a test run can be
 launched:
 
